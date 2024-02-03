@@ -12,58 +12,63 @@ class Rank {
 		<div class="main_welcome">Hall of Fame 🏆</div>
 		<div class="rankers_box">
 			<div class="ranker_box">
-				<div class="rank first">1.</div>
-				<div class="friend_info">
+				<div class="rank_first">1.</div>
+				<div class="rank_info">
 					<div class="profile first bord_one"></div>
 					<div class="first">youngmch</div>
 				</div>
-				<div class="friend_status">
-					<div class="friend_status_msg __online">online</div>
-					<div class="friend_status_dot __online_dot"></div>
+				<div class="match_history">
+					<div class="history_big">10 games 🏓</div>
+					<div class="history_big">10 wins 😆</div>
+					<div class="history_big">0 loses 😮‍💨</div>
 				</div>
 			</div>
 			<div class="ranker_box">
-				<div class="rank second">2.</div>
-				<div class="friend_info">
+				<div class="rank_second">2.</div>
+				<div class="rank_info">
 					<div class="profile second bord_one"></div>
 					<div class="second">youngmch</div>
 				</div>
-				<div class="friend_status">
-					<div class="friend_status_msg __online">online</div>
-					<div class="friend_status_dot __online_dot"></div>
+				<div class="match_history">
+					<div class="history_big">10 games 🏓</div>
+					<div class="history_big">8 wins 😆</div>
+					<div class="history_big">2 loses 😮‍💨</div>
 				</div>
 			</div>
 			<div class="ranker_box">
-				<div class="rank third">3.</div>
-				<div class="friend_info">
+				<div class="rank_third">3.</div>
+				<div class="rank_info">
 					<div class="profile third bord_one"></div>
 					<div class="third">youngmch</div>
 				</div>
-				<div class="friend_status">
-					<div class="friend_status_msg __ingame">in game</div>
-					<div class="friend_status_dot __ingame_dot"></div>
+				<div class="match_history">
+					<div class="history_big">10 games 🏓</div>
+					<div class="history_big">6 wins 😆</div>
+					<div class="history_big">4 loses 😮‍💨</div>
 				</div>
 			</div>
 			<div class="ranker_box">
-				<div class="rank mid">4.</div>
-				<div class="friend_info">
+				<div class="mid">4.</div>
+				<div class="rank_info">
 					<div class="profile mid bord_one"></div>
 					<div class="mid">youngmch</div>
 				</div>
-				<div class="friend_status">
-					<div class="friend_status_msg __offline">offline</div>
-					<div class="friend_status_dot __offline_dot"></div>
+				<div class="match_history">
+					<div class="history_small">10 games 🏓</div>
+					<div class="history_small">3 wins 😆</div>
+					<div class="history_small">7 loses 😮‍💨</div>
 				</div>
 			</div>
 			<div class="ranker_box">
-				<div class="rank mid">5.</div>
-				<div class="friend_info">
+				<div class="mid">5.</div>
+				<div class="rank_info">
 					<div class="profile mid bord_one"></div>
 					<div class="mid">youngmch</div>
 				</div>
-				<div class="friend_status">
-					<div class="friend_status_msg __offline">offline</div>
-					<div class="friend_status_dot __offline_dot"></div>
+				<div class="match_history">
+					<div class="history_small">10 games 🏓</div>
+					<div class="history_small">1 wins 😆</div>
+					<div class="history_small">9 loses 😮‍💨</div>
 				</div>
 			</div>
 		</div>
