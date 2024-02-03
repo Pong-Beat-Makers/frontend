@@ -9,29 +9,41 @@ class Chat {
 			<button class="main_header_bar__tab gameBtn">Game</button>
 			<button class="main_header_bar__tab rankBtn">Rank</button>
 		</div>
-		<div class="main_welcome">Chatting page!</div>
-		<div class="main_body">
-			<ul class="main_list">
-				<li class="main_list_item">Rules of Pong</li>
-				<li class="main_list_item">How to play</li>
-				<li class="main_list_item">How to chat</li>
-				<li class="main_list_item">Tournament</li>
-			</ul>
+		<form id="chatRoomSearch">
+			<input id="chatRoomSearchInput" type="text" placeholder="search"/>
+			<button class="chatRoomSearchBtn">🔍</button>
+		</form>
+		<div class="chatroom_list">
+			<div class="chatroom">
+				<div class="empty"></div>
+				<div class="profile second"></div>
+				<div class="chat_contents">
+					<div class="chat_name">naki</div>
+					<div class="chat_msg">Hi Hi</div>
+				</div>
+				<div class="chat_time">오후 7시 16분</div>
+			</div>
+			<div class="chatroom">
+				<div class="empty"></div>
+				<div class="profile second"></div>
+				<div class="chat_contents">
+					<div class="chat_name">jeelee</div>
+					<div class="chat_msg">hello world</div>
+				</div>
+				<div class="chat_time">오후 7시 17분</div>
+			</div>
 		</div>
-		<footer>
-			<div class="footer_name">Team 42tsc</div>
-			<ul class="footer_list">
-				<li class="footer_list_item">hyeslim</li>
-				<li class="footer_list_item">youngmch</li>
-				<li class="footer_list_item">isunwoo</li>
-				<li class="footer_list_item">naki</li>
-				<li class="footer_list_item">jeelee</li>
-			</ul>
-			<div class="contacts">contacts: </div>
-		</footer>
 		`;
 	}
 }
 export default new Chat();
 
 window.addEventListener("click", handleClick);
+window.addEventListener("submit", handleSubmit);
+
+function handleSubmit(event) {
+	event.preventDefault();
+}
+
+// const chatroomSearchForm = document.getElementById("chatRoomSearch");
+// chatroomSearchForm.addEventListener("submit", handleSearchSubmit);

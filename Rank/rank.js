@@ -15,7 +15,7 @@ class Rank {
 				<div class="rank_first">1.</div>
 				<div class="rank_info">
 					<div class="profile first bord_one"></div>
-					<div class="first">youngmch</div>
+					<div class="first">hyeslim</div>
 				</div>
 				<div class="match_history">
 					<div class="history_big">10 games 🏓</div>
@@ -27,7 +27,7 @@ class Rank {
 				<div class="rank_second">2.</div>
 				<div class="rank_info">
 					<div class="profile second bord_one"></div>
-					<div class="second">youngmch</div>
+					<div class="second">isunwoo</div>
 				</div>
 				<div class="match_history">
 					<div class="history_big">10 games 🏓</div>
@@ -39,7 +39,7 @@ class Rank {
 				<div class="rank_third">3.</div>
 				<div class="rank_info">
 					<div class="profile third bord_one"></div>
-					<div class="third">youngmch</div>
+					<div class="third">jeelee</div>
 				</div>
 				<div class="match_history">
 					<div class="history_big">10 games 🏓</div>
@@ -51,7 +51,7 @@ class Rank {
 				<div class="mid">4.</div>
 				<div class="rank_info">
 					<div class="profile mid bord_one"></div>
-					<div class="mid">youngmch</div>
+					<div class="mid">naki</div>
 				</div>
 				<div class="match_history">
 					<div class="history_small">10 games 🏓</div>

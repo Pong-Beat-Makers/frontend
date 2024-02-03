@@ -19,15 +19,7 @@ class Home {
 			</ul>
 		</div>
 		<footer>
-			<div class="footer_name">Team 42tsc</div>
-			<ul class="footer_list">
-				<li class="footer_list_item">hyeslim</li>
-				<li class="footer_list_item">youngmch</li>
-				<li class="footer_list_item">isunwoo</li>
-				<li class="footer_list_item">naki</li>
-				<li class="footer_list_item">jeelee</li>
-			</ul>
-			<div class="contacts">contacts: </div>
+			<div class="footer">Made by: @hyeslim @isunwoo @jeelee @naki @youngmch</div>
 		</footer>
 		`;
 	}
