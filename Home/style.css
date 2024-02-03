@@ -33,6 +33,21 @@ header {
     font-size: 25px;
 }
 
+.logoutBtn {
+    all: unset;
+    cursor: pointer;
+    background-color: #ff8282;
+    padding: 5px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity linear .1s;
+    &:hover {
+        opacity: 0.8;
+    }
+}
+
 .profile_box {
     background-color: white;
     width: 200px;
@@ -77,12 +92,14 @@ section {
 }
 
 .profile_info_name {
+    margin-top: 20px;
     font-size: 17px;
     font-weight: 600;
     margin-bottom: 20px;
 }
 
 .friends_box {
+    margin-top: auto;
     background-color: #ffbcbc;
     padding: 10px;
     width: 90%;
@@ -158,10 +175,15 @@ main {
 }
 
 .main_header_bar__tab {
+    all: unset;
+    cursor: pointer;
     padding: 0 20px;
     height: 100%;
     display: flex;
     align-items: center;
+	&:hover {
+		align-items: flex-end;
+	}
 }
 
 .main_welcome {
@@ -219,4 +241,8 @@ footer {
 
 .__tab_active {
     border-bottom: 5px solid #9b6a6a;
+}
+
+.__hidden {
+    display: none;
 }

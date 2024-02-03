@@ -3,31 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Document</title>
+    <link rel="stylesheet" href="Home/style.css">
+    <link rel="stylesheet" href="Rank/style.css">
+    <!-- <link rel="stylesheet" href="Chat/style.css">
+    <link rel="stylesheet" href="Game/style.css">
+    <link rel="stylesheet" href="Login/style.css"> -->
+    <title>Transcendence</title>
 </head>
 <body>
     <div id="container">
-        <main>
-            <div class="wrapper">
-                <div class="item_one">
-                    42tsc_Pong logo
-                </div>
-                <div class="item_two">
-                    <div class="login_header">
-                        Login with
-                    </div>
-                    <div class="login_box">
-                        <div class="login_logo"></div>
-                        <div class="login_name">Google</div>
-                    </div>
-                    <div class="login_box">
-                        <div class="login_logo"></div>
-                        <div class="login_name">42 Network</div>
-                    </div>
-                </div>
+        <header>
+            <div class="header_item">
+                <div class="logo_img"></div>
+                <div class="logo_name">42tsc_Pong 🏓</div>
             </div>
-        </main>
+            <div class="header_item">
+                <button class="logoutBtn">Logout</button>
+                <!-- <div class="profile_box">
+                    <div class="profile_name">login_name</div>
+                    <div class="profile"></div>
+                </div> -->
+            </div>
+        </header>
+        <div class="wrapper">
+            <section>
+                <div class="profile big"></div>
+                <div class="profile_info">
+                    <div class="profile_info_name">hyeslim</div>
+                    <div class="profile_info_description">other informations like points. availability. rank ...</div>
+                </div>
+                <div class="friends_box">
+                    <div class="friend_header">friends</div>
+                    <div class="friend_box">
+                        <div class="friend_info">
+                            <div class="profile bord_one"></div>
+                            <div class="friend_box_name">youngmch</div>
+                        </div>
+                        <div class="friend_status">
+                            <div class="friend_status_msg __online">online</div>
+                            <div class="friend_status_dot __online_dot"></div>
+                        </div>
+                    </div>
+                    <div class="friend_box">
+                        <div class="friend_info">
+                            <div class="profile bord_one"></div>
+                            <div class="friend_box_name">youngmch</div>
+                        </div>
+                        <div class="friend_status">
+                            <div class="friend_status_msg __online">online</div>
+                            <div class="friend_status_dot __online_dot"></div>
+                        </div>
+                    </div>
+                    <div class="friend_box">
+                        <div class="friend_info">
+                            <div class="profile bord_one"></div>
+                            <div class="friend_box_name">youngmch</div>
+                        </div>
+                        <div class="friend_status">
+                            <div class="friend_status_msg __ingame">in game</div>
+                            <div class="friend_status_dot __ingame_dot"></div>
+                        </div>
+                    </div>
+                    <div class="friend_box">
+                        <div class="friend_info">
+                            <div class="profile bord_one"></div>
+                            <div class="friend_box_name">youngmch</div>
+                        </div>
+                        <div class="friend_status">
+                            <div class="friend_status_msg __offline">offline</div>
+                            <div class="friend_status_dot __offline_dot"></div>
+                        </div>
+                    </div>
+                    <div class="friend_box">
+                        <div class="friend_info">
+                            <div class="profile bord_one"></div>
+                            <div class="friend_box_name">youngmch</div>
+                        </div>
+                        <div class="friend_status">
+                            <div class="friend_status_msg __offline">offline</div>
+                            <div class="friend_status_dot __offline_dot"></div>
+                        </div>
+                    </div>
+                    <!--
+                    <div class="friend_box">
+                        <div class="friend_info">
+                            <div class="profile bord_one"></div>
+                            <div class="friend_box_name">youngmch</div>
+                        </div>
+                        <div class="friend_status">
+                            <div class="friend_status_msg __offline">offline</div>
+                            <div class="friend_status_dot __offline_dot"></div>
+                        </div>
+                    </div>
+                    -->
+                    <div class="friend_box_add">
+                        Add a friend
+                    </div>
+                </div>
+            </section>
+            <main class="main">
+                <div class="main_header_bar">
+                    <button class="main_header_bar__tab homeBtn __tab_active">Home</button>
+                    <button class="main_header_bar__tab chatBtn">Chat</button>
+                    <button class="main_header_bar__tab gameBtn">Game</button>
+                    <button class="main_header_bar__tab rankBtn">Rank</button>
+                </div>
+                <div class="main_welcome">Welcome to 42tsc_Pong!</div>
+                <div class="main_body">
+                    <ul class="main_list">
+                        <li class="main_list_item">Rules of Pong</li>
+                        <li class="main_list_item">How to play</li>
+                        <li class="main_list_item">How to chat</li>
+                        <li class="main_list_item">Tournament</li>
+                    </ul>
+                </div>
+                <footer>
+                    <div class="footer_name">Team 42tsc</div>
+                    <ul class="footer_list">
+                        <li class="footer_list_item">hyeslim</li>
+                        <li class="footer_list_item">youngmch</li>
+                        <li class="footer_list_item">isunwoo</li>
+                        <li class="footer_list_item">naki</li>
+                        <li class="footer_list_item">jeelee</li>
+                    </ul>
+                    <div class="contacts">contacts: </div>
+                </footer>
+            </main>
+        </div>
     </div>
+    <script type="module" src="./route.js"></script>
+	<script type="module" src="./app.js"></script>
+	<script type="module" src="./Login/login.js"></script>
+	<script type="module" src="./Home/home.js"></script>
+	<script type="module" src="./Chat/chat.js"></script>
+	<script type="module" src="./Game/game.js"></script>
+	<script type="module" src="./Rank/rank.js"></script>
 </body>
 </html>
