@@ -11,10 +11,15 @@ export default function handleClick(event)
         changeUrl("/game");
     } else if (event.target.classList.contains("rankBtn")) {
         changeUrl("/rank");
-    } else if (event.target.classList.contains("loginBtn")) {
-        localStorage.clear();
-        greeting.innerText = "";
-        loginForm.classList.remove("hidden");
+    } else if (event.target.classList.contains("logoutBtn")) {
         changeUrl("/");
+    }
+    const modal = document.querySelector(".modal");
+    if (event.target.classList.contains("open_modal_btn")) {
+        modal.style.display = "block";
+        document.body.style.overflow = "hidden"; // 스크롤바 제거
+    } else if (event.target.classList.contains("close_modal_btn")) {
+        modal.style.display = "none";
+        document.body.style.overflow = "auto"; // 스크롤바 제거
     }
 }

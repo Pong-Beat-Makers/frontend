@@ -11,12 +11,38 @@ class Home {
 		</div>
 		<div class="main_welcome">Welcome to 42tsc_Pong!</div>
 		<div class="main_body">
-			<ul class="main_list">
-				<li class="main_list_item">Rules of Pong</li>
-				<li class="main_list_item">How to play</li>
-				<li class="main_list_item">How to chat</li>
-				<li class="main_list_item">Tournament</li>
-			</ul>
+			<button class="open_modal_btn">Rules of Pong</button>
+			<div class="modal">
+				<div class="modal_content">
+				<h2>Rules of Pong</h2>
+				<p>모달창 내용</p>
+				<button class="close_modal_btn">❌</button>
+				</div>
+			</div>
+			<button class="open_modal_btn">How to play</button>
+			<div class="modal">
+				<div class="modal_content">
+				<h2>How to play</h2>
+				<p>모달창 내용</p>
+				<button class="close_modal_btn">❌</button>
+				</div>
+			</div>
+			<button class="open_modal_btn">How to chat</button>
+			<div class="modal">
+				<div class="modal_content">
+				<h2>How to chat</h2>
+				<p>모달창 내용</p>
+				<button class="close_modal_btn">❌</button>
+				</div>
+			</div>
+			<button class="open_modal_btn">Tournament</button>
+			<div class="modal">
+				<div class="modal_content">
+				<h2>Tournament</h2>
+				<p>모달창 내용</p>
+				<button class="close_modal_btn">❌</button>
+				</div>
+			</div>
 		</div>
 		<footer>
 			<div class="footer">Made by: @hyeslim @isunwoo @jeelee @naki @youngmch</div>
