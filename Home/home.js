@@ -11,36 +11,36 @@ class Home {
 		</div>
 		<div class="main_welcome">Welcome to 42tsc_Pong!</div>
 		<div class="main_body">
-			<button class="open_modal_btn">Rules of Pong</button>
+			<button class="open_modal_btn">Rules of Pong 🏓</button>
 			<div class="modal">
 				<div class="modal_content">
-				<h2>Rules of Pong</h2>
-				<p>모달창 내용</p>
-				<button class="close_modal_btn">❌</button>
+					<button class="close_modal_btn">❌</button>
+					<h2>Rules of Pong 🏓</h2>
+					<p>모달창 내용</p>
 				</div>
 			</div>
-			<button class="open_modal_btn">How to play</button>
+			<button class="open_modal_btn">How to play 🤹🏻‍♀️</button>
 			<div class="modal">
 				<div class="modal_content">
-				<h2>How to play</h2>
-				<p>모달창 내용</p>
-				<button class="close_modal_btn">❌</button>
+					<button class="close_modal_btn">❌</button>
+					<h2>How to play 🤹🏻‍♀️</h2>
+					<p>모달창 내용</p>
 				</div>
 			</div>
-			<button class="open_modal_btn">How to chat</button>
+			<button class="open_modal_btn">How to chat 💬</button>
 			<div class="modal">
 				<div class="modal_content">
-				<h2>How to chat</h2>
-				<p>모달창 내용</p>
-				<button class="close_modal_btn">❌</button>
+					<button class="close_modal_btn">❌</button>
+					<h2>How to chat 💬</h2>
+					<p>모달창 내용</p>
 				</div>
 			</div>
-			<button class="open_modal_btn">Tournament</button>
+			<button class="open_modal_btn">Tournament 🏟️</button>
 			<div class="modal">
 				<div class="modal_content">
-				<h2>Tournament</h2>
-				<p>모달창 내용</p>
-				<button class="close_modal_btn">❌</button>
+					<button class="close_modal_btn">❌</button>
+					<h2>Tournament 🏟️</h2>
+					<p>모달창 내용</p>
 				</div>
 			</div>
 		</div>

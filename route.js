@@ -28,7 +28,6 @@ const changeUrl = (requestedUrl) => {
 	main.innerHTML = routes[requestedUrl].template();
     // appContents.innerHTML = routes[requestedUrl].templateContents();
 }
-
 export default changeUrl;
 
 window.addEventListener("popstate", () => {
