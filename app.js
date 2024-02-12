@@ -14,12 +14,25 @@ export default function handleClick(event)
     } else if (event.target.classList.contains("logoutBtn")) {
         changeUrl("/");
     }
-    const modal = document.querySelector(".modal");
-    if (event.target.classList.contains("open_modal_btn")) {
-        modal.style.display = "block";
-        document.body.style.overflow = "hidden"; // 스크롤바 제거
-    } else if (event.target.classList.contains("close_modal_btn")) {
-        modal.style.display = "none";
-        document.body.style.overflow = "auto"; // 스크롤바 제거
-    }
+}
+
+const modals = document.getElementsByClassName("modal");
+const openModalBtns = document.getElementsByClassName("open_modal_btn");
+const closeModalBtns = document.getElementsByClassName("close_modal_btn");
+
+// Modal을 띄우고 닫는 클릭 이벤트를 정의한 함수
+function Modal(num) {
+    return function() {
+        openModalBtns[num].onclick =  function() {
+            modals[num].style.display = "block";
+        };
+        closeModalBtns[num].onclick = function() {
+            modals[num].style.display = "none";
+        };
+    };
+}
+
+// 원하는 Modal 수만큼 Modal 함수를 호출해서 funcs 함수에 정의합니다.
+for(let i = 0; i < openModalBtns.length; i++) {
+    Modal(i)();
 }
