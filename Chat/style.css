@@ -38,11 +38,13 @@ input#chatRoomSearchInput {
     width: 90%;
     display: flex;
     flex-direction: column;
+    align-items: center;
     margin-left: auto;
-    margin-right: auto;   
+    margin-right: auto;
 }
 
 .chatroom {
+    cursor: pointer;
     margin-top: 5px;
     background-color: #ffbcbc;
     padding: 10px;
@@ -84,4 +86,6 @@ input#chatRoomSearchInput {
     font-weight: 100;
     display: flex;
     align-self: flex-start;
+    margin-left: auto;
+    margin-right: 10px;
 }
