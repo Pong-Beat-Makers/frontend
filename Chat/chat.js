@@ -16,7 +16,7 @@ class Chat {
 		<div class="chatroom_list">
 			<div class="chatroom">
 				<div class="empty"></div>
-				<div class="profile second"></div>
+				<div class="profile ranker"></div>
 				<div class="chat_contents">
 					<div class="chat_name">naki</div>
 					<div class="chat_msg">Hi Hi</div>
@@ -25,7 +25,7 @@ class Chat {
 			</div>
 			<div class="chatroom">
 				<div class="empty"></div>
-				<div class="profile second"></div>
+				<div class="profile ranker"></div>
 				<div class="chat_contents">
 					<div class="chat_name">jeelee</div>
 					<div class="chat_msg">hello world</div>
