@@ -42,7 +42,32 @@ window.addEventListener("click", handleClick);
 window.addEventListener("submit", handleSubmit);
 
 function handleSubmit(event) {
-	event.preventDefault();
+	event.preventDefault(); // form이라면 어쨌든 필수
+	const searchName = document.querySelector("#chatRoomSearch input").value;
+	const nameAll = document.getElementsByClassName("chat_name");
+	const searchResult = document.querySelector(".chatroom_list");
+	for (let i = 0; i < nameAll.length; i++) {
+		if (searchName === nameAll[i].innerHTML) {
+			searchResult.innerHTML = `
+			<div class="chatroom">
+				<div class="empty"></div>
+				<div class="profile ranker"></div>
+				<div class="chat_contents">
+					<div class="chat_name">naki</div>
+					<div class="chat_msg">Hi Hi</div>
+				</div>
+				<div class="chat_time">오후 7시 16분</div>
+			</div>
+			`
+			break;
+		}
+		if (i === nameAll.length - 1) {
+			searchResult.innerHTML = `<div>No result found for ${searchName}</div>`
+			if (searchName === "") {
+				searchResult.innerHTML = `<div>original</div>`
+			}
+		}
+	}
 }
 
 // const chatroomSearchForm = document.getElementById("chatRoomSearch");

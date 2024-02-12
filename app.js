@@ -31,7 +31,7 @@ function handleModal() {
     const closeModalBtns = document.getElementsByClassName("close_modal_btn");
     // 원하는 Modal 수만큼 Modal 함수를 호출해서 funcs 함수에 정의합니다.
     for(let i = 0; i < openModalBtns.length; i++) {
-        openModalBtns[i].onclick =  function() {
+        openModalBtns[i].onclick = function() {
             modals[i].style.display = "block";
         };
         closeModalBtns[i].onclick = function() {
@@ -39,3 +39,20 @@ function handleModal() {
         };
     }
 }
+/*
+function handleChat() {
+    // const chatRoomSearchBtn = document.getElementsByClassName("chatRoomSearchBtn");
+    const openModalBtns = document.getElementsByClassName("open_modal_btn");
+    const closeModalBtns = document.getElementsByClassName("close_modal_btn");
+
+    // chatRoomSearchBtn.onclick = function() {
+    // chat.js 내 handleSubmit이 처리 가능
+    // }
+    openModalBtns.onclick = function() {
+        room.style.display = "block";
+    };
+    closeModalBtns.onclick = function() {
+        room.style.display = "none";
+    }
+}
+*/
