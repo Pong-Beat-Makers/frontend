@@ -21,7 +21,24 @@ export default function handleClick(event)
         // handleRank();
     } else if (event.target.classList.contains("open_modal_btn")) {
         handleHomeModal();
+    } else if (event.target.classList.contains("user-token-submit")) {
+        localStorage.setItem("token", document.querySelector('#user-token-input').value);
+        updateProfile();
     }
 }
+
+function updateProfile() {
+    const userTokenSubmit = document.querySelector('.user-token-submit');
+    const userTokenInputDom = document.querySelector('#user-token-input');
+    userTokenSubmit.classList.add("hidden");
+    userTokenInputDom.classList.add("hidden");
+    const profileInfo = document.querySelector('.profile_info_description');
+    profileInfo.innerHTML = `Your chat token : ${localStorage.getItem("token")}`
+}
+
+if (localStorage.length > 0) {
+    updateProfile();
+}
+
 window.addEventListener("click", handleClick);
 window.addEventListener("submit", handleSubmit);

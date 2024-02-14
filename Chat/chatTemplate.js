@@ -16,6 +16,7 @@ class Chat {
 				<div class="chatroom_content">
 					<button class="close_chatroom_btn">❌</button>
 					<textarea id="chat-log" cols="85" rows="20"></textarea>
+					<input id="target-token-input" type="text" size="10" placeholder="To">
 					<div>
 						<input id="chat-message-input" type="text" size="90">
 						<input id="chat-message-submit" type="button" value="Send">
