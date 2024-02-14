@@ -9,7 +9,7 @@ export default function handleClick(event)
         handleModal();
 	} else if (event.target.classList.contains("chatBtn")) {
 		changeUrl("/chat");
-        // handleChat();
+        handleChat();
 	} else if (event.target.classList.contains("gameBtn")) {
         changeUrl("/game");
         // handleGame();
@@ -17,7 +17,7 @@ export default function handleClick(event)
         changeUrl("/rank");
         // handleRank();
     } else if (event.target.classList.contains("logoutBtn")) {
-        changeUrl("/");
+        changeUrl("/home");
         handleModal();
     } else if (event.target.classList.contains("open_modal_btn")) {
         handleModal();
@@ -39,20 +39,18 @@ function handleModal() {
         };
     }
 }
-/*
-function handleChat() {
-    // const chatRoomSearchBtn = document.getElementsByClassName("chatRoomSearchBtn");
-    const openModalBtns = document.getElementsByClassName("open_modal_btn");
-    const closeModalBtns = document.getElementsByClassName("close_modal_btn");
 
-    // chatRoomSearchBtn.onclick = function() {
-    // chat.js 내 handleSubmit이 처리 가능
-    // }
-    openModalBtns.onclick = function() {
-        room.style.display = "block";
-    };
-    closeModalBtns.onclick = function() {
-        room.style.display = "none";
+function handleChat() {
+	const chatModal = document.querySelector(".chat_modal");
+    const openModalBtn = document.getElementsByClassName("chatroom");
+    const closeModalBtn = document.querySelector(".close_chatroom_btn");
+
+    for (let i = 0; i < openModalBtn.length; i++) {
+        openModalBtn[i].onclick = function() {
+            chatModal.style.display = "block";
+        }
     }
+	closeModalBtn.onclick = function() {
+		chatModal.style.display = "none";
+	}
 }
-*/

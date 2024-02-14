@@ -14,7 +14,14 @@ class Chat {
 			<button class="chatRoomSearchBtn">🔍</button>
 		</form>
 		<div class="chatroom_list">
-			<div class="chatroom">
+			<div class="chat_modal">
+				<div class="chatroom_content">
+					<button class="close_chatroom_btn">❌</button>
+					<h2>Chat room</h2>
+					<p>hi hi ㅋ</p>
+				</div>
+			</div>
+			<div class="chatroom" role="button">
 				<div class="empty"></div>
 				<div class="profile ranker"></div>
 				<div class="chat_contents">
@@ -23,7 +30,7 @@ class Chat {
 				</div>
 				<div class="chat_time">오후 7시 16분</div>
 			</div>
-			<div class="chatroom">
+			<div class="chatroom" role="button">
 				<div class="empty"></div>
 				<div class="profile ranker"></div>
 				<div class="chat_contents">
@@ -41,7 +48,7 @@ export default new Chat();
 window.addEventListener("click", handleClick);
 window.addEventListener("submit", handleSubmit);
 
-function handleSubmit(event) {
+function handleSubmit(event) { // handle submit을 할 게 아니라 value를 시시각각 체크해서 결과를 보여줘야 할듯 ㅠㅠ .!!
 	event.preventDefault(); // form이라면 어쨌든 필수
 	const searchName = document.querySelector("#chatRoomSearch input").value;
 	const nameAll = document.getElementsByClassName("chat_name");
@@ -63,11 +70,10 @@ function handleSubmit(event) {
 		}
 		if (i === nameAll.length - 1) {
 			searchResult.innerHTML = `<div>No result found for ${searchName}</div>`
-			if (searchName === "") {
-				searchResult.innerHTML = `<div>original</div>`
-			}
 		}
 	}
+	if (searchName === "")
+		searchResult.innerHTML = `<div>original</div>`
 }
 
 // const chatroomSearchForm = document.getElementById("chatRoomSearch");
