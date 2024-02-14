@@ -1,5 +1,3 @@
-import handleClick from "../app.js";
-
 class Chat {
 	template() {
 		return `
@@ -14,18 +12,29 @@ class Chat {
 			<button class="chatRoomSearchBtn">🔍</button>
 		</form>
 		<div class="chatroom_list">
-			<div class="chatroom">
+			<div class="chat_modal">
+				<div class="chatroom_content">
+					<button class="close_chatroom_btn">❌</button>
+					<textarea id="chat-log" cols="85" rows="20"></textarea>
+					<input id="target-token-input" type="text" size="10" placeholder="To">
+					<div>
+						<input id="chat-message-input" type="text" size="90">
+						<input id="chat-message-submit" type="button" value="Send">
+					</div>
+				</div>
+			</div>
+			<div class="chatroom" role="button">
 				<div class="empty"></div>
-				<div class="profile second"></div>
+				<div class="profile ranker"></div>
 				<div class="chat_contents">
 					<div class="chat_name">naki</div>
 					<div class="chat_msg">Hi Hi</div>
 				</div>
 				<div class="chat_time">오후 7시 16분</div>
 			</div>
-			<div class="chatroom">
+			<div class="chatroom" role="button">
 				<div class="empty"></div>
-				<div class="profile second"></div>
+				<div class="profile ranker"></div>
 				<div class="chat_contents">
 					<div class="chat_name">jeelee</div>
 					<div class="chat_msg">hello world</div>
@@ -36,14 +45,5 @@ class Chat {
 		`;
 	}
 }
+
 export default new Chat();
-
-window.addEventListener("click", handleClick);
-window.addEventListener("submit", handleSubmit);
-
-function handleSubmit(event) {
-	event.preventDefault();
-}
-
-// const chatroomSearchForm = document.getElementById("chatRoomSearch");
-// chatroomSearchForm.addEventListener("submit", handleSearchSubmit);

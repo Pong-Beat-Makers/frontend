@@ -38,11 +38,13 @@ input#chatRoomSearchInput {
     width: 90%;
     display: flex;
     flex-direction: column;
+    align-items: center;
     margin-left: auto;
-    margin-right: auto;   
+    margin-right: auto;
 }
 
 .chatroom {
+    cursor: pointer;
     margin-top: 5px;
     background-color: #ffbcbc;
     padding: 10px;
@@ -84,4 +86,51 @@ input#chatRoomSearchInput {
     font-weight: 100;
     display: flex;
     align-self: flex-start;
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+.close_chatroom_btn {
+    all: unset;
+    cursor: pointer;
+    width: 10%;
+    display: flex;
+    justify-content: center;
+    align-self: flex-end;
+    transition: opacity linear .1s;
+    &:hover {
+        opacity: 0.8;
+    }
+}
+
+.chat_modal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    display: none;
+}
+
+.chatroom_content {
+    background-color:#f8a9a9;
+    /* margin: 15% auto; */
+    margin-top: 4%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 15px;
+    width: 40%;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.hidden {
+    display: none;
 }

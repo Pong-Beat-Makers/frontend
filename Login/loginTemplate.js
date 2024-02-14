@@ -1,5 +1,3 @@
-import changeUrl from "../route.js";
-
 class Login {
 	template() {
 		return `
@@ -24,6 +22,7 @@ class Login {
 		`;
 	}
 }
+
 export default new Login();
 
 // const greeting = document.querySelector("#greeting");

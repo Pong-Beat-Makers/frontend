@@ -19,10 +19,6 @@
             </div>
             <div class="header_item">
                 <button class="logoutBtn">Logout</button>
-                <!-- <div class="profile_box">
-                    <div class="profile_name">login_name</div>
-                    <div class="profile"></div>
-                </div> -->
             </div>
         </header>
         <div class="wrapper">
@@ -30,7 +26,11 @@
                 <div class="profile big"></div>
                 <div class="profile_info">
                     <div class="profile_info_name">hyeslim</div>
-                    <div class="profile_info_description">other informations like points. availability. rank ...</div>
+                    <div>
+                        <div class="profile_info_description">set your chat token : </div>
+                        <input id="user-token-input" type="text" size="10" placeholder="token">
+                        <input class="user-token-submit" type="button" value="Set">
+                    </div>
                 </div>
                 <div class="friends_box">
                     <div class="friend_header">friends</div>
@@ -84,18 +84,6 @@
                             <div class="friend_status_dot __offline_dot"></div>
                         </div>
                     </div>
-                    <!--
-                    <div class="friend_box">
-                        <div class="friend_info">
-                            <div class="profile bord_one"></div>
-                            <div class="friend_box_name">youngmch</div>
-                        </div>
-                        <div class="friend_status">
-                            <div class="friend_status_msg __offline">offline</div>
-                            <div class="friend_status_dot __offline_dot"></div>
-                        </div>
-                    </div>
-                    -->
                     <div class="friend_box_add">
                         Add a friend
                     </div>
@@ -110,36 +98,55 @@
                 </div>
                 <div class="main_welcome">Welcome to 42tsc_Pong!</div>
                 <div class="main_body">
-                    <ul class="main_list">
-                        <li class="main_list_item">Rules of Pong</li>
-                        <li class="main_list_item">How to play</li>
-                        <li class="main_list_item">How to chat</li>
-                        <li class="main_list_item">Tournament</li>
-                    </ul>
+                    <button class="open_modal_btn">Rules of Pong 🏓</button>
+                    <div class="modal">
+                        <div class="modal_content">
+                            <button class="close_modal_btn">❌</button>
+                            <h2>Rules of Pong 🏓</h2>
+                            <p>모달창 내용</p>
+                        </div>
+                    </div>
+                    <button class="open_modal_btn">How to play 🤹🏻‍♀️</button>
+                    <div class="modal">
+                        <div class="modal_content">
+                            <button class="close_modal_btn">❌</button>
+                            <h2>How to play 🤹🏻‍♀️</h2>
+                            <p>모달창 내용</p>
+                        </div>
+                    </div>
+                    <button class="open_modal_btn">How to chat 💬</button>
+                    <div class="modal">
+                        <div class="modal_content">
+                            <button class="close_modal_btn">❌</button>
+                            <h2>How to chat 💬</h2>
+                            <p>모달창 내용</p>
+                        </div>
+                    </div>
+                    <button class="open_modal_btn">Tournament 🏟️</button>
+                    <div class="modal">
+                        <div class="modal_content">
+                            <button class="close_modal_btn">❌</button>
+                            <h2>Tournament 🏟️</h2>
+                            <p>모달창 내용</p>
+                        </div>
+                    </div>
                 </div>
-                <!-- <footer>
-                    <div class="footer_name">Team 42tsc</div>
-                    <ul class="footer_list">
-                        <li class="footer_list_item">hyeslim</li>
-                        <li class="footer_list_item">youngmch</li>
-                        <li class="footer_list_item">isunwoo</li>
-                        <li class="footer_list_item">naki</li>
-                        <li class="footer_list_item">jeelee</li>
-                    </ul>
-                    <div class="contacts">contacts: </div>
-                </footer> -->
                 <footer>
                     <div class="footer">Made by: @hyeslim @isunwoo @jeelee @naki @youngmch</div>
                 </footer>
             </main>
         </div>
     </div>
-    <script type="module" src="./route.js"></script>
-	<script type="module" src="./app.js"></script>
-	<script type="module" src="./Login/login.js"></script>
-	<script type="module" src="./Home/home.js"></script>
-	<script type="module" src="./Chat/chat.js"></script>
-	<script type="module" src="./Game/game.js"></script>
-	<script type="module" src="./Rank/rank.js"></script>
+    <div>
+        <script type="module" src="./route.js"></script>
+        <script type="module" src="./app.js"></script>
+        <script type="module" src="./Login/loginTemplate.js"></script>
+        <script type="module" src="./Home/homeTemplate.js"></script>
+        <script type="module" src="./Home/homeUtils.js"></script>
+        <script type="module" src="./Chat/chatTemplate.js"></script>
+        <script type="module" src="./Chat/chatUtils.js"></script>
+        <script type="module" src="./Game/gameTemplate.js"></script>
+        <script type="module" src="./Rank/rankTemplate.js"></script>
+    </div>
 </body>
 </html>
