@@ -1,5 +1,3 @@
-import handleClick from "../app.js";
-
 class Game {
 	template() {
 		return `
@@ -16,6 +14,5 @@ class Game {
 		`;
 	}
 }
-export default new Game();
 
-window.addEventListener("click", handleClick);
+export default new Game();

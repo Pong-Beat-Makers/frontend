@@ -1,5 +1,3 @@
-import handleClick from "../app.js";
-
 class Home {
 	template() {
 		return `
@@ -50,6 +48,5 @@ class Home {
 		`;
 	}
 }
-export default new Home();
 
-window.addEventListener("click", handleClick);
+export default new Home();

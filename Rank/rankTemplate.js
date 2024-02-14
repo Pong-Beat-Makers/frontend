@@ -1,5 +1,3 @@
-import handleClick from "../app.js";
-
 class Rank {
 	template() {
 		return `
@@ -75,6 +73,5 @@ class Rank {
 		`;
 	}
 }
-export default new Rank();
 
-window.addEventListener("click", handleClick);
+export default new Rank();
