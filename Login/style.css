@@ -47,6 +47,7 @@ main {
 }
 
 .login_box {
+    cursor: pointer;
     background-color: lightgray;
     padding: 5px 10px;
     display: flex;
