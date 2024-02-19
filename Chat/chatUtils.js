@@ -93,6 +93,10 @@ export function handleChatModal() {
         if (blockToggleBtn.innerHTML === "Block") {
             blockToggleBtn.innerHTML = "Unblock";
             methodSelected = 'POST';
+            chatSocket.send(JSON.stringify({
+                'target_nickname' : `${targetToken}_test_id`,
+                'message': `${targetToken}_test_id is now blocked by ${localStorage.getItem("token")}_test_id ❤️`
+            }));
         }
         else if (blockToggleBtn.innerHTML === "Unblock") {
             blockToggleBtn.innerHTML = "Block";
@@ -134,8 +138,8 @@ export function initChatSocket() {
 
     document.querySelector('#chat-message-submit').onclick = function(e) {
         const messageInputDom = document.querySelector('#chat-message-input');
-        const message = messageInputDom.value;
         const targetToken = document.querySelector('#target-token-input').innerHTML;
+        const message = messageInputDom.value;
         const obj = {
             'target_nickname' : `${targetToken}_test_id`,
             'message': message
