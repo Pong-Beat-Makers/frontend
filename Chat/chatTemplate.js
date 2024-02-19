@@ -7,16 +7,24 @@ class Chat {
 			<button class="main_header_bar__tab gameBtn">Game</button>
 			<button class="main_header_bar__tab rankBtn">Rank</button>
 		</div>
+		<!--
 		<form id="chatRoomSearch">
 			<input id="chatRoomSearchInput" type="text" placeholder="search"/>
+			<button class="chatRoomSearchBtn">🔍</button>
+		</form>
+		-->
+		<form id="chatRoomSearch">
+			<input id="chatRoomSearchInput" type="text" placeholder="temporary token input"/>
 			<button class="chatRoomSearchBtn">🔍</button>
 		</form>
 		<div class="chatroom_list">
 			<div class="chat_modal">
 				<div class="chatroom_content">
 					<button class="close_chatroom_btn">❌</button>
+					<button class="block_toggle_btn">Block</button>
 					<textarea id="chat-log" cols="85" rows="20"></textarea>
-					<input id="target-token-input" type="text" size="10" placeholder="To">
+					<div>You are now chatting to</div>
+					<div id="target-token-input"></div>
 					<div>
 						<input id="chat-message-input" type="text" size="90">
 						<input id="chat-message-submit" type="button" value="Send">
