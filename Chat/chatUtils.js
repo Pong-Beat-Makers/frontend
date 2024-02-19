@@ -1,8 +1,6 @@
 import { chatSocket } from "../profileUtils.js";
 
-export const localhost = "localhost:8000";
-
-// 심각한 문제 ! ! ㅎㅎ 1002가 1001로 보내는 메시지만 안보내짐,, 차단이 . . 아마 안됐을텐데 왜이러는걸까
+export const localhost = "http://127.0.0.1:8000";
 
 /*
 export function handleSubmit(event) { // handle submit을 할 게 아니라 value를 시시각각 체크해서 결과를 보여줘야 할듯 ㅠㅠ .!!
@@ -35,6 +33,11 @@ export function handleSubmit(event) { // handle submit을 할 게 아니라 valu
 }
 */
 
+/*
+동작방식 : 채팅목록에서 채팅방 누르면 채팅창 하나를 띄우되, 
+밖에서 어떤 값을 입력했냐에 따라 내부의 타겟 토큰이 하나로 정해져있고, 그 사람을 블락토글 할 수 있도록 하기
+*/
+
 export function handleSubmit(event) {
 	event.preventDefault();
 	const tokenInput = document.querySelector("#chatRoomSearch input").value;
@@ -47,14 +50,19 @@ export function handleSubmit(event) {
     document.querySelector('#target-token-input').innerHTML = tokenInput;
 
     // 이미 차단된 사람인지 체크 => 내부 창 block 버튼 unblock으로 바꾸기 위해
-    fetch(`${localhost}/blockedusers/`)
-    .then((response) => {
+    fetch(`${localhost}/blockedusers/?target_nickname=${tokenInput}_test_id`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem("token")}`,
+        },
+    })
+    .then(response => {
         if (!response.ok)
             throw new Error(`Error : ${response.status}`);
         return  response.json();
     })
-    .then((data) => {
-        if (data.block_requested === true)
+    .then(data => {
+        if (data.is_blocked === true)
             document.querySelector(".block_toggle_btn").innerHTML = "Unblock";
     });
 
@@ -62,8 +70,6 @@ export function handleSubmit(event) {
     document.querySelector("#chatRoomSearch input").value = '';
 }
 
-// 지금 해야하는 것 : 채팅목록에서 채팅방 누르면 채팅창 하나를 띄우되,
-// 밖에서 어떤 값을 입력했냐에 따라 내부의 타겟 토큰이 하나로 정해져있고, 그 사람을 블락토글 할 수 있도록 하기
 // 로그는 추후 수정
 
 export function handleChatModal() {
@@ -82,29 +88,26 @@ export function handleChatModal() {
 	}
 	blockToggleBtn.onclick = function() {
         const targetToken = document.querySelector('#target-token-input').innerHTML;
-        let obj;
+        let methodSelected;
 
         if (blockToggleBtn.innerHTML === "Block") {
-            obj = {
-                'target_nickname' : `${targetToken}_test_id`,
-                'block_requested' : true
-            };
             blockToggleBtn.innerHTML = "Unblock";
+            methodSelected = 'POST';
         }
         else if (blockToggleBtn.innerHTML === "Unblock") {
-            obj = {
-                'target_nickname' : `${targetToken}_test_id`,
-                'block_requested' : false
-            };
             blockToggleBtn.innerHTML = "Block";
+            methodSelected = 'DELETE';
         }
 
         const data = {
-          method: 'POST',
+          method: methodSelected,
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem("token")}`,
           },
-          body: JSON.stringify(obj)
+          body: JSON.stringify({
+            'target_nickname' : `${targetToken}_test_id`,
+          })
         };
         
         fetch(`${localhost}/blockedusers/`, data); // 예외처리 필요
@@ -116,7 +119,6 @@ export function initChatSocket() {
         const data = JSON.parse(e.data);
         document.querySelector('#chat-log').value += (data.from + ' : ');
         document.querySelector('#chat-log').value += (data.message + '\n');
-        console.dir(data);
     };
 
     chatSocket.onclose = function(e) {
@@ -139,7 +141,6 @@ export function initChatSocket() {
             'message': message
         };
         chatSocket.send(JSON.stringify(obj));
-        console.dir(obj);
         messageInputDom.value = '';
     };
 }

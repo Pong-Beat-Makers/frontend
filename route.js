@@ -17,6 +17,7 @@ const main = document.querySelector(".main");
 main.innerHTML = routes["/"].template();
 
 const changeUrl = (requestedUrl) => {
+    // history.pushState(null, null, requestedUrl);
     main.innerHTML = routes[requestedUrl].template();
 }
 export default changeUrl;
