@@ -1,15 +1,9 @@
+import LoginSuccess from "./Login/loginSuccessTemplate.js";
 import changeUrl from "./route.js";
 import { handleChatModal, initChatSocket, handleSubmit } from "./Chat/chatUtils.js";
 import { handleHomeModal } from "./Home/homeUtils.js";
 import { updateProfile, resetProfile } from "./profileUtils.js";
-
-import LoginSuccess from "./Login/loginSuccessTemplate.js";
-
-const FRONTEND = "http://127.0.0.1:5001";
-const BACKEND = "http://127.0.0.1:8000";
-
-// http://127.0.0.1:5501/?code=4%2F0AeaYSHDHrOC_3acsM1JP9Wh3H3kFGTqSUZd3JYtMjlzk9GDC2r_oSu9LI2pZ4drZdROnEw&scope=email+profile+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email+https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.profile+openid&authuser=0&hd=g.skku.edu&prompt=consent
-// => 127.0.0.1:8000/google/login/callback/?code=~~~ 로 GET 요청 보내기
+import { BACKEND } from "../Public/global.js"
 
 function setUserInfo(site) {
     fetch(`${BACKEND}/accounts/${site}/login/`, {
@@ -35,7 +29,6 @@ loginBtns[1].onclick = () => {
     setUserInfo("42intra");
 };
 
-// 로그인에서 메인화면으로 넘어가면서 handleModal() 등록되게 하기
 export default function handleClick(event)
 {
     if (event.target.classList.contains("homeBtn")) {

@@ -1,6 +1,5 @@
 import { chatSocket } from "../profileUtils.js";
-
-export const BACKEND = "http://127.0.0.1:8000";
+import { BACKEND } from "../Public/global.js"
 
 /*
 export function handleSubmit(event) { // handle submit을 할 게 아니라 value를 시시각각 체크해서 결과를 보여줘야 할듯 ㅠㅠ .!!
