@@ -1,6 +1,6 @@
 import { chatSocket } from "../profileUtils.js";
 
-export const localhost = "http://127.0.0.1:8000";
+export const BACKEND = "http://127.0.0.1:8000";
 
 /*
 export function handleSubmit(event) { // handle submit을 할 게 아니라 value를 시시각각 체크해서 결과를 보여줘야 할듯 ㅠㅠ .!!
@@ -50,7 +50,7 @@ export function handleSubmit(event) {
     document.querySelector('#target-token-input').innerHTML = tokenInput;
 
     // 이미 차단된 사람인지 체크 => 내부 창 block 버튼 unblock으로 바꾸기 위해
-    fetch(`${localhost}/blockedusers/?target_nickname=${tokenInput}_test_id`, {
+    fetch(`${BACKEND}/blockedusers/?target_nickname=${tokenInput}_test_id`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem("token")}`,
@@ -114,7 +114,7 @@ export function handleChatModal() {
           })
         };
         
-        fetch(`${localhost}/blockedusers/`, data); // 예외처리 필요
+        fetch(`${BACKEND}/blockedusers/`, data); // 예외처리 필요
 	}
 }
 

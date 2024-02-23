@@ -13,10 +13,10 @@ const routes = {
     "/rank": Rank,
 }
 
-const main = document.querySelector(".main");
-main.innerHTML = routes["/"].template();
+// main.innerHTML = routes["/"].template();
 
 const changeUrl = (requestedUrl) => {
+    const main = document.querySelector(".main");
     // history.pushState(null, null, requestedUrl);
     main.innerHTML = routes[requestedUrl].template();
 }
