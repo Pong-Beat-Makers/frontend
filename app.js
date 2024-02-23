@@ -59,24 +59,34 @@ export default function handleClick(event)
     }
 }
 
-// http://127.0.0.1:5501/?code=~~~
-// => 127.0.0.1:8000/google/login/callback/?code=~~~ 로 GET 요청 보내기
+function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
 
-if (window.location.search) {
-    // console.log(window.location.search);
-    fetch(`${BACKEND}/google/login/callback/?${window.location.search}`, {
-        method: 'GET',
-    })
-    .then(response => {
-        if (!response.ok)
-            throw new Error(`Error : ${response.status}`);
-        return response.json();
-    })
-    .then(data => {
-        if (data.error)
-            return ;
-        console.dir(data);
-    });
+function deleteCookie(name) {
+    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+
+if (document.cookie) {
+    if (getCookie("refresh_token")) {
+        const cookies = Object.fromEntries(
+            document.cookie.split(';').map((cookie) => cookie.trim().split('=')),
+        );
+        localStorage.setItem("refresh_token", cookies["refresh_token"]);
+        deleteCookie("refresh_token");
+    }
     const body = document.querySelector(".body");
     body.innerHTML = LoginSuccess.template();
     window.addEventListener("click", handleClick);
@@ -85,5 +95,4 @@ if (window.location.search) {
     if (localStorage.length > 0) {
         updateProfile();
     }
-    // window.location.search = ""; // 이거 추가하면 왜 .. 페이지 안바뀌지 ? ㅠㅠ
 }
