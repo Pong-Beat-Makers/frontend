@@ -1,12 +1,12 @@
 export let chatSocket;
 
 export function updateProfile() {
-    const userTokenSubmit = document.querySelector('.user-token-submit');
-    const userTokenInputDom = document.querySelector('#user-token-input');
-    userTokenSubmit.classList.add("hidden");
-    userTokenInputDom.classList.add("hidden");
-    const profileInfo = document.querySelector('.profile_info_description');
-    profileInfo.innerHTML = `Your chat token : ${localStorage.getItem("token")}`
+    // const userTokenSubmit = document.querySelector('.user-token-submit');
+    // const userTokenInputDom = document.querySelector('#user-token-input');
+    // userTokenSubmit.classList.add("hidden");
+    // userTokenInputDom.classList.add("hidden");
+    // const profileInfo = document.querySelector('.profile_info_description');
+    // profileInfo.innerHTML = `Your chat token : ${localStorage.getItem("token")}`
 
     // initChatSocket
     chatSocket = new WebSocket(

@@ -13,12 +13,16 @@ const routes = {
     "/rank": Rank,
 }
 
-// main.innerHTML = routes["/"].template();
-
 const changeUrl = (requestedUrl) => {
-    const main = document.querySelector(".main");
+    const main = document.querySelector(".main-section__main");
     // history.pushState(null, null, requestedUrl);
     main.innerHTML = routes[requestedUrl].template();
+    
+    const headerElements = document.querySelectorAll(".main-section__list--item");
+    headerElements.forEach(nav => {
+        if (nav.classList.contains("active"))
+            nav.classList.remove("active");
+    });
 }
 export default changeUrl;
 
