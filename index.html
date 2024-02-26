@@ -3,51 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="Login/style.css">
-    <link rel="stylesheet" href="Home/style.css">
-    <link rel="stylesheet" href="Chat/style.css">
-    <link rel="stylesheet" href="Game/style.css">
-    <link rel="stylesheet" href="Rank/style.css">
-    <title>Transcendence_login</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="src/style.css">
+    <title>Transcendence</title>
 </head>
 <body>
-    <div class="body">
-        <div class="main"></div>
-        <div id="container_login">
-            <main class="main_login">
-                <div class="wrapper_login">
-                    <div class="item_one">
-                        42tsc_Pong logo
-                    </div>
-                    <div class="item_two">
-                        <div class="login_header">
-                            Login with
-                        </div>
-                        <div class="login_box">
-                            <div class="login_logo"></div>
-                            <div class="login_name">Google</div>
-                        </div>
-                        <div class="login_box">
-                            <div class="login_logo"></div>
-                            <div class="login_name">42 Network</div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </div>
+    <div class="background-cover">
+        <div class="background-cover__bubble bubble__one"></div>
+        <div class="background-cover__bubble bubble__two"></div>
+        <div class="background-cover__bubble bubble__three"></div>
+        <div class="background-cover__bubble bubble__four"></div>
+        <div class="background-cover__bubble bubble__five"></div>
     </div>
-    <div>
-        <script type="module" src="./route.js"></script>
-        <script type="module" src="./app.js"></script>
-        <script type="module" src="./Login/loginTemplate.js"></script>
-        <script type="module" src="./Login/loginUtils.js"></script>
-        <script type="module" src="./Login/loginSuccessTemplate.js"></script>
-        <script type="module" src="./Home/homeTemplate.js"></script>
-        <script type="module" src="./Home/homeUtils.js"></script>
-        <script type="module" src="./Chat/chatTemplate.js"></script>
-        <script type="module" src="./Chat/chatUtils.js"></script>
-        <script type="module" src="./Game/gameTemplate.js"></script>
-        <script type="module" src="./Rank/rankTemplate.js"></script>
-    </div>
+    <div id="app"></div>
+    <script src="./src/app.js" type="module"></script>
 </body>
 </html>

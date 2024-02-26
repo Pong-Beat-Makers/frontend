@@ -1,0 +1,15 @@
+.modal {
+    position: absolute;
+    z-index: 999;
+    cursor: default;
+}
+
+.modal__container {
+    min-width: var(--min-width-size);
+    min-height: var(--min-height-size);
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

@@ -1,0 +1,33 @@
+.home__header {
+    margin-bottom: 50px;
+}
+
+.home__header--text {
+    font-size: 100px;
+    color: white;
+    text-shadow: 0px -8px 10px var(--point-color), 0px 8px 10px #9546FC;
+}
+
+.home__body {
+    width: 95%;
+    border-top: 1px solid #9546FC80;
+    border-bottom: 1px solid #9546FC80;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+}
+
+.home__body--note {
+    font-size: 18px;
+    height: 300px;
+}
+
+.home__footer {
+    width: 95%;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 25px;
+    color: #AE6FFF99;
+}

@@ -1,9 +1,10 @@
 import LoginSuccess from "./Login/loginSuccessTemplate.js";
+import Login from "./Login/loginTemplate.js"
 import changeUrl from "./route.js";
 import { handleChatModal, initChatSocket, handleSubmit } from "./Chat/chatUtils.js";
 import { handleHomeModal } from "./Home/homeUtils.js";
 import { updateProfile, resetProfile } from "./profileUtils.js";
-import { BACKEND } from "../Public/global.js"
+import { BACKEND } from "./Public/global.js"
 
 function setUserInfo(site) {
     fetch(`${BACKEND}/accounts/${site}/login/`, {
@@ -21,40 +22,44 @@ function setUserInfo(site) {
     });
 }
 
-const loginBtns = document.getElementsByClassName("login_box");
-loginBtns[0].onclick = () => {
-    setUserInfo("google");
-};
-loginBtns[1].onclick = () => {
-    setUserInfo("42intra");
-};
+function handleNaviClick() {
+    const headerElements = document.querySelectorAll(".main-section__list--item");
+    headerElements[0].onclick = () => {
+        changeUrl("/home");
+        handleHomeModal();
+        headerElements[0].classList.add("active");
+    };
+    headerElements[1].onclick = () => {
+		changeUrl("/chat");
+        // handleChatModal();
+        headerElements[1].classList.add("active");
+        initChatSocket();
+    }
+    headerElements[2].onclick = () => {
+        changeUrl("/game");
+        headerElements[2].classList.add("active");
+        // handleGame();
+    }
+    headerElements[3].onclick = () => {
+        changeUrl("/rank");
+        headerElements[3].classList.add("active");
+        // handleRank();
+    }
+}
 
 export default function handleClick(event)
 {
-    if (event.target.classList.contains("homeBtn")) {
-        changeUrl("/home");
-        handleHomeModal();
-	} else if (event.target.classList.contains("chatBtn")) {
-		changeUrl("/chat");
-        handleChatModal();
-        initChatSocket();
-	} else if (event.target.classList.contains("gameBtn")) {
-        changeUrl("/game");
-        // handleGame();
-    } else if (event.target.classList.contains("rankBtn")) {
-        changeUrl("/rank");
-        // handleRank();
-    } else if (event.target.classList.contains("user-token-submit")) {
+    if (event.target.classList.contains("user-token-submit")) {
         localStorage.setItem("token", document.querySelector('#user-token-input').value);
         updateProfile();
-    } else if (event.target.classList.contains("logoutBtn")) {
+    } else if (event.target.classList.contains("header__logout--btn")) {
         resetProfile();
         changeUrl("/login");
         loginBtns[0].onclick = () => {
-            window.location.href = `${BACKEND}/accounts/google/login/`;
+            setUserInfo("google");
         };
         loginBtns[1].onclick = () => {
-            window.location.href = `${BACKEND}/accounts/google/login/`;
+            setUserInfo("42intra");
         };
     }
 }
@@ -79,6 +84,10 @@ function deleteCookie(name) {
     document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 }
 
+const app = document.querySelector("#app");
+window.addEventListener("click", handleClick);
+window.addEventListener("submit", handleSubmit);
+
 if (document.cookie) {
     if (getCookie("refresh_token")) {
         const cookies = Object.fromEntries(
@@ -87,12 +96,22 @@ if (document.cookie) {
         localStorage.setItem("refresh_token", cookies["refresh_token"]);
         deleteCookie("refresh_token");
     }
-    const body = document.querySelector(".body");
-    body.innerHTML = LoginSuccess.template();
-    window.addEventListener("click", handleClick);
-    window.addEventListener("submit", handleSubmit);
+    app.innerHTML = LoginSuccess.template();
+    changeUrl("/home");
+    handleNaviClick();
+    document.querySelectorAll(".main-section__list--item")[0].classList.add("active");
     handleHomeModal();
     if (localStorage.length > 0) {
         updateProfile();
     }
+}
+else {
+    app.innerHTML = Login.template();
+    const loginBtns = document.getElementsByClassName("login-btn");
+    loginBtns[0].onclick = () => {
+        setUserInfo("google");
+    };
+    loginBtns[1].onclick = () => {
+        setUserInfo("42intra");
+    };
 }
