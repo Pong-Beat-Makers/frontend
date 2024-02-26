@@ -1,5 +1,8 @@
-import { chatSocket } from "../profileUtils.js";
-import { BACKEND } from "../Public/global.js"
+import { BACKEND, FRONTEND } from "../Public/global.js";
+import { routes } from "../route.js";
+
+// const chatroomSearchForm = document.getElementById("chatRoomSearch");
+// chatroomSearchForm.addEventListener("submit", handleSearchSubmit);
 
 /*
 export function handleSubmit(event) { // handle submit을 할 게 아니라 value를 시시각각 체크해서 결과를 보여줘야 할듯 ㅠㅠ .!!
@@ -37,16 +40,78 @@ export function handleSubmit(event) { // handle submit을 할 게 아니라 valu
 밖에서 어떤 값을 입력했냐에 따라 내부의 타겟 토큰이 하나로 정해져있고, 그 사람을 블락토글 할 수 있도록 하기
 */
 
+function handleInvite() {
+    const targetToken = document.querySelector(".chat__header--name").innerHTML;
+    // const targetName = document.querySelector(".chat__header--name").innerHTML;
+    // const targetToken = getChatToken(targetName);
+    const roomAddress = `${FRONTEND}/game/${crypto.randomUUID()}`;
+
+    chatSocket.send(JSON.stringify({
+        'target_nickname' : `${targetToken}_test_id`,
+        'message': `${localStorage.getItem("token")}_test_id invited you to a game!\n
+        ${roomAddress}`
+    }));
+    // 추후 식별 가능 문자열로 바꿔서 이 메시지 받으면 게임 참여하기 버튼으로 바뀌게 하기 !
+
+    window.location.href(roomAddress);
+}
+
+function getChatToken(targetName) {
+    const data = {
+        method: GET,
+        body: JSON.stringify({
+          'target_nickname' : targetName,
+        })
+      };
+      fetch(`${BACKEND}/`, data);
+}
+
+function handleBlockToggle() {
+    // const targetName = document.querySelector(".chat__header--name").innerHTML;
+    // const targetToken = getChatToken(targetName);
+    const targetToken = document.querySelector(".chat__header--name").innerHTML;
+    const blockToggleBtn = document.querySelectorAll(".chat__header--btn")[1];
+    
+    let methodSelected;
+
+    if (blockToggleBtn.innerHTML === "Block") {
+        blockToggleBtn.innerHTML = "Unblock";
+        methodSelected = 'POST';
+        chatSocket.send(JSON.stringify({
+            'target_nickname' : `${targetToken}_test_id`,
+            'message': `${targetToken}_test_id is now blocked by ${localStorage.getItem("token")}_test_id ❤️`
+        }));
+    }
+    else if (blockToggleBtn.innerHTML === "Unblock") {
+        blockToggleBtn.innerHTML = "Block";
+        methodSelected = 'DELETE';
+    }
+
+    const data = {
+      method: methodSelected,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: JSON.stringify({
+        'target_nickname' : `${targetToken}_test_id`,
+      })
+    };
+    
+    fetch(`${BACKEND}/blockedusers/`, data); // 예외처리 필요
+}
+
 export function handleSubmit(event) {
 	event.preventDefault();
-	const tokenInput = document.querySelector("#chatRoomSearch input").value;
+
+    // const targetName = document.querySelector(".chat__header--name").innerHTML;
+    // const targetToken = getChatToken(targetName);
+	const tokenInput = document.querySelector('#chat__search--input').value;
 
     chatSocket.send(JSON.stringify({
         'target_nickname' : `${tokenInput}_test_id`,
         'message': `${localStorage.getItem("token")} has successfully connected to ${tokenInput}`
     }));
-    // 모달 띄울 때 내부 토큰 정함
-    document.querySelector('#target-token-input').innerHTML = tokenInput;
 
     // 이미 차단된 사람인지 체크 => 내부 창 block 버튼 unblock으로 바꾸기 위해
     fetch(`${BACKEND}/blockedusers/?target_nickname=${tokenInput}_test_id`, {
@@ -62,82 +127,91 @@ export function handleSubmit(event) {
     })
     .then(data => {
         if (data.is_blocked === true)
-            document.querySelector(".block_toggle_btn").innerHTML = "Unblock";
+            document.querySelectorAll(".chat__header--btn")[0].innerHTML = "Unblock";
     });
 
-    document.querySelector(".chat_modal").style.display = "block";
-    document.querySelector("#chatRoomSearch input").value = '';
+    // document.querySelector(".chat_modal").style.display = "block";
+    document.querySelector(".main-section__main").innerHTML = routes["/chat"].modalTemplate();
+    // 모달 띄울 때 내부 토큰 정함
+    document.querySelector(".chat__header--name").innerHTML = tokenInput;
+    const chatHeaderBtns = document.querySelectorAll(".chat__header--btn");
+    chatHeaderBtns[0].onclick = handleInvite;
+    chatHeaderBtns[1].onclick = handleBlockToggle;
+    handleChatRoom();
+    // document.querySelector("#chat__search--input input").value = '';
 }
 
-// 로그는 추후 수정
-
 export function handleChatModal() {
-	const chatModal = document.querySelector(".chat_modal");
-    const openModalBtn = document.getElementsByClassName("chatroom");
-    const closeModalBtn = document.querySelector(".close_chatroom_btn");
-    const blockToggleBtn = document.querySelector(".block_toggle_btn");
+	// const chatModal = document.querySelector(".chat_modal");
+    const openModalBtn = document.querySelectorAll(".chat__room");
+    // const closeModalBtn = document.querySelector(".close_chatroom_btn");
     
     for (let i = 0; i < openModalBtn.length; i++) {
         openModalBtn[i].onclick = function() {
-            chatModal.style.display = "block";
+            // chatModal.style.display = "block";
+            document.querySelector(".main-section__main").innerHTML = routes["/chat"].modalTemplate();
+            // 모달 띄울 때 내부 토큰 정함
+            document.querySelector(".chat__header--name").innerHTML = tokenInput;
+            handleChatRoom();
         }
     }
-	closeModalBtn.onclick = function() {
-		chatModal.style.display = "none";
-	}
-	blockToggleBtn.onclick = function() {
-        const targetToken = document.querySelector('#target-token-input').innerHTML;
-        let methodSelected;
+	// closeModalBtn.onclick = function() {
+	// 	chatModal.style.display = "none";
+	// }
+}
 
-        if (blockToggleBtn.innerHTML === "Block") {
-            blockToggleBtn.innerHTML = "Unblock";
-            methodSelected = 'POST';
-            chatSocket.send(JSON.stringify({
-                'target_nickname' : `${targetToken}_test_id`,
-                'message': `${targetToken}_test_id is now blocked by ${localStorage.getItem("token")}_test_id ❤️`
-            }));
-        }
-        else if (blockToggleBtn.innerHTML === "Unblock") {
-            blockToggleBtn.innerHTML = "Block";
-            methodSelected = 'DELETE';
-        }
+export const chatSocket = new WebSocket(
+    'ws://'
+    + '127.0.0.1'
+    + ':8000'
+    + '/ws/chatting/'
+);
 
-        const data = {
-          method: methodSelected,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({
-            'target_nickname' : `${targetToken}_test_id`,
-          })
-        };
-        
-        fetch(`${BACKEND}/blockedusers/`, data); // 예외처리 필요
-	}
+chatSocket.onopen = function (e) {
+    chatSocket.send(JSON.stringify({
+        'token' : localStorage.getItem("token"),
+    }));
+}
+
+function chatBoxTemplate(type, message, time) {
+    return `
+        <div class="chatbox ${type}">
+            <div class="chatbox__message">${message}</div>
+            <div class="chatbox__info">${time}</div>
+        </div>
+    `;
 }
 
 export function initChatSocket() {
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
-        document.querySelector('#chat-log').value += (data.from + ' : ');
-        document.querySelector('#chat-log').value += (data.message + '\n');
+        const chatFrame = document.querySelector(".chat__body--frame");
+        if (data.from == `${localStorage.getItem("token")}_test_id`)
+            chatFrame.innerHTML += chatBoxTemplate("message_me", data.message, "data.time");
+        else
+            chatFrame.innerHTML += chatBoxTemplate("message_you", data.message, "data.time");
     };
 
     chatSocket.onclose = function(e) {
         console.error('Chat socket closed unexpectedly');
     };
+}
 
-    document.querySelector('#chat-message-input').focus();
-    document.querySelector('#chat-message-input').onkeydown = function(e) {
+export function handleChatRoom() {
+    const chatHeaderBtns = document.querySelectorAll(".chat__header--btn");
+    chatHeaderBtns[0].onclick = handleInvite;
+    chatHeaderBtns[1].onclick = handleBlockToggle;
+
+    document.querySelector('.chat__controller--text').focus();
+    document.querySelector('.chat__body--text').onkeydown = function(e) {
         if (e.keyCode === 13) {  // enter, return
-            document.querySelector('#chat-message-submit').click();
+            document.querySelector('.chat__controller--btn').click();
         }
     };
 
-    document.querySelector('#chat-message-submit').onclick = function(e) {
-        const messageInputDom = document.querySelector('#chat-message-input');
-        const targetToken = document.querySelector('#target-token-input').innerHTML;
+    document.querySelector('.chat__send--btn').onclick = function(e) {
+        const messageInputDom = document.querySelector('.chat__body--text');
+        const targetToken = document.querySelector('.chat__header--name').innerHTML;
         const message = messageInputDom.value;
         const obj = {
             'target_nickname' : `${targetToken}_test_id`,
@@ -147,6 +221,3 @@ export function initChatSocket() {
         messageInputDom.value = '';
     };
 }
-
-// const chatroomSearchForm = document.getElementById("chatRoomSearch");
-// chatroomSearchForm.addEventListener("submit", handleSearchSubmit);

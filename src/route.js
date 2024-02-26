@@ -4,7 +4,7 @@ import Game from "./Game/gameTemplate.js";
 import Rank from "./Rank/rankTemplate.js";
 import Login from "./Login/loginTemplate.js";
 
-const routes = {
+export const routes = {
     "/": Home,
     "/home": Home,
     "/login": Login,

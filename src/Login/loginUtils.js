@@ -1,31 +1,37 @@
-// import LoginSuccess from "./loginSuccessTemplate.js";
+import { BACKEND } from "../Public/global.js"
 
-// const BACKEND = "http://127.0.0.1:8000";
-// const loginBtns = document.getElementsByClassName("login_box");
-// let loginStatus = false;
+export function setUserInfo(site) {
+    fetch(`${BACKEND}/accounts/${site}/login/`, {
+        method: 'GET',
+    })
+    .then(response => {
+        if (!response.ok)
+            throw new Error(`Error : ${response.status}`);
+        return response.json();
+    })
+    .then(data => {
+        if (data.error)
+            return ;
+        window.location.href = data.login_url;
+    });
+}
 
-// function setUserInfo(site) {
-//     fetch(`${BACKEND}/accounts/${site}/login/`, {
-//         method: 'GET',
-//     })
-//     .then(response => {
-//         if (!response.ok)
-//             throw new Error(`Error : ${response.status}`);
-//         // loginStatus = true;
-//         return response.json();
-//     })
-//     .then(data => {
-//         if (data.error)
-//             return ;
-//         console.dir(data);
-//     });
-//     loginStatus = true;
-// }
+export function getCookie(cname) {
+    let name = cname + "=";
+    let decodedCookie = decodeURIComponent(document.cookie);
+    let ca = decodedCookie.split(';');
+    for(let i = 0; i <ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
 
-// loginBtns[0].onclick = setUserInfo("google");
-// loginBtns[1].onclick = setUserInfo("42intra");
-
-// if (loginStatus === true) {
-//     const body = document.querySelector(".body");
-//     body.innerHTML = LoginSuccess.template();
-// }
+export function deleteCookie(name) {
+    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
