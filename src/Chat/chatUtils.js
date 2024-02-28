@@ -23,46 +23,33 @@ export function initChatSocket() {
     };
 }
 
-window.addEventListener("submit", handleSubmit); // 이거 지금은 chat에서만 필요하긴 한디 .. 
-
-// const chatroomSearchForm = document.getElementById("chatRoomSearch");
-// chatroomSearchForm.addEventListener("submit", handleSearchSubmit);
-
-/*
-export function handleSubmit(event) { // handle submit을 할 게 아니라 value를 시시각각 체크해서 결과를 보여줘야 할듯 ㅠㅠ .!!
-	event.preventDefault(); // form이라면 어쨌든 필수
-	const searchName = document.querySelector("#chatRoomSearch input").value;
-	const nameAll = document.getElementsByClassName("chat_name");
-	const searchResult = document.querySelector(".chatroom_list");
-	for (let i = 0; i < nameAll.length; i++) {
-		if (searchName === nameAll[i].innerHTML) {
-			searchResult.innerHTML = `
-			<div class="chatroom">
-				<div class="empty"></div>
-				<div class="profile ranker"></div>
-				<div class="chat_contents">
-					<div class="chat_name">naki</div>
-					<div class="chat_msg">Hi Hi</div>
-				</div>
-				<div class="chat_time">오후 7시 16분</div>
-			</div>
-			`
-			break;
-		}
-		if (i === nameAll.length - 1) {
-			searchResult.innerHTML = `<div>No result found for ${searchName}</div>`
-		}
-	}
-    searchName = '';
-	if (searchName === "")
-		searchResult.innerHTML = `<div>original</div>`
+function checkChatroomSearch() {
+    const searchInput = document.querySelector('#chat__search--input').value;
+    const nameAll = document.querySelectorAll(".chat__room--name");
+    const searchResult = document.querySelector(".chat__room--list");
+    while (searchInput) {
+        for (let i = 0; i < nameAll.length; i++) {
+            if (searchInput === nameAll[i].innerHTML) {
+                searchResult.innerHTML = `
+                <div class="chat__room" role="button">
+                    <div class="chat__empty"></div>
+                    <div class="chat__room--profile"></div>
+                    <div class="chat__room--contents">
+                        <div class="chat__room--name">${searchInput}</div>
+                        <div class="chat__room--msg">Hi Hi</div>
+                    </div>
+                    <div class="chat__room--time">17:16</div>
+                </div>
+                `
+                break;
+            }
+            if (i === nameAll.length - 1) {
+                searchResult.innerHTML = `<div>No result found for ${searchInput}</div>`
+            }
+        }
+    }
+    document.querySelector('#chat__search--input').value = '';
 }
-*/
-
-/*
-동작방식 : 채팅목록에서 채팅방 누르면 채팅창 하나를 띄우되, 
-밖에서 어떤 값을 입력했냐에 따라 내부의 타겟 토큰이 하나로 정해져있고, 그 사람을 블락토글 할 수 있도록 하기
-*/
 
 function handleInvite() {
     const targetToken = document.querySelector(".chat__header--name").innerHTML;
@@ -74,7 +61,6 @@ function handleInvite() {
         ${roomAddress}`
     }));
     // 추후 식별 가능 문자열로 바꿔서 이 메시지 받으면 게임 참여하기 버튼으로 바뀌게 하기 !
-
     window.location.href(roomAddress);
 }
 
@@ -114,7 +100,7 @@ function handleBlockToggle() {
 function showChatroom(tokenInput) {
     const chatModal = document.querySelector(".chat__modal");
     chatModal.style.display = "block";
-    
+
     // 이미 차단된 사람인지 체크 => 내부 창 block 버튼 unblock으로 바꾸기 위해
     fetch(`${BACKEND}/blockedusers/?target_nickname=${tokenInput}_test_id`, {
         method: 'GET',
@@ -139,30 +125,29 @@ function showChatroom(tokenInput) {
 
     chatModal.innerHTML += routes["/chat"].modalTemplate();
     document.querySelector(".chat__header--name").innerHTML = tokenInput;
+
+    document.querySelector(".chat__header--close").onclick = function() {
+		chatModal.style.display = "none";
+        chatModal.innerHTML -= document.querySelector(".chat__container");
+	}
+
     handleChatRoom();
 }
 
-export function handleSubmit(event) {
-    event.preventDefault();
-	const tokenInput = document.querySelector('#chat__search--input').value;
-    document.querySelector("#chat__search--input").value = '';
-    showChatroom(tokenInput);
-}
-
 export function handleChatModal() {
+    document.querySelector(".chat__search").onsubmit = function (e) {
+        e.preventDefault();
+    }
+
     const openModalBtn = document.querySelectorAll(".chat__room");
     for (let i = 0; i < openModalBtn.length; i++) {
-        openModalBtn[i].onclick = function(e) {
+        openModalBtn[i].onclick = function() {
             showChatroom(openModalBtn[i].querySelector(".chat__room--name").innerText);
         }
     }
-    // const closeModalBtn = document.querySelector(".close_chatroom_btn");
-	// closeModalBtn.onclick = function() {
-	// 	chatModal.style.display = "none";
-	// }
 }
 
-export function handleChatRoom() {
+function handleChatRoom() {
     const chatHeaderBtns = document.querySelectorAll(".chat__header--btn");
     chatHeaderBtns[0].onclick = handleInvite;
     chatHeaderBtns[1].onclick = handleBlockToggle;

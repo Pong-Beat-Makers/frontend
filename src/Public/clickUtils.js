@@ -28,7 +28,6 @@ export function handleNaviClick() {
         changeUrl("/chat");
         handleChatModal();
         headerElements[1].classList.add("active");
-        // handleChatSocket(); // handle chat modal 내부에 있음
     }
     headerElements[2].onclick = () => {
         changeUrl("/game");

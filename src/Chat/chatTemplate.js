@@ -10,8 +10,8 @@ class Chat {
 
     template() {
         return `
-		<form id="chat__search">
-			<input id="chat__search--input" type="text" placeholder="temporary token input"/>
+		<form class="chat__search">
+			<input id="chat__search--input" type="text" placeholder="Chatroom Search"/>
 			<button class="chat__search--btn">🔍</button>
 		</form>
 		<div class="chat__room--list">
@@ -47,14 +47,17 @@ class Chat {
                     <div class="chat__header--avator"></div>
                     <div class="chat__header--name">friend</div>
                 </div>
-                <div class="chat__header--controlls chat__header--invite">
-                    <button class="chat__header--btn" >
+                <div class="chat__header--controlls">
+                    <button class="chat__header--btn">
                         <i class="bi bi-controller"></i>
                         invite
                     </button>
-                    <button class="chat__header--btn chat__header--block" >
+                    <button class="chat__header--btn">
                         <i class="bi bi-person-slash"></i>
                         block
+                    </button>
+                    <button class="chat__header--close">
+                        X
                     </button>
                 </div>
             </div>
