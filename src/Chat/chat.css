@@ -271,3 +271,8 @@ input#chat__search--input {
     padding: 10px 15px;
     border-radius: 10px;
 }
+
+.chat__search--error {
+    margin-top: 5%;
+    font-size: 25px;
+}

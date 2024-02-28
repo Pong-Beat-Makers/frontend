@@ -23,34 +23,6 @@ export function initChatSocket() {
     };
 }
 
-function checkChatroomSearch() {
-    const searchInput = document.querySelector('#chat__search--input').value;
-    const nameAll = document.querySelectorAll(".chat__room--name");
-    const searchResult = document.querySelector(".chat__room--list");
-    while (searchInput) {
-        for (let i = 0; i < nameAll.length; i++) {
-            if (searchInput === nameAll[i].innerHTML) {
-                searchResult.innerHTML = `
-                <div class="chat__room" role="button">
-                    <div class="chat__empty"></div>
-                    <div class="chat__room--profile"></div>
-                    <div class="chat__room--contents">
-                        <div class="chat__room--name">${searchInput}</div>
-                        <div class="chat__room--msg">Hi Hi</div>
-                    </div>
-                    <div class="chat__room--time">17:16</div>
-                </div>
-                `
-                break;
-            }
-            if (i === nameAll.length - 1) {
-                searchResult.innerHTML = `<div>No result found for ${searchInput}</div>`
-            }
-        }
-    }
-    document.querySelector('#chat__search--input').value = '';
-}
-
 function handleInvite() {
     const targetToken = document.querySelector(".chat__header--name").innerHTML;
     const roomAddress = `${FRONTEND}/game/${crypto.randomUUID()}`;
@@ -141,10 +113,35 @@ function showChatroom(tokenInput) {
     handleChatRoom();
 }
 
+function checkChatroomSearch(event) {
+    const chatSearchInput = document.querySelector(".chat__search input");
+    const chatroomList = document.querySelector(".chat__room--list");
+    const nameAll = document.querySelectorAll(".chat__room--name");
+    const chatRoomAll = document.querySelectorAll(".chat__room");
+    // 추후 all 항목들 html에서 가져오지 말고 data source에서 가져오기
+
+    if (chatSearchInput.value) {
+        for (let i = 0; i < nameAll.length; i++) {
+            if (nameAll[i].innerHTML === chatSearchInput.value) {
+                chatroomList.innerHTML = `<div class="chat__room" role="button">
+                ${chatRoomAll[i].innerHTML}
+                </div>`;
+            }
+        }
+        // chatroomList.innerHTML = `<div class="chat__search--error">
+        // Nothing found for ${chatSearchInput.value}</div>`
+    }
+    else {
+        // data source에서 전체 정보 가져와서 다시 띄우기
+    }
+}
+
 export function handleChatModal() {
-    document.querySelector(".chat__search").onsubmit = function (e) {
+    const chatSearchBtn = document.querySelector(".chat__search");
+    chatSearchBtn.onsubmit = function (e) {
         e.preventDefault();
     }
+    chatSearchBtn.oninput = checkChatroomSearch;
 
     const openModalBtn = document.querySelectorAll(".chat__room");
     for (let i = 0; i < openModalBtn.length; i++) {
