@@ -54,7 +54,7 @@ class Chat {
                     </button>
                     <button class="chat__header--btn">
                         <i class="bi bi-person-slash"></i>
-                        block
+                        Block
                     </button>
                     <button class="chat__header--close">
                         X

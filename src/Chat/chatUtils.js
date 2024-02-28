@@ -67,19 +67,22 @@ function handleInvite() {
 function handleBlockToggle() {
     const targetToken = document.querySelector(".chat__header--name").innerHTML;
     const blockToggleBtn = document.querySelectorAll(".chat__header--btn")[1];
+    const blockIcon = `<i class="bi bi-person-slash"></i>`;
     
     let methodSelected;
 
-    if (blockToggleBtn.innerHTML === "Block") {
-        blockToggleBtn.innerHTML = "Unblock";
+    console.log(`aaaa${blockToggleBtn.innerText}aaaa`);
+
+    if (blockToggleBtn.innerText === " Block") {
+        blockToggleBtn.innerHTML = `${blockIcon}Unblock`;
         methodSelected = 'POST';
         chatSocket.send(JSON.stringify({
             'target_nickname' : `${targetToken}_test_id`,
             'message': `${targetToken}_test_id is now blocked by ${localStorage.getItem("token")}_test_id ❤️`
         }));
     }
-    else if (blockToggleBtn.innerHTML === "Unblock") {
-        blockToggleBtn.innerHTML = "Block";
+    else {
+        blockToggleBtn.innerHTML = `${blockIcon}Block`;
         methodSelected = 'DELETE';
     }
 
@@ -101,6 +104,8 @@ function showChatroom(tokenInput) {
     const chatModal = document.querySelector(".chat__modal");
     chatModal.style.display = "block";
 
+    const blockIcon = `<i class="bi bi-person-slash"></i>`;
+
     // 이미 차단된 사람인지 체크 => 내부 창 block 버튼 unblock으로 바꾸기 위해
     fetch(`${BACKEND}/blockedusers/?target_nickname=${tokenInput}_test_id`, {
         method: 'GET',
@@ -115,7 +120,7 @@ function showChatroom(tokenInput) {
     })
     .then(data => {
         if (data.is_blocked === true)
-        document.querySelectorAll(".chat__header--btn")[0].innerHTML = "Unblock";
+        document.querySelectorAll(".chat__header--btn")[1].innerHTML = `${blockIcon}Unblock`;
     });
 
     chatSocket.send(JSON.stringify({

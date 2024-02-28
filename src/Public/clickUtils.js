@@ -1,6 +1,6 @@
 import changeUrl from "../route.js";
 import { socialLogin } from "../Login/loginUtils.js";
-import { handleChatModal, initChatSocket } from "../Chat/chatUtils.js";
+import { handleChatModal } from "../Chat/chatUtils.js";
 import { handleHomeModal } from "../Home/homeUtils.js";
 
 export function handleLoginBtn() {
