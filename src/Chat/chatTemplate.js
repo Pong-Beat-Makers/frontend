@@ -1,26 +1,11 @@
 class Chat {
-    constructor() {
-        // 멤버변수 정의 : 선언만 하고 추후 값을 할당할 경우 null을 할당해 둔다.
-        this.chatBoxes = ``;
-    }
-
-    // chatbox(type, message, time) {
-    //     return `
-    //             <div class="chatbox ${type}">
-    //                 <div class="chatbox__message">${message}</div>
-    //                 <div class="chatbox__info">${time}</div>
-    //             </div>
-    //         `;
-    // }
-
-    chatbox(type, message, time) {
-        this.chatBoxes += `
+    chatBoxTemplate(type, message, time) {
+        return `
             <div class="chatbox ${type}">
                 <div class="chatbox__message">${message}</div>
                 <div class="chatbox__info">${time}</div>
             </div>
         `;
-        // 아래 템플릿에서 해당 변수를 사용하긴 하지만, return 된 이후의 값은 업데이트가 되지 않음 ,,
     }
 
     template() {

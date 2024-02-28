@@ -1,6 +1,6 @@
 import { BACKEND } from "../Public/global.js"
 
-export function setUserInfo(site) {
+export function socialLogin(site) {
     fetch(`${BACKEND}/accounts/${site}/login/`, {
         method: 'GET',
     })
@@ -16,7 +16,7 @@ export function setUserInfo(site) {
     });
 }
 
-export function getCookie(cname) {
+function getCookie(cname) {
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
     let ca = decodedCookie.split(';');
@@ -32,6 +32,25 @@ export function getCookie(cname) {
     return "";
 }
 
-export function deleteCookie(name) {
+function deleteCookie(name) {
     document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+}
+
+export function deleteCookieAll () {
+    const cookies = document.cookie.split('; ');
+    const expiration = 'Sat, 01 Jan 1972 00:00:00 GMT';
+  
+    for (i = 0; i < cookies.length; i++) {
+        document.cookie = cookies[i].split('=')[0] + '=; expires=' + expiration;
+    }
+}
+
+export function moveRefresh() {
+    if (getCookie("refresh_token")) {
+        const cookies = Object.fromEntries(
+            document.cookie.split(';').map((cookie) => cookie.trim().split('=')),
+        );
+        localStorage.setItem("refresh_token", cookies["refresh_token"]);
+        deleteCookie("refresh_token");
+    }
 }

@@ -1,5 +1,29 @@
 import { BACKEND, FRONTEND } from "../Public/global.js";
 import { routes } from "../route.js";
+import { chatSocket } from "../app.js";
+
+export function initChatSocket() {
+    chatSocket.onopen = function (e) {
+        chatSocket.send(JSON.stringify({
+            'token' : localStorage.getItem("token"),
+        }));
+    };
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const chatFrame = document.querySelector(".chat__body--frame");
+        if (data.from == `${localStorage.getItem("token")}_test_id`)
+            chatFrame.innerHTML += routes["/chat"].chatBoxTemplate("message_me", data.message, "data.time");
+        else
+            chatFrame.innerHTML += routes["/chat"].chatBoxTemplate("message_you", data.message, "data.time");
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+}
+
+window.addEventListener("submit", handleSubmit); // 이거 지금은 chat에서만 필요하긴 한디 .. 
 
 // const chatroomSearchForm = document.getElementById("chatRoomSearch");
 // chatroomSearchForm.addEventListener("submit", handleSearchSubmit);
@@ -42,8 +66,6 @@ export function handleSubmit(event) { // handle submit을 할 게 아니라 valu
 
 function handleInvite() {
     const targetToken = document.querySelector(".chat__header--name").innerHTML;
-    // const targetName = document.querySelector(".chat__header--name").innerHTML;
-    // const targetToken = getChatToken(targetName);
     const roomAddress = `${FRONTEND}/game/${crypto.randomUUID()}`;
 
     chatSocket.send(JSON.stringify({
@@ -56,19 +78,7 @@ function handleInvite() {
     window.location.href(roomAddress);
 }
 
-function getChatToken(targetName) {
-    const data = {
-        method: GET,
-        body: JSON.stringify({
-          'target_nickname' : targetName,
-        })
-      };
-      fetch(`${BACKEND}/`, data);
-}
-
 function handleBlockToggle() {
-    // const targetName = document.querySelector(".chat__header--name").innerHTML;
-    // const targetToken = getChatToken(targetName);
     const targetToken = document.querySelector(".chat__header--name").innerHTML;
     const blockToggleBtn = document.querySelectorAll(".chat__header--btn")[1];
     
@@ -102,16 +112,9 @@ function handleBlockToggle() {
 }
 
 export function handleSubmit(event) {
-	event.preventDefault();
+    event.preventDefault();
 
-    // const targetName = document.querySelector(".chat__header--name").innerHTML;
-    // const targetToken = getChatToken(targetName);
 	const tokenInput = document.querySelector('#chat__search--input').value;
-
-    chatSocket.send(JSON.stringify({
-        'target_nickname' : `${tokenInput}_test_id`,
-        'message': `${localStorage.getItem("token")} has successfully connected to ${tokenInput}`
-    }));
 
     // 이미 차단된 사람인지 체크 => 내부 창 block 버튼 unblock으로 바꾸기 위해
     fetch(`${BACKEND}/blockedusers/?target_nickname=${tokenInput}_test_id`, {
@@ -130,15 +133,16 @@ export function handleSubmit(event) {
             document.querySelectorAll(".chat__header--btn")[0].innerHTML = "Unblock";
     });
 
+    chatSocket.send(JSON.stringify({
+        'target_nickname' : `${tokenInput}_test_id`,
+        'message': `${localStorage.getItem("token")} has successfully connected to ${tokenInput}`
+    }));
+
     // document.querySelector(".chat_modal").style.display = "block";
-    document.querySelector(".main-section__main").innerHTML = routes["/chat"].modalTemplate();
-    // 모달 띄울 때 내부 토큰 정함
-    document.querySelector(".chat__header--name").innerHTML = tokenInput;
-    const chatHeaderBtns = document.querySelectorAll(".chat__header--btn");
-    chatHeaderBtns[0].onclick = handleInvite;
-    chatHeaderBtns[1].onclick = handleBlockToggle;
-    handleChatRoom();
     // document.querySelector("#chat__search--input input").value = '';
+    document.querySelector(".main-section__main").innerHTML = routes["/chat"].modalTemplate();
+    document.querySelector(".chat__header--name").innerHTML = tokenInput;
+    handleChatRoom();
 }
 
 export function handleChatModal() {
@@ -158,43 +162,6 @@ export function handleChatModal() {
 	// closeModalBtn.onclick = function() {
 	// 	chatModal.style.display = "none";
 	// }
-}
-
-export const chatSocket = new WebSocket(
-    'ws://'
-    + '127.0.0.1'
-    + ':8000'
-    + '/ws/chatting/'
-);
-
-chatSocket.onopen = function (e) {
-    chatSocket.send(JSON.stringify({
-        'token' : localStorage.getItem("token"),
-    }));
-}
-
-function chatBoxTemplate(type, message, time) {
-    return `
-        <div class="chatbox ${type}">
-            <div class="chatbox__message">${message}</div>
-            <div class="chatbox__info">${time}</div>
-        </div>
-    `;
-}
-
-export function initChatSocket() {
-    chatSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-        const chatFrame = document.querySelector(".chat__body--frame");
-        if (data.from == `${localStorage.getItem("token")}_test_id`)
-            chatFrame.innerHTML += chatBoxTemplate("message_me", data.message, "data.time");
-        else
-            chatFrame.innerHTML += chatBoxTemplate("message_you", data.message, "data.time");
-    };
-
-    chatSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
-    };
 }
 
 export function handleChatRoom() {
