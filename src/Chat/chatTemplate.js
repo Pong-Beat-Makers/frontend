@@ -19,21 +19,23 @@ class Chat {
 				<div class="chat__empty"></div>
 				<div class="chat__room--profile"></div>
 				<div class="chat__room--contents">
-					<div class="chat__room--name">naki</div>
+					<div class="chat__room--name">1001</div>
 					<div class="chat__room--msg">Hi Hi</div>
 				</div>
-				<div class="chat__room--time">오후 7시 16분</div>
+				<div class="chat__room--time">17:16</div>
 			</div>
 			<div class="chat__room" role="button">
 				<div class="chat__empty"></div>
 				<div class="chat__room--profile"></div>
 				<div class="chat__room--contents">
-					<div class="chat__room--name">jeelee</div>
+					<div class="chat__room--name">1002</div>
 					<div class="chat__room--msg">hello world</div>
 				</div>
-				<div class="chat__room--time">오후 7시 17분</div>
+				<div class="chat__room--time">17:17</div>
 			</div>
 		</div>
+        <div class="chat__modal">
+        </div>
 		`;
     }
 

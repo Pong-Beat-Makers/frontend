@@ -13,9 +13,9 @@ export function initChatSocket() {
         const data = JSON.parse(e.data);
         const chatFrame = document.querySelector(".chat__body--frame");
         if (data.from == `${localStorage.getItem("token")}_test_id`)
-            chatFrame.innerHTML += routes["/chat"].chatBoxTemplate("message_me", data.message, "data.time");
+            chatFrame.innerHTML += routes["/chat"].chatBoxTemplate("message_me", data.message, data.time);
         else
-            chatFrame.innerHTML += routes["/chat"].chatBoxTemplate("message_you", data.message, "data.time");
+            chatFrame.innerHTML += routes["/chat"].chatBoxTemplate("message_you", data.message, data.time);
     };
 
     chatSocket.onclose = function(e) {
@@ -111,11 +111,10 @@ function handleBlockToggle() {
     fetch(`${BACKEND}/blockedusers/`, data); // 예외처리 필요
 }
 
-export function handleSubmit(event) {
-    event.preventDefault();
-
-	const tokenInput = document.querySelector('#chat__search--input').value;
-
+function showChatroom(tokenInput) {
+    const chatModal = document.querySelector(".chat__modal");
+    chatModal.style.display = "block";
+    
     // 이미 차단된 사람인지 체크 => 내부 창 block 버튼 unblock으로 바꾸기 위해
     fetch(`${BACKEND}/blockedusers/?target_nickname=${tokenInput}_test_id`, {
         method: 'GET',
@@ -125,12 +124,12 @@ export function handleSubmit(event) {
     })
     .then(response => {
         if (!response.ok)
-            throw new Error(`Error : ${response.status}`);
-        return  response.json();
+        throw new Error(`Error : ${response.status}`);
+    return  response.json();
     })
     .then(data => {
         if (data.is_blocked === true)
-            document.querySelectorAll(".chat__header--btn")[0].innerHTML = "Unblock";
+        document.querySelectorAll(".chat__header--btn")[0].innerHTML = "Unblock";
     });
 
     chatSocket.send(JSON.stringify({
@@ -138,27 +137,26 @@ export function handleSubmit(event) {
         'message': `${localStorage.getItem("token")} has successfully connected to ${tokenInput}`
     }));
 
-    // document.querySelector(".chat_modal").style.display = "block";
-    // document.querySelector("#chat__search--input input").value = '';
-    document.querySelector(".main-section__main").innerHTML = routes["/chat"].modalTemplate();
+    chatModal.innerHTML += routes["/chat"].modalTemplate();
     document.querySelector(".chat__header--name").innerHTML = tokenInput;
     handleChatRoom();
 }
 
+export function handleSubmit(event) {
+    event.preventDefault();
+	const tokenInput = document.querySelector('#chat__search--input').value;
+    document.querySelector("#chat__search--input").value = '';
+    showChatroom(tokenInput);
+}
+
 export function handleChatModal() {
-	// const chatModal = document.querySelector(".chat_modal");
     const openModalBtn = document.querySelectorAll(".chat__room");
-    // const closeModalBtn = document.querySelector(".close_chatroom_btn");
-    
     for (let i = 0; i < openModalBtn.length; i++) {
-        openModalBtn[i].onclick = function() {
-            // chatModal.style.display = "block";
-            document.querySelector(".main-section__main").innerHTML = routes["/chat"].modalTemplate();
-            // 모달 띄울 때 내부 토큰 정함
-            document.querySelector(".chat__header--name").innerHTML = tokenInput;
-            handleChatRoom();
+        openModalBtn[i].onclick = function(e) {
+            showChatroom(openModalBtn[i].querySelector(".chat__room--name").innerText);
         }
     }
+    // const closeModalBtn = document.querySelector(".close_chatroom_btn");
 	// closeModalBtn.onclick = function() {
 	// 	chatModal.style.display = "none";
 	// }
