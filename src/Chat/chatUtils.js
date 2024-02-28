@@ -71,10 +71,9 @@ function handleBlockToggle() {
     
     let methodSelected;
 
-    console.log(`aaaa${blockToggleBtn.innerText}aaaa`);
-
-    if (blockToggleBtn.innerText === " Block") {
-        blockToggleBtn.innerHTML = `${blockIcon}Unblock`;
+    if (blockToggleBtn.classList.contains("block")) {
+        blockToggleBtn.classList.replace("block", "unblock");
+        blockToggleBtn.innerHTML = `${blockIcon} Unblock`;
         methodSelected = 'POST';
         chatSocket.send(JSON.stringify({
             'target_nickname' : `${targetToken}_test_id`,
@@ -82,7 +81,7 @@ function handleBlockToggle() {
         }));
     }
     else {
-        blockToggleBtn.innerHTML = `${blockIcon}Block`;
+        blockToggleBtn.innerHTML = `${blockIcon} Block`;
         methodSelected = 'DELETE';
     }
 
@@ -119,8 +118,11 @@ function showChatroom(tokenInput) {
     return  response.json();
     })
     .then(data => {
-        if (data.is_blocked === true)
-        document.querySelectorAll(".chat__header--btn")[1].innerHTML = `${blockIcon}Unblock`;
+        if (data.is_blocked === true) {
+            const blockToggleBtn = document.querySelectorAll(".chat__header--btn")[1];
+            blockToggleBtn.innerHTML = `${blockIcon} Unblock`;
+            blockToggleBtn.classList.replace("block", "unblock");
+        }
     });
 
     chatSocket.send(JSON.stringify({

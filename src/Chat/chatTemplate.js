@@ -52,7 +52,7 @@ class Chat {
                         <i class="bi bi-controller"></i>
                         invite
                     </button>
-                    <button class="chat__header--btn">
+                    <button class="chat__header--btn block">
                         <i class="bi bi-person-slash"></i>
                         Block
                     </button>
