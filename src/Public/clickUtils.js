@@ -2,6 +2,7 @@ import changeUrl from "../route.js";
 import { socialLogin } from "../Login/loginUtils.js";
 import { handleChatModal } from "../Chat/chatUtils.js";
 import { handleHomeModal } from "../Home/homeUtils.js";
+import {handleGameModal} from "../Game/gameUtils.js";
 
 export function handleLoginBtn() {
     const loginBtns = document.querySelectorAll(".login-btn");
@@ -32,7 +33,7 @@ export function handleNaviClick() {
     headerElements[2].onclick = () => {
         changeUrl("/game");
         headerElements[2].classList.add("active");
-        // handleGame();
+        handleGameModal();
     }
     headerElements[3].onclick = () => {
         changeUrl("/rank");

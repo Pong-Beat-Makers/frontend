@@ -9,7 +9,7 @@
 .login__container--header {
   color: white;
   font-size: 100px;
-  text-shadow: 0px -8px 10px var(--point-color), 0px 8px 10px #872AFF;
+  text-shadow: 0px -8px 10px rgba(var(--point-color) / 50%), 0px 8px 10px #872AFF;
   margin-bottom: 50px;
 }
 
