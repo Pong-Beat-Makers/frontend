@@ -1,4 +1,3 @@
-// 이전에는 버튼 클릭 시 실행되는 함수가 handleClick, onclick 두가지여서 안됐던듯 . . 내부에서 분기 후 해결 ㅠ
 export function handleHomeModal() {
     const modals = document.getElementsByClassName("modal");
     const openModalBtns = document.getElementsByClassName("open_modal_btn");
