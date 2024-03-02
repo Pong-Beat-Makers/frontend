@@ -18,9 +18,10 @@ import { showChatList, showSearchResult } from "./chatPageUtils.js";
 
 TODO: 
     1. 채팅방 목록 띄울 때 최근 채팅 순서대로
-    2. 로컬스토리지 데이터 바탕으로 채팅방 검색기능 구현
-    3. 메시지 보낸지 24시간 지나면 해당 채팅방 재접속 시 데이터 삭제
-    4. 코드 분리
+    2. 메시지 보낸지 24시간 지나면 해당 채팅방 재접속 시 데이터 삭제
+    3. 코드 분리
+    4. 채팅, 차단, 검색 모두 테스트 후 머지
+    5. 모달 & 검색창 css 수정
 */
 
 function saveNewMsg(chatId, newMsgObj) {
