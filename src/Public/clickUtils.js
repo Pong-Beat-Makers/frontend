@@ -2,7 +2,7 @@ import changeUrl from "../route.js";
 import { socialLogin } from "../Login/loginUtils.js";
 import { handleChatModal } from "../Chat/chatUtils.js";
 import { handleHomeModal } from "../Home/homeUtils.js";
-import {handleGameModal} from "../Game/gameUtils.js";
+import { handleGameModal } from "../Game/gameUtils.js";
 
 export function handleLoginBtn() {
     const loginBtns = document.querySelectorAll(".login-btn");
