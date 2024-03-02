@@ -76,11 +76,15 @@ class PlayGameApp {
                     (obj) => {
                         this._scene.add(obj);
                     },
-                    (xhr) => console.log((xhr.loaded / xhr.total * 100) + '% OBJ loaded'),
+                    (xhr) => {
+                        // console.log((xhr.loaded / xhr.total * 100) + '% OBJ loaded');
+                    },
                     (err) => console.error('Error:', err)
                 );
             },
-            (xhr) => console.log((xhr.loaded / xhr.total * 100) + '% MTL loaded'),
+            (xhr) => {
+                // console.log((xhr.loaded / xhr.total * 100) + '% MTL loaded');
+            },
             (err) => console.error('Error:', err)
         );
     }
