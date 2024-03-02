@@ -1,5 +1,5 @@
 import Game from './gameTemplate.js';
-import PlayGameApp from "../PlayGame/gameApp.js";
+import PlayGameApp from "./gameApp.js";
 
 export function handleGameModal() {
     const playBtn = document.querySelectorAll('.game__playbtn');

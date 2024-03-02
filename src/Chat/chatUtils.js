@@ -1,21 +1,103 @@
-import { BACKEND, FRONTEND } from "../Public/global.js";
+import { BACKEND, FRONTEND, EXPIRY, chatTokenKey } from "../Public/global.js";
 import { routes } from "../route.js";
 import { chatSocket } from "../app.js";
+
+/*
+1. 메시지 받으면 로컬스토리지에 저장
+- key : chat_${token}_num
+- value :
+    from : me / you
+    msg : data.msg
+    time : data.time
+    exp : time + 1
+
+1-1. 한 메시지씩 저장하지 말고, 한 사람과의 대화를 통째로 저장
+- key : chat_${token}
+- value:
+    {[from], [msg], [time], [exp]}, {[from], [msg], [time], [exp]}, {[from], [msg], [time], [exp]} ...
+
+2. 채팅 목록 페이지는 로컬스토리지의 key를 참조하여 chat_${token} 개수만큼 목록 생성
+2-1. 로컬스토리지 key를 이용하여 목록을 띄우고, 클릭시 내부 value 개수를 이용하여 말풍선 생성
+
+가능하다면 -1번 방법들이 좋을 듯 !
+작동은 하는데 .. 보낸메시지는 전부 자기 로그에 저장해버리는 이슈 ㅠ
+
+3. 특정 채팅방 클릭 시 해당 token과의 채팅 목록 불러와서 채팅방 모달 띄움
+4. 로그아웃 시 로컬스토리지, 쿠키의 모든 데이터 지워짐
+
+-> 하루 지난 메시지는 언제 삭제할건지 ? 2번 / 3번
+-> 일단 저장부터 만들귀 ㅎㅎ . 
+*/
+
+function saveNewMsg(chatId, newMsgObj) {
+    let chatLog = localStorage.getItem(chatId);
+    if (chatLog) {
+        chatLog = JSON.parse(chatLog);
+    } else {
+        chatLog = [];
+    }
+    chatLog.push(newMsgObj);
+    localStorage.setItem(chatId, JSON.stringify(chatLog));
+}
+
+function updateChatLog(newMsgObj) {
+    try {
+        const chatFrame = document.querySelector(".chat__body--frame");
+        chatFrame.innerHTML += routes["/chat"].chatBoxTemplate(
+            `message_${newMsgObj.from}`, newMsgObj.msg, newMsgObj.time);
+    }
+    catch {
+    }
+}
+
+// 로그의 처음부터 끝까지 출력이라 처음에 채팅창 열 때 한번만 호출해야 함
+function loadChatLog(chatId) {
+    const chatFrame = document.querySelector(".chat__body--frame");
+    let chatLog = localStorage.getItem(chatId);
+    
+    if (!chatLog)
+        return ;
+
+    chatLog = JSON.parse(chatLog);
+    for (let i = 0; i < chatLog.length; i++) {
+            chatFrame.innerHTML += routes["/chat"].chatBoxTemplate(
+                `message_${chatLog[i].from}`, chatLog[i].msg, chatLog[i].time);
+    }
+}
 
 export function initChatSocket() {
     chatSocket.onopen = function (e) {
         chatSocket.send(JSON.stringify({
-            'token' : localStorage.getItem("token"),
+            'token' : localStorage.getItem(chatTokenKey),
         }));
     };
 
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
-        const chatFrame = document.querySelector(".chat__body--frame");
-        if (data.from == `${localStorage.getItem("token")}_test_id`)
-            chatFrame.innerHTML += routes["/chat"].chatBoxTemplate("message_me", data.message, data.time);
-        else
-            chatFrame.innerHTML += routes["/chat"].chatBoxTemplate("message_you", data.message, data.time);
+
+        const fromToken = data.from.slice(0, -8); // token_test_id에서 _test_id 제거
+        // successfully logged in 메시지는 from이 없어서 에러뜸, 추후 지우기 ㅎㅎ
+        // const exp = new Date().getTime() + EXPIRY * 24 * 60 * 60 * 1000;
+        const exp = "1111";
+        
+        let chatSide;
+        let chatId;
+        if (fromToken === localStorage.getItem(chatTokenKey)) {
+            chatSide = "me";
+            chatId = document.querySelector(".chat__header--name").innerText;
+        } else {
+            chatSide = "you";
+            chatId = fromToken;
+        }
+
+        const newMsgObj = {
+            from: chatSide,
+            msg: data.message,
+            time: data.time,
+            exp: exp,
+        };
+        saveNewMsg(`chatLog_${chatId}`, newMsgObj);
+        updateChatLog(newMsgObj);
     };
 
     chatSocket.onclose = function(e) {
@@ -29,7 +111,7 @@ function handleInvite() {
 
     chatSocket.send(JSON.stringify({
         'target_nickname' : `${targetToken}_test_id`,
-        'message': `${localStorage.getItem("token")}_test_id invited you to a game!\n
+        'message': `${localStorage.getItem(chatTokenKey)}_test_id invited you to a game!\n
         ${roomAddress}`
     }));
     // 추후 식별 가능 문자열로 바꿔서 이 메시지 받으면 게임 참여하기 버튼으로 바뀌게 하기 !
@@ -49,7 +131,7 @@ function handleBlockToggle() {
         methodSelected = 'POST';
         chatSocket.send(JSON.stringify({
             'target_nickname' : `${targetToken}_test_id`,
-            'message': `${targetToken}_test_id is now blocked by ${localStorage.getItem("token")}_test_id ❤️`
+            'message': `${targetToken}_test_id is now blocked by ${localStorage.getItem(chatTokenKey)}_test_id ❤️`
         }));
     }
     else {
@@ -61,7 +143,7 @@ function handleBlockToggle() {
       method: methodSelected,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem("token")}`,
+        'Authorization': `Bearer ${localStorage.getItem(chatTokenKey)}`,
       },
       body: JSON.stringify({
         'target_nickname' : `${targetToken}_test_id`,
@@ -81,7 +163,7 @@ function showChatroom(tokenInput) {
     fetch(`${BACKEND}/blockedusers/?target_nickname=${tokenInput}_test_id`, {
         method: 'GET',
         headers: {
-            'Authorization': `Bearer ${localStorage.getItem("token")}`,
+            'Authorization': `Bearer ${localStorage.getItem(chatTokenKey)}`,
         },
     })
     .then(response => {
@@ -96,12 +178,12 @@ function showChatroom(tokenInput) {
             blockToggleBtn.classList.replace("block", "unblock");
         }
     });
-
+/*
     chatSocket.send(JSON.stringify({
         'target_nickname' : `${tokenInput}_test_id`,
-        'message': `${localStorage.getItem("token")} has successfully connected to ${tokenInput}`
+        'message': `${localStorage.getItem(chatTokenKey)} has successfully connected to ${tokenInput}`
     }));
-
+*/
     chatModal.innerHTML += routes["/chat"].modalTemplate();
     document.querySelector(".chat__header--name").innerHTML = tokenInput;
 
@@ -110,6 +192,7 @@ function showChatroom(tokenInput) {
         chatModal.innerHTML -= document.querySelector(".chat__container");
 	}
 
+    loadChatLog(`chatLog_${tokenInput}`);
     handleChatRoom();
 }
 
