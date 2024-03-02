@@ -18,11 +18,17 @@
     font-size: 25px;
     opacity: 60%;
     cursor: pointer;
+    transition: .2s ease-in-out;
+}
+
+.main-section__list--item:hover {
+    opacity: 100%;
+    text-shadow: 2px 4px 8px rgba(var(--point-color) / 50%);
 }
 
 .main-section__list--item.active {
     opacity: 100%;
-    text-shadow: 2px 4px 8px var(--point-color);
+    text-shadow: 2px 4px 8px rgba(var(--point-color) / 50%);
 }
 
 .main-section__main {

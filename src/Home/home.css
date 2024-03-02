@@ -5,7 +5,7 @@
 .home__header--text {
     font-size: 100px;
     color: white;
-    text-shadow: 0px -8px 10px var(--point-color), 0px 8px 10px #9546FC;
+    text-shadow: 0px -8px 10px rgba(var(--point-color) / 50%), 0px 8px 10px #9546FC;
 }
 
 .home__body {

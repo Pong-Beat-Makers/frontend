@@ -14,6 +14,9 @@
 @import "Public/components/modal.css";
 @import "Public/components/note.css";
 
+/* Modal */
+@import "Modals/profile-modal.css";
+
 /* screens */
 @import "Login/login.css";
 @import "Home/home.css";
@@ -30,7 +33,7 @@
     min-height: var(--min-height-size);
     height: 100vh;
     font-family: var(--main-font);
-    color: var(--font-color);
+    color: rgb(var(--font-color));
     -webkit-user-select: none;
     -khtml-user-select: none;
     -moz-user-select: none;

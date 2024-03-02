@@ -1,6 +1,7 @@
 header {
     background: #AF81EC;
     height: 85px;
+    min-height: 85px;
     box-shadow: 0px 4px 4px 0px #00000040;
     display: flex;
     justify-content: space-between;
@@ -12,12 +13,12 @@ header {
 }
 
 .header__logo--text {
-    color: #FFFFFF;
+    color: white;
     font-size: 60px;
     font-weight: 400;
     line-height: 72px;
     letter-spacing: 0em;
-    text-shadow: 0px -8px 10px var(--point-color), 0px 8px 10px #872AFF;
+    text-shadow: 0px -8px 10px rgba(var(--point-color) / 50%), 0px 8px 10px #872AFF;
     cursor: pointer;
 }
 
@@ -30,7 +31,7 @@ header {
 }
 
 .header__logout--btn {
-    background: #FFFFFF;
+    background: white;
     width: 139px;
     height: 56px;
     border-radius: 10px;

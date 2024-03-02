@@ -3,7 +3,7 @@ import Login from "./Login/loginTemplate.js"
 import changeUrl from "./route.js";
 import { LOCALHOST } from "./Public/global.js";
 import { initChatSocket } from "./Chat/chatUtils.js";
-import { moveRefresh } from "./Login/loginUtils.js";
+import {handleEditUserUtils, moveRefresh} from "./Login/loginUtils.js";
 import { handleLoginBtn, handleNaviClick } from "./Public/clickUtils.js";
 import { handleHomeModal } from "./Home/homeUtils.js";
 
@@ -21,6 +21,9 @@ if (document.cookie) {
     initChatSocket();
     handleNaviClick();
     // handleHomeModal();
+
+    // 메인 섹션 프로필 이벤트 등록
+    handleEditUserUtils();
 }
 else {
     app.innerHTML = Login.template();
