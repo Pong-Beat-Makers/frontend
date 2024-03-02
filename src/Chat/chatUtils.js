@@ -1,6 +1,7 @@
 import { BACKEND, FRONTEND, EXPIRY, chatTokenKey } from "../Public/global.js";
 import { routes } from "../route.js";
 import { chatSocket } from "../app.js";
+import { showChatList } from "./chatPageUtils.js";
 
 /*
 1. 메시지 받으면 로컬스토리지에 저장. 한 사람과의 대화 전체를 하나의 key로 저장. 
@@ -213,6 +214,8 @@ function checkChatroomSearch(event) {
 }
 
 export function handleChatModal() {
+    showChatList();
+
     const chatSearchBtn = document.querySelector(".chat__search");
     chatSearchBtn.onsubmit = function (e) {
         e.preventDefault();
@@ -232,7 +235,7 @@ function handleChatRoom() {
     chatHeaderBtns[0].onclick = handleInvite;
     chatHeaderBtns[1].onclick = handleBlockToggle;
 
-    document.querySelector('.chat__controller--text').focus();
+    // document.querySelector('.chat__controller--text').focus();
     document.querySelector('.chat__body--text').onkeydown = function(e) {
         if (e.keyCode === 13) {  // enter, return
             document.querySelector('.chat__controller--btn').click();
