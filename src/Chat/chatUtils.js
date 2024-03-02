@@ -22,6 +22,9 @@ TODO:
     3. 코드 분리
     4. 채팅, 차단, 검색 모두 테스트 후 머지
     5. 모달 & 검색창 css 수정
+
+error:
+    innerHTML 변경할 때마다 이벤트리스너 새로 달아줘야하는듯 .. 이건 내일해야지
 */
 
 function saveNewMsg(chatId, newMsgObj) {
