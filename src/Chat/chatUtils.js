@@ -1,7 +1,7 @@
 import { BACKEND, FRONTEND, EXPIRY, chatTokenKey } from "../Public/global.js";
 import { routes } from "../route.js";
 import { chatSocket } from "../app.js";
-import { showChatList } from "./chatPageUtils.js";
+import { showChatList, showSearchResult } from "./chatPageUtils.js";
 
 /*
 1. 메시지 받으면 로컬스토리지에 저장. 한 사람과의 대화 전체를 하나의 key로 저장. 
@@ -17,7 +17,7 @@ import { showChatList } from "./chatPageUtils.js";
 4. 로그아웃 시 로컬스토리지, 쿠키의 모든 데이터 삭제
 
 TODO: 
-    1. 로컬스토리지 참조하여 채팅방 목록 띄우기
+    1. 채팅방 목록 띄울 때 최근 채팅 순서대로
     2. 로컬스토리지 데이터 바탕으로 채팅방 검색기능 구현
     3. 메시지 보낸지 24시간 지나면 해당 채팅방 재접속 시 데이터 삭제
     4. 코드 분리
@@ -190,30 +190,16 @@ function showChatroom(tokenInput) {
     handleChatRoom();
 }
 
+// 검색창 내부 input 달라질 때마다 호출되는 함수
 function checkChatroomSearch(event) {
     const chatSearchInput = document.querySelector(".chat__search input");
-    const chatroomList = document.querySelector(".chat__room--list");
-    const nameAll = document.querySelectorAll(".chat__room--name");
-    const chatRoomAll = document.querySelectorAll(".chat__room");
-    // 추후 all 항목들 html에서 가져오지 말고 data source에서 가져오기
-
-    if (chatSearchInput.value) {
-        for (let i = 0; i < nameAll.length; i++) {
-            if (nameAll[i].innerHTML === chatSearchInput.value) {
-                chatroomList.innerHTML = `<div class="chat__room" role="button">
-                ${chatRoomAll[i].innerHTML}
-                </div>`;
-            }
-        }
-        // chatroomList.innerHTML = `<div class="chat__search--error">
-        // Nothing found for ${chatSearchInput.value}</div>`
-    }
-    else {
-        // data source에서 전체 정보 가져와서 다시 띄우기
-    }
+    if (chatSearchInput.value)
+        showSearchResult(chatSearchInput.value);
+    else
+        showChatList();
 }
 
-export function handleChatModal() {
+export function setChatPage() {
     showChatList();
 
     const chatSearchBtn = document.querySelector(".chat__search");
