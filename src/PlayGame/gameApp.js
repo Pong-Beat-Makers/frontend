@@ -261,10 +261,14 @@ class PlayGameApp {
                 this.renderYourPaddle(data.player1_coords[1], 470, -340);
 
                 this._container.addEventListener('keydown', e => {
+                    e.preventDefault();
+
                     if (e.key === 'ArrowLeft') this._send('up');
                     else if (e.key === 'ArrowRight') this._send('down');
                 });
                 this._container.addEventListener('keyup', e => {
+                    e.preventDefault();
+
                     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') this._send('stop');
                 });
             }
