@@ -3,30 +3,23 @@ import { routes } from "../route.js";
 import { chatSocket } from "../app.js";
 
 /*
-1. 메시지 받으면 로컬스토리지에 저장
-- key : chat_${token}_num
-- value :
-    from : me / you
-    msg : data.msg
-    time : data.time
-    exp : time + 1
-
-1-1. 한 메시지씩 저장하지 말고, 한 사람과의 대화를 통째로 저장
-- key : chat_${token}
+1. 메시지 받으면 로컬스토리지에 저장. 한 사람과의 대화 전체를 하나의 key로 저장. 
+- key : chatLog_${token}
 - value:
     {[from], [msg], [time], [exp]}, {[from], [msg], [time], [exp]}, {[from], [msg], [time], [exp]} ...
 
-2. 채팅 목록 페이지는 로컬스토리지의 key를 참조하여 chat_${token} 개수만큼 목록 생성
-2-1. 로컬스토리지 key를 이용하여 목록을 띄우고, 클릭시 내부 value 개수를 이용하여 말풍선 생성
+2. 채팅 목록 페이지는 로컬스토리지의 key를 참조하여 chat_${token} 개수만큼 생성.
 
-가능하다면 -1번 방법들이 좋을 듯 !
-작동은 하는데 .. 보낸메시지는 전부 자기 로그에 저장해버리는 이슈 ㅠ
+3. 특정 채팅방 클릭 시 해당 token과의 채팅 목록 불러와서 채팅방 모달 띄움,
+    내부 value개수만큼 말풍선 생성
 
-3. 특정 채팅방 클릭 시 해당 token과의 채팅 목록 불러와서 채팅방 모달 띄움
-4. 로그아웃 시 로컬스토리지, 쿠키의 모든 데이터 지워짐
+4. 로그아웃 시 로컬스토리지, 쿠키의 모든 데이터 삭제
 
--> 하루 지난 메시지는 언제 삭제할건지 ? 2번 / 3번
--> 일단 저장부터 만들귀 ㅎㅎ . 
+TODO: 
+    1. 로컬스토리지 참조하여 채팅방 목록 띄우기
+    2. 로컬스토리지 데이터 바탕으로 채팅방 검색기능 구현
+    3. 메시지 보낸지 24시간 지나면 해당 채팅방 재접속 시 데이터 삭제
+    4. 코드 분리
 */
 
 function saveNewMsg(chatId, newMsgObj) {
@@ -53,8 +46,8 @@ function updateChatLog(newMsgObj) {
 // 로그의 처음부터 끝까지 출력이라 처음에 채팅창 열 때 한번만 호출해야 함
 function loadChatLog(chatId) {
     const chatFrame = document.querySelector(".chat__body--frame");
+
     let chatLog = localStorage.getItem(chatId);
-    
     if (!chatLog)
         return ;
 
