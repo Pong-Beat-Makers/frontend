@@ -39,31 +39,6 @@ class Game {
 		</div>
 		`;
 	}
-
-	modalTemplate() {
-		return `
-		<div style="background-color: rgb(var(--sub-color));" class="modal__container">
-			<div class="playgame__wrapper">
-				<div class="playgame__header">
-					<div class="playgame__header--profile">
-					<div class="playgame__header--avator"></div>
-					<div class="playgame__header--name">Player1</div>
-					</div><div class="playgame__header--profile">
-					<div class="playgame__header--avator"></div>
-					<div class="playgame__header--name">Player2</div>
-					</div>
-				</div>
-				<div class="playgame__body">
-					<div id="game_playground" tabindex="0"></div>
-					<botton class="playgame__btn">
-						<i class="bi bi-flag"></i>
-						give up
-					</botton>
-				</div>
-			</div>
-		</div>
-		`
-	}
 }
 
 export default new Game();

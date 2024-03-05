@@ -3,9 +3,10 @@ import Login from "./Login/loginTemplate.js"
 import changeUrl from "./route.js";
 import { LOCALHOST } from "./Public/global.js";
 import { initChatSocket } from "./Chat/chatSocketUtils.js";
-import {handleEditUserUtils, moveRefresh} from "./Login/loginUtils.js";
+import { moveRefresh } from "./Login/loginUtils.js";
 import { handleLoginBtn, handleNaviClick } from "./Public/clickUtils.js";
 import { handleHomeModal } from "./Home/homeUtils.js";
+import { handleEditUserModalUtils, handleFriendModalUtils } from "./Modals/modalUtils.js";
 
 const app = document.querySelector("#app");
 export let chatSocket;
@@ -23,7 +24,8 @@ if (document.cookie) {
     // handleHomeModal();
 
     // 메인 섹션 프로필 이벤트 등록
-    handleEditUserUtils();
+    handleEditUserModalUtils();
+    handleFriendModalUtils();
 }
 else {
     app.innerHTML = Login.template();
