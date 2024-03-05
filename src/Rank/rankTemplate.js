@@ -1,4 +1,12 @@
 class Rank {
+	rankerStageTemplate(tier) {
+		return `
+			<div class="rank__stage--table">
+				<div class="rank__stage--avator rank__profile--${tier}"></div>
+		</div>
+		`
+	}
+
 	rankerTemplate() {
 		return `
 			<div class="rank__list--item">
@@ -19,17 +27,7 @@ class Rank {
 
 	template() {
 		return `
-			<div class="rank__stage">
-					<div class="rank__stage--table">
-							<div class="rank__stage--avator rank__profile--silver"></div>
-					</div>
-					<div class="rank__stage--table">
-							<div class="rank__stage--avator rank__profile--gold"></div>
-					</div>
-					<div class="rank__stage--table">
-							<div class="rank__stage--avator rank__profile--bronze"></div>
-					</div>
-			</div>
+			<div class="rank__stage"></div>
 			<div class="rank__list">
 					<div class="rank__list--friends">
 					</div>
