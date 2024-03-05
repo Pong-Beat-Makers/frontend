@@ -1,22 +1,20 @@
 class Rank {
-	friend_profile(number) {
-		let ret = '';
-		for (let i = 0; i < number; ++i) ret += `
-				<div class="rank__list--item">
-						<div class="rank__list--number">${i+1}</div>
-						<div class="profile-section__friends--item">
-								<div class="profile-section__friends--profile">
-										<div></div>
-										<div>friend</div>
-								</div>
-								<div class="profile-section__friends--status online">
-										<div>online</div>
-										<div></div>
-								</div>
+	rankerTemplate() {
+		return `
+			<div class="rank__list--item">
+				<div class="rank__list--number"></div>
+				<div class="profile-section__friends--item">
+						<div class="profile-section__friends--profile">
+								<div></div>
+								<div>friend</div>
+						</div>
+						<div class="profile-section__friends--status online">
+								<div>online</div>
+								<div></div>
 						</div>
 				</div>
+		</div>
 		`;
-		return ret;
 	}
 
 	template() {
@@ -34,7 +32,6 @@ class Rank {
 			</div>
 			<div class="rank__list">
 					<div class="rank__list--friends">
-							${this.friend_profile(15)}
 					</div>
 			</div>
 			`;

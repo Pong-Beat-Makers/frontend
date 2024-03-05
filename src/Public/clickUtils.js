@@ -3,7 +3,7 @@ import { socialLogin } from "../Login/loginUtils.js";
 import { setChatPage } from "../Chat/chatPageUtils.js";
 import { handleHomeModal } from "../Home/homeUtils.js";
 import { handleGameModal } from "../Game/gameUtils.js";
-import { handleFriendModalUtils } from "../Modals/modalUtils.js";
+import { setRankPage } from "../Rank/rankUtils.js";
 
 export function handleLoginBtn() {
     const loginBtns = document.querySelectorAll(".login-btn");
@@ -39,8 +39,9 @@ export function handleNaviClick() {
     headerElements[3].onclick = () => {
         changeUrl("/rank");
         headerElements[3].classList.add("active");
-        handleFriendModalUtils();
         // handleRank();
+        setRankPage();
+        // handleFriendModalUtils();
     }
     logoutBtn.onclick = handleLogoutBtn;
 }

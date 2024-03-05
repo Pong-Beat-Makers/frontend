@@ -1,7 +1,38 @@
-export function handleRankModal() {
-    const frendItems = document.querySelectorAll('.profile-section__friends--item');
+import { routes } from "../route.js";
+import { friendModalClick } from "../Modals/modalUtils.js";
 
-    frendItems.forEach(item => {
+const RankerNumber = 18;
+// 추후 백엔드에서 불러오기
+
+export function setRankPage() {
+// 1등 띄우기
+// 2등 띄우기
+// 3등 띄우기
+
+    const rankerList = document.querySelector(".rank__list--friends");
+    for (let i = 0; i < RankerNumber; i++) {
+        rankerList.innerHTML += routes["/rank"].rankerTemplate();
+    }
+
+    const rankerNum = document.querySelectorAll(".rank__list--number");
+    for (let i = 0; i < RankerNumber; i++) {
+        rankerNum[i].innerHTML = i + 4;
+    }
+
+// 아무도 없으면 showChatList()처럼 empty error msg 띄우기
+    rankerOnclick();
+}
+
+function rankerOnclick() {
+    const rankersHigh = document.querySelectorAll(".rank__stage--table");
+    const rankers = document.querySelectorAll('.profile-section__friends--item');
+
+    rankersHigh.forEach(item => {
+        item.removeEventListener('click', friendModalClick, true);
+        item.addEventListener('click', friendModalClick);
+    })
+
+    rankers.forEach(item => {
         item.removeEventListener('click', friendModalClick, true);
         item.addEventListener('click', friendModalClick);
     });
