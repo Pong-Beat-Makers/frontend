@@ -2,7 +2,7 @@ import LoginSuccess from "./Login/loginSuccessTemplate.js";
 import Login from "./Login/loginTemplate.js"
 import changeUrl from "./route.js";
 import { LOCALHOST } from "./Public/global.js";
-import { initChatSocket } from "./Chat/chatUtils.js";
+import { initChatSocket } from "./Chat/chatSocketUtils.js";
 import {handleEditUserUtils, moveRefresh} from "./Login/loginUtils.js";
 import { handleLoginBtn, handleNaviClick } from "./Public/clickUtils.js";
 import { handleHomeModal } from "./Home/homeUtils.js";

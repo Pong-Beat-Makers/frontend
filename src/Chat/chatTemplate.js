@@ -8,6 +8,20 @@ class Chat {
         `;
     }
 
+    chatRoomTemplate(name, msg, time) {
+        return `
+        <div class="chat__room" role="button">
+            <div class="chat__empty"></div>
+            <div class="chat__room--profile"></div>
+            <div class="chat__room--contents">
+                <div class="chat__room--name">${name}</div>
+                <div class="chat__room--msg">${msg}</div>
+            </div>
+            <div class="chat__room--time">${time}</div>
+        </div>
+        `;
+    }
+
     template() {
         return `
 		<form class="chat__search">
@@ -15,24 +29,6 @@ class Chat {
 			<button class="chat__search--btn">🔍</button>
 		</form>
 		<div class="chat__room--list">
-			<div class="chat__room" role="button">
-				<div class="chat__empty"></div>
-				<div class="chat__room--profile"></div>
-				<div class="chat__room--contents">
-					<div class="chat__room--name">1001</div>
-					<div class="chat__room--msg">Hi Hi</div>
-				</div>
-				<div class="chat__room--time">17:16</div>
-			</div>
-			<div class="chat__room" role="button">
-				<div class="chat__empty"></div>
-				<div class="chat__room--profile"></div>
-				<div class="chat__room--contents">
-					<div class="chat__room--name">1002</div>
-					<div class="chat__room--msg">hello world</div>
-				</div>
-				<div class="chat__room--time">17:17</div>
-			</div>
 		</div>
         <div class="chat__modal">
         </div>

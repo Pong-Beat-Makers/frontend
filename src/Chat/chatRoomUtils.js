@@ -1,26 +1,20 @@
-import { BACKEND, FRONTEND } from "../Public/global.js";
+import { BACKEND, FRONTEND, EXPIRY, chatTokenKey } from "../Public/global.js";
 import { routes } from "../route.js";
 import { chatSocket } from "../app.js";
 
-export function initChatSocket() {
-    chatSocket.onopen = function (e) {
-        chatSocket.send(JSON.stringify({
-            'token' : localStorage.getItem("token"),
-        }));
-    };
+// 로그의 처음부터 끝까지 출력이라 처음에 채팅창 열 때 한번만 호출해야 함
+function loadChatLog(chatId) {
+    const chatFrame = document.querySelector(".chat__body--frame");
 
-    chatSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-        const chatFrame = document.querySelector(".chat__body--frame");
-        if (data.from == `${localStorage.getItem("token")}_test_id`)
-            chatFrame.innerHTML += routes["/chat"].chatBoxTemplate("message_me", data.message, data.time);
-        else
-            chatFrame.innerHTML += routes["/chat"].chatBoxTemplate("message_you", data.message, data.time);
-    };
+    let chatLog = localStorage.getItem(chatId);
+    if (!chatLog)
+        return ;
 
-    chatSocket.onclose = function(e) {
-        console.error('Chat socket closed unexpectedly');
-    };
+    chatLog = JSON.parse(chatLog);
+    for (let i = 0; i < chatLog.length; i++) {
+            chatFrame.innerHTML += routes["/chat"].chatBoxTemplate(
+                `message_${chatLog[i].from}`, chatLog[i].msg, chatLog[i].time);
+    }
 }
 
 function handleInvite() {
@@ -29,7 +23,7 @@ function handleInvite() {
 
     chatSocket.send(JSON.stringify({
         'target_nickname' : `${targetToken}_test_id`,
-        'message': `${localStorage.getItem("token")}_test_id invited you to a game!\n
+        'message': `${localStorage.getItem(chatTokenKey)}_test_id invited you to a game!\n
         ${roomAddress}`
     }));
     // 추후 식별 가능 문자열로 바꿔서 이 메시지 받으면 게임 참여하기 버튼으로 바뀌게 하기 !
@@ -49,7 +43,7 @@ function handleBlockToggle() {
         methodSelected = 'POST';
         chatSocket.send(JSON.stringify({
             'target_nickname' : `${targetToken}_test_id`,
-            'message': `${targetToken}_test_id is now blocked by ${localStorage.getItem("token")}_test_id ❤️`
+            'message': `${targetToken}_test_id is now blocked by ${localStorage.getItem(chatTokenKey)}_test_id ❤️`
         }));
     }
     else {
@@ -61,7 +55,7 @@ function handleBlockToggle() {
       method: methodSelected,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem("token")}`,
+        'Authorization': `Bearer ${localStorage.getItem(chatTokenKey)}`,
       },
       body: JSON.stringify({
         'target_nickname' : `${targetToken}_test_id`,
@@ -71,7 +65,7 @@ function handleBlockToggle() {
     fetch(`${BACKEND}/blockedusers/`, data); // 예외처리 필요
 }
 
-function showChatroom(tokenInput) {
+export function showChatroom(tokenInput) {
     const chatModal = document.querySelector(".chat__modal");
     chatModal.style.display = "block";
 
@@ -81,7 +75,7 @@ function showChatroom(tokenInput) {
     fetch(`${BACKEND}/blockedusers/?target_nickname=${tokenInput}_test_id`, {
         method: 'GET',
         headers: {
-            'Authorization': `Bearer ${localStorage.getItem("token")}`,
+            'Authorization': `Bearer ${localStorage.getItem(chatTokenKey)}`,
         },
     })
     .then(response => {
@@ -96,12 +90,12 @@ function showChatroom(tokenInput) {
             blockToggleBtn.classList.replace("block", "unblock");
         }
     });
-
+/*
     chatSocket.send(JSON.stringify({
         'target_nickname' : `${tokenInput}_test_id`,
-        'message': `${localStorage.getItem("token")} has successfully connected to ${tokenInput}`
+        'message': `${localStorage.getItem(chatTokenKey)} has successfully connected to ${tokenInput}`
     }));
-
+*/
     chatModal.innerHTML += routes["/chat"].modalTemplate();
     document.querySelector(".chat__header--name").innerHTML = tokenInput;
 
@@ -110,45 +104,8 @@ function showChatroom(tokenInput) {
         chatModal.innerHTML -= document.querySelector(".chat__container");
 	}
 
+    loadChatLog(`chatLog_${tokenInput}`);
     handleChatRoom();
-}
-
-function checkChatroomSearch(event) {
-    const chatSearchInput = document.querySelector(".chat__search input");
-    const chatroomList = document.querySelector(".chat__room--list");
-    const nameAll = document.querySelectorAll(".chat__room--name");
-    const chatRoomAll = document.querySelectorAll(".chat__room");
-    // 추후 all 항목들 html에서 가져오지 말고 data source에서 가져오기
-
-    if (chatSearchInput.value) {
-        for (let i = 0; i < nameAll.length; i++) {
-            if (nameAll[i].innerHTML === chatSearchInput.value) {
-                chatroomList.innerHTML = `<div class="chat__room" role="button">
-                ${chatRoomAll[i].innerHTML}
-                </div>`;
-            }
-        }
-        // chatroomList.innerHTML = `<div class="chat__search--error">
-        // Nothing found for ${chatSearchInput.value}</div>`
-    }
-    else {
-        // data source에서 전체 정보 가져와서 다시 띄우기
-    }
-}
-
-export function handleChatModal() {
-    const chatSearchBtn = document.querySelector(".chat__search");
-    chatSearchBtn.onsubmit = function (e) {
-        e.preventDefault();
-    }
-    chatSearchBtn.oninput = checkChatroomSearch;
-
-    const openModalBtn = document.querySelectorAll(".chat__room");
-    for (let i = 0; i < openModalBtn.length; i++) {
-        openModalBtn[i].onclick = function() {
-            showChatroom(openModalBtn[i].querySelector(".chat__room--name").innerText);
-        }
-    }
 }
 
 function handleChatRoom() {
@@ -156,7 +113,7 @@ function handleChatRoom() {
     chatHeaderBtns[0].onclick = handleInvite;
     chatHeaderBtns[1].onclick = handleBlockToggle;
 
-    document.querySelector('.chat__controller--text').focus();
+    // document.querySelector('.chat__controller--text').focus();
     document.querySelector('.chat__body--text').onkeydown = function(e) {
         if (e.keyCode === 13) {  // enter, return
             document.querySelector('.chat__controller--btn').click();
