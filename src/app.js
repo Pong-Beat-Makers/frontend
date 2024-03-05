@@ -16,12 +16,13 @@ if (document.cookie) {
     app.innerHTML = LoginSuccess.template();
     changeUrl("/home");
     document.querySelectorAll(".main-section__list--item")[0].classList.add("active");
+    // handleHomeModal();
+    
     chatSocket = new WebSocket(
         'ws://' + LOCALHOST + ':8000' + '/ws/chatting/'
     );
     initChatSocket();
     handleNaviClick();
-    // handleHomeModal();
 
     // 메인 섹션 프로필 이벤트 등록
     handleEditUserModalUtils();

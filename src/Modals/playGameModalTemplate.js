@@ -32,7 +32,7 @@ class PlayGameModal {
                 Searching for a match ...
                 <button class="matching-game__btn">
                     <i class="bi bi-x-square"></i>
-                    cancle & exit
+                    cancel & exit
                 </button>
             </div>
         </div>

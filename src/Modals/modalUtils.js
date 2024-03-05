@@ -1,7 +1,7 @@
 import ProfileModal from "./profileModalTemplate.js";
 import FriendModalTemplate from "./friendModalTemplate.js";
 
-function friendModalClick() {
+export function friendModalClick() {
     const modal = document.querySelector('.modal');
 
     modal.innerHTML = FriendModalTemplate.template();
