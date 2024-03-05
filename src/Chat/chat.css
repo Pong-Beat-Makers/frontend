@@ -1,11 +1,13 @@
-#chat__search {
+.chat__search {
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
 input#chat__search--input {
-    height: 50px;
+    height: 60px;
+    width: 70%;
     font-size:20px;
     border: 0;
     border-radius: 15px;
