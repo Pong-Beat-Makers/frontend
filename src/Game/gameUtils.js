@@ -1,17 +1,20 @@
-import Game from './gameTemplate.js';
-import PlayGameApp from "./gameApp.js";
+import PlayGameModalTemplate from "../Modals/playGameModalTemplate.js";
+
+const TWO_PLAYER_BTN = 0;
+const RANDOM_BTN = 1;
+const TOURNAMENT_BTN = 2;
+
 
 export function handleGameModal() {
     const playBtn = document.querySelectorAll('.game__playbtn');
 
-    playBtn[0].addEventListener('click', () => {
+    playBtn[RANDOM_BTN].addEventListener('click', () => {
         const modal = document.querySelector('.modal');
 
-        modal.innerHTML = Game.modalTemplate();
+        modal.innerHTML = PlayGameModalTemplate.matchTemplate();
 
-        document.querySelector('.playgame__btn').addEventListener('click', () => {
+        document.querySelector('.matching-game__btn').addEventListener('click', () => {
             modal.innerHTML = '';
         });
-        new PlayGameApp();
     });
 }

@@ -16,6 +16,8 @@
 
 /* Modal */
 @import "Modals/profile-modal.css";
+@import "Modals/friend-modal.css";
+@import "Modals/playgame-modal.css";
 
 /* screens */
 @import "Login/login.css";
