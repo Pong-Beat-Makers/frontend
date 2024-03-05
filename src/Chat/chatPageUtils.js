@@ -27,13 +27,17 @@ export function showChatList() {
     const chatRoomList = document.querySelector(".chat__room--list");
     chatRoomList.innerHTML = "";
     for (let i = 0; i < localStorage.length; i++) {
-        let key = localStorage.key(i)
+        let key = localStorage.key(i);
         if (key.startsWith("chatLog_")) {
             chatRoomList.innerHTML += routes["/chat"].chatRoomTemplate(
                 key.slice(8),  // name : key에서 chatLog_ 뒤부터 끝까지
                 getLastObj(key).msg, getLastObj(key).time);
         }
     }
+    if (chatRoomList.innerHTML === "")
+        chatRoomList.innerHTML = `<div class="chat__search--error">
+        You haven't started chatting!
+        </div>`
 }
 
 function showSearchResult(input) {
