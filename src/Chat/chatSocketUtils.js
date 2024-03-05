@@ -3,26 +3,6 @@ import { routes } from "../route.js";
 import { chatSocket } from "../app.js";
 import { showChatList, chatListOnclick } from "./chatPageUtils.js";
 
-/*
-1. 메시지 받으면 로컬스토리지에 저장. 한 사람과의 대화 전체를 하나의 key로 저장. 
-- key : chatLog_${token}
-- value:
-    {[from], [msg], [time], [exp]}, {[from], [msg], [time], [exp]}, {[from], [msg], [time], [exp]} ...
-
-2. 채팅 목록 페이지는 로컬스토리지의 key를 참조하여 chat_${token} 개수만큼 생성.
-
-3. 특정 채팅방 클릭 시 해당 token과의 채팅 목록 불러와서 채팅방 모달 띄움,
-    내부 value개수만큼 말풍선 생성
-
-4. 로그아웃 시 로컬스토리지, 쿠키의 모든 데이터 삭제
-
-TODO: 
-    1. 채팅방 목록 띄울 때 최근 채팅 순서대로
-    2. 메시지 보낸지 24시간 지나면 해당 채팅방 재접속 시 데이터 삭제
-    4. 채팅, 차단, 검색 모두 테스트 후 머지
-    5. 모달 & 검색창 css 수정
-*/
-
 function saveNewMsg(chatId, newMsgObj) {
     let chatLog = localStorage.getItem(chatId);
     if (chatLog) {
