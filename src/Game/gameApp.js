@@ -9,7 +9,10 @@ const ROOM_ID = '69133283-5a26-48b8-bfe7-8ffbacd5206b';
 
 class PlayGameApp {
     constructor() {
-        const container = document.getElementById("game_playground");
+        this._socket = new WebSocket(`ws://${BASE_DOMAIN}/ws/game/${ROOM_ID}/`);
+    }
+
+    gameRender(container) {
         this._container = container;
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -217,9 +220,7 @@ class PlayGameApp {
     }
 
     listen() {
-        const socket = new WebSocket(`ws://${BASE_DOMAIN}/ws/game/${ROOM_ID}/`);
-
-        socket.addEventListener('message', e => {
+        this._socket.addEventListener('message', e => {
             /*
                 ball_coords: (2) [210, 210]
                 player1_coords: (2) [-335, 0]
@@ -273,7 +274,6 @@ class PlayGameApp {
                 });
             }
         });
-        this._socket = socket;
     }
 
     _send(eventName) {

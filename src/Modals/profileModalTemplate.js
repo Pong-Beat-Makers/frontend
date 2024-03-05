@@ -1,19 +1,19 @@
 class ProfileModal {
     template() {
         return `
-<div class="modal__container modal_profile">
+<div class="modal__container modal-name__profile">
     <div class="modal__background"></div>
     <div class="profile-modal__container">
         <div class="profile-modal__header">Edit Profile</div>
         <div class="profile-modal__body">
             <div class="profile-modal__body--header">profile</div>
             <div class="profile-modal__body--content">
-                <div class="profile-modal__avator profile-modal__big-avator image_gong"></div>
+                <div class="profile-modal__avator profile-modal__big-avator image_cat"></div>
                 <div class="profile-modal__avatorlist">
-                    <div class="profile-modal__avator image_go"></div>
-                    <div class="profile-modal__avator image_ddong"></div>
-                    <div class="profile-modal__avator image_jok"></div>
-                    <div class="profile-modal__avator image_dol"></div>
+                    <div class="profile-modal__avator image_bird"></div>
+                    <div class="profile-modal__avator image_gadget"></div>
+                    <div class="profile-modal__avator image_crocodile"></div>
+                    <div class="profile-modal__avator image_dolphin"></div>
                 </div>
             </div>
             <div class="profile-modal__body--header">nickname</div>
