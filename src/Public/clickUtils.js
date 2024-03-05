@@ -1,6 +1,6 @@
 import changeUrl from "../route.js";
 import { socialLogin } from "../Login/loginUtils.js";
-import { setChatPage } from "../Chat/chatUtils.js";
+import { setChatPage } from "../Chat/chatPageUtils.js";
 import { handleHomeModal } from "../Home/homeUtils.js";
 import { handleGameModal } from "../Game/gameUtils.js";
 
