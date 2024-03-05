@@ -19,7 +19,10 @@ export function setRankPage() {
         rankerNum[i].innerHTML = i + 4;
     }
 
-// 아무도 없으면 showChatList()처럼 empty error msg 띄우기
+    // if (rankerList.innerHTML === "")
+        rankerList.innerHTML = `<div class="chat__search--error">
+        No ranker presents yet. Be the first ranker!
+        </div>`
     rankerOnclick();
 }
 
