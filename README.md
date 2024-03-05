@@ -11,7 +11,8 @@
 1. 메시지 받으면 로컬스토리지에 저장. 한 사람과의 대화 전체를 하나의 key로 저장. 
 - key : chatLog_${token}
 - value:
-    {[from], [msg], [time], [exp]}, {[from], [msg], [time], [exp]}, {[from], [msg], [time], [exp]} ...
+    [{"from":${from},"msg":${msg},"time":${time},"exp":${exp}}, {"from":${from},"msg":${msg},"time":${time},"exp":${exp}}]
+
 2. 채팅 목록 페이지는 로컬스토리지의 key를 참조하여 chat_${token} 개수만큼 생성.
 3. 특정 채팅방 클릭 시 해당 token과의 채팅 목록 불러와서 채팅방 모달 띄움,
     내부 value개수만큼 말풍선 생성

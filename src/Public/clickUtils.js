@@ -39,9 +39,7 @@ export function handleNaviClick() {
     headerElements[3].onclick = () => {
         changeUrl("/rank");
         headerElements[3].classList.add("active");
-        // handleRank();
         setRankPage();
-        // handleFriendModalUtils();
     }
     logoutBtn.onclick = handleLogoutBtn;
 }
