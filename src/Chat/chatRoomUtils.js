@@ -80,8 +80,8 @@ export function showChatroom(tokenInput) {
     })
     .then(response => {
         if (!response.ok)
-        throw new Error(`Error : ${response.status}`);
-    return  response.json();
+            throw new Error(`Error : ${response.status}`);
+        return  response.json();
     })
     .then(data => {
         if (data.is_blocked === true) {
@@ -90,12 +90,7 @@ export function showChatroom(tokenInput) {
             blockToggleBtn.classList.replace("block", "unblock");
         }
     });
-/*
-    chatSocket.send(JSON.stringify({
-        'target_nickname' : `${tokenInput}_test_id`,
-        'message': `${localStorage.getItem(chatTokenKey)} has successfully connected to ${tokenInput}`
-    }));
-*/
+
     chatModal.innerHTML += routes["/chat"].modalTemplate();
     document.querySelector(".chat__header--name").innerHTML = tokenInput;
 

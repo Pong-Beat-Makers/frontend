@@ -3,7 +3,7 @@ import Login from "./Login/loginTemplate.js"
 import changeUrl from "./route.js";
 import { LOCALHOST } from "./Public/global.js";
 import { initChatSocket } from "./Chat/chatSocketUtils.js";
-import { moveRefresh } from "./Login/loginUtils.js";
+import { moveRefresh, setFriendList } from "./Login/loginUtils.js";
 import { handleLoginBtn, handleNaviClick } from "./Public/clickUtils.js";
 import { handleHomeModal } from "./Home/homeUtils.js";
 import { handleEditUserModalUtils, handleFriendModalUtils } from "./Modals/modalUtils.js";
@@ -23,6 +23,7 @@ if (document.cookie) {
     );
     initChatSocket();
     handleNaviClick();
+    setFriendList();
 
     // 메인 섹션 프로필 이벤트 등록
     handleEditUserModalUtils();
