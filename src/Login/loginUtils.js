@@ -119,14 +119,7 @@ export function setFriendList() {
     }
 }
 
-const friendAddButton = document.querySelector(".profile-section__friends--button");
-friendAddButton.onclick = () => {
-    // user search modal
-    const profileSearchInput = document.querySelector("."); // profile search input
-    profileSearchInput.oninput = () => { handleProfileSearch(profileSearchInput.value); };
-}
-
-function handleProfileSearch(input) {
+export function handleProfileSearch(input) {
     fetch(`${BACKEND}/api/user-management/profile/search/?keyword=${input}`, {
         method: 'GET',
         headers: {
