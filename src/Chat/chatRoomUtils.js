@@ -52,17 +52,17 @@ function handleBlockToggle() {
     }
 
     const data = {
-      method: methodSelected,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem(chatTokenKey)}`,
-      },
-      body: JSON.stringify({
-        'target_nickname' : `${targetToken}_test_id`,
-      })
+            method: methodSelected,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem(chatTokenKey)}`,
+            },
+            body: JSON.stringify({
+                'target_nickname' : `${targetToken}_test_id`,
+        })
     };
     
-    fetch(`${BACKEND}/blockedusers/`, data); // 예외처리 필요
+    fetch(`${BACKEND}/api/chatting/blockedusers/`, data); // 예외처리 필요
 }
 
 export function showChatroom(tokenInput) {
@@ -72,7 +72,7 @@ export function showChatroom(tokenInput) {
     const blockIcon = `<i class="bi bi-person-slash"></i>`;
 
     // 이미 차단된 사람인지 체크 => 내부 창 block 버튼 unblock으로 바꾸기 위해
-    fetch(`${BACKEND}/blockedusers/?target_nickname=${tokenInput}_test_id`, {
+    fetch(`${BACKEND}/api/chatting/blockedusers/?target_nickname=${tokenInput}_test_id`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem(chatTokenKey)}`,

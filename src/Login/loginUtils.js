@@ -3,7 +3,7 @@ import LoginSuccess from "./loginSuccessTemplate.js";
 import ProfileModal from "../Modals/profileModalTemplate.js";
 
 export function socialLogin(site) {
-    fetch(`${BACKEND}/accounts/${site}/login/`, {
+    fetch(`${BACKEND}/api/user-management/accounts/${site}/login/`, {
         method: 'GET',
     })
         .then(response => {
@@ -46,8 +46,8 @@ export function deleteCookieAll () {
         document.cookie = cookies[i].split('=')[0] + '=; expires=' + expiration;
     }
 }
-
-export function moveRefresh() {
+/*
+function moveRefresh() {
     if (getCookie("refresh_token")) {
         const cookies = Object.fromEntries(
             document.cookie.split(';').map((cookie) => cookie.trim().split('=')),
@@ -56,16 +56,15 @@ export function moveRefresh() {
         deleteCookie("refresh_token");
     }
 }
-
+*/
 export function setFriendList() {
     let friendsArray = [];
 
-    for (let i = 0; i < 5; i++) {
-        friendsArray.push([`100${i}`, "default"]);
-    }
+    // for (let i = 0; i < 5; i++) {
+    //     friendsArray.push([`100${i}`, "default"]);
+    // }
 
-/*
-    fetch(`${BACKEND}/friends/`, {
+    fetch(`${BACKEND}/api/user-management/friends/`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${(getCookie("access_token"))}`,
@@ -79,12 +78,13 @@ export function setFriendList() {
     .then(data => {
         if (!data)
             return ;
+        // console.dir(data);
         // const obj = JSON.parse(data);
         for (let i = 0; i < data.length; i++) {
             friendsArray.push([data[i].nickname, data[i].profile]);
         }
     });
-*/
+
     const FriendsNum = friendsArray.length;
     const friendList = document.querySelector(".profile-section__friends--list");
     for (let i = 0; i < FriendsNum; i++) {
@@ -117,4 +117,36 @@ export function setFriendList() {
             friendsStatText[i].innerHTML = "offline";
         }
     }
+}
+
+const friendAddButton = document.querySelector(".profile-section__friends--button");
+friendAddButton.onclick = () => {
+    // user search modal
+    const profileSearchInput = document.querySelector("."); // profile search input
+    profileSearchInput.oninput = () => { handleProfileSearch(profileSearchInput.value); };
+}
+
+function handleProfileSearch(input) {
+    fetch(`${BACKEND}/api/user-management/profile/search/?keyword=${input}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${(getCookie("access_token"))}`,
+        },
+    })
+    .then(response => {
+        if (!response.ok)
+            throw new Error(`Error : ${response.status}`);
+        return response.json();
+    })
+    .then(data => {
+        for (let i = 0; i < data.length; i++) {
+            console.log(data[i]);
+            /*
+            추후 friend search modal에서 keyword포함한 user elements 모두 띄우기
+            const searchResult = document.querySelector(".search--list");
+            searchResult.innerHTML += profile.friendsTemplate("nickname");
+            그리고 각 element에 eventlistener 달아서 클릭시 세부정보 모달 띄우도록 하기
+            */
+        }
+    });
 }

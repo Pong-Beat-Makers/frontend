@@ -6,7 +6,7 @@ class LoginSuccess {
                     <div class="profile-section__friends--pic"></div>
                     <div class="profile-section__friends--name">friend</div>
                 </div>
-                <div class="profile-section__friends--status online">
+                <div class="profile-section__friends--status">
                     <div class="profile-section__friends--status--text">online</div>
                     <div></div>
                 </div>
@@ -40,7 +40,7 @@ class LoginSuccess {
                     <div class="profile-section__friends--block">
                         <div class="profile-section__friends--header">
                             <div>friends</div>
-                            <button>
+                            <button class="profile-section__friends--button">
                                 <i class="bi bi-person-plus"></i>
                             </button>
                         </div>
