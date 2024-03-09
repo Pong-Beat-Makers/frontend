@@ -1,4 +1,4 @@
-import PlayGameModalTemplate from "../Modals/playGameModalTemplate.js";
+import { routes } from "../route.js";
 
 const TWO_PLAYER_BTN = 0;
 const RANDOM_BTN = 1;
@@ -11,7 +11,7 @@ export function handleGameModal() {
     playBtn[RANDOM_BTN].addEventListener('click', () => {
         const modal = document.querySelector('.modal');
 
-        modal.innerHTML = PlayGameModalTemplate.matchTemplate();
+        modal.innerHTML = routes['/game'].matchModalTemplate();
 
         document.querySelector('.matching-game__btn').addEventListener('click', () => {
             modal.innerHTML = '';

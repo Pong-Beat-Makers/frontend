@@ -1,29 +1,25 @@
 import ProfileModal from "./profileModalTemplate.js";
-import FriendModalTemplate from "./friendModalTemplate.js";
 
-export function friendModalClick() {
+export function  modalRender(modalName, htmlCode) {
     const modal = document.querySelector('.modal');
 
-    modal.innerHTML = FriendModalTemplate.template();
+    modal.innerHTML += htmlCode;
 
     document.querySelector('.modal__background').addEventListener('click', () => {
-        const modalContainer = document.querySelector('.modal-name__friend-profile');
+        const modalContainer = document.querySelector(`.modal-name__${modalName}`);
         if (modalContainer !== undefined)  modalContainer.remove();
     });
+}
+
+export function friendModalClick() {
+    modalRender("friend-profile", ProfileModal.friendModalTemplate());
 }
 
 export function handleEditUserModalUtils() {
     const profileBtn = document.querySelector('.profile-section__profile');
 
     profileBtn.addEventListener('click', () => {
-        const modal = document.querySelector('.modal');
-
-        modal.innerHTML += ProfileModal.template();
-
-        document.querySelector('.modal__background').addEventListener('click', () => {
-            const modalContainer = document.querySelector('.modal-name__profile');
-            if (modalContainer !== undefined)  modalContainer.remove();
-        });
+        modalRender("profile", ProfileModal.template());
 
         document.querySelectorAll('textarea').forEach(element => {
             element.addEventListener('keyup', e => {

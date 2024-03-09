@@ -17,7 +17,8 @@
 /* Modal */
 @import "Modals/profile-modal.css";
 @import "Modals/friend-modal.css";
-@import "Modals/playgame-modal.css";
+@import "Game/game-modal.css";
+@import "Chat/chat-modal.css";
 
 /* screens */
 @import "Login/login.css";
