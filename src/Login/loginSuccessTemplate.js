@@ -1,4 +1,19 @@
 class LoginSuccess {
+    friendBoxTemplate() {
+        return `
+            <div class="profile-section__friends--item">
+                <div class="profile-section__friends--profile">
+                    <div class="profile-section__friends--pic"></div>
+                    <div class="profile-section__friends--name">friend</div>
+                </div>
+                <div class="profile-section__friends--status">
+                    <div class="profile-section__friends--status--text">online</div>
+                    <div></div>
+                </div>
+            </div>
+        `;
+    }
+
 	template() {
 		return `
         <header>
@@ -25,42 +40,11 @@ class LoginSuccess {
                     <div class="profile-section__friends--block">
                         <div class="profile-section__friends--header">
                             <div>friends</div>
-                            <button>
+                            <button class="profile-section__friends--button">
                                 <i class="bi bi-person-plus"></i>
                             </button>
                         </div>
-                        <div class="profile-section__friends--list">
-                            <div class="profile-section__friends--item">
-                                <div class="profile-section__friends--profile">
-                                    <div></div>
-                                    <div>friend</div>
-                                </div>
-                                <div class="profile-section__friends--status online">
-                                    <div>online</div>
-                                    <div></div>
-                                </div>
-                            </div>
-                            <div class="profile-section__friends--item">
-                                <div class="profile-section__friends--profile">
-                                    <div></div>
-                                    <div>friend</div>
-                                </div>
-                                <div class="profile-section__friends--status playing">
-                                    <div>online</div>
-                                    <div></div>
-                                </div>
-                            </div>
-                            <div class="profile-section__friends--item">
-                                <div class="profile-section__friends--profile">
-                                    <div></div>
-                                    <div>friend</div>
-                                </div>
-                                <div class="profile-section__friends--status offline">
-                                    <div>online</div>
-                                    <div></div>
-                                </div>
-                            </div>
-                        </div>
+                        <div class="profile-section__friends--list"></div>
                     </div>
                 </div>
             </section>

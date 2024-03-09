@@ -1,10 +1,8 @@
 import { routes } from "../route.js";
 import { friendModalClick } from "../Modals/modalUtils.js";
 
-const RankerNumber = 18;
-// 추후 백엔드에서 불러오기
-
 export function setRankPage() {
+    const RankerNumber = 18; // 추후 백엔드에서 불러오기
     const rankerStage = document.querySelector(".rank__stage");
     const rankerList = document.querySelector(".rank__list--friends");
 
