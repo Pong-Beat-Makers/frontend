@@ -119,7 +119,11 @@ export function setFriendList() {
     }
 }
 
-export function handleProfileSearch(input) {
+function handleProfileSearch(input) {
+    const profileSearchResult = document.querySelector(".profile__result--list");
+    profileSearchResult.innerHTML = "";
+    if (input == "")
+        return ;
     fetch(`${BACKEND}/api/user-management/profile/search/?keyword=${input}`, {
         method: 'GET',
         headers: {
@@ -133,13 +137,22 @@ export function handleProfileSearch(input) {
     })
     .then(data => {
         for (let i = 0; i < data.length; i++) {
-            console.log(data[i]);
-            /*
-            추후 friend search modal에서 keyword포함한 user elements 모두 띄우기
-            const searchResult = document.querySelector(".search--list");
-            searchResult.innerHTML += profile.friendsTemplate("nickname");
-            그리고 각 element에 eventlistener 달아서 클릭시 세부정보 모달 띄우도록 하기
-            */
+            profileSearchResult.innerHTML += ProfileModal.profileSearchResultTemplate(data[i]);
         }
+        // 각 element에 eventlistener 달아서 클릭시 세부정보 모달 띄우도록 하기
+    });
+}
+
+export function handleAddFriendBtn() {
+    const modal = document.querySelector(".modal");
+    modal.innerHTML = ProfileModal.profileSearchTemplate();
+
+    const profileSearchInput = document.querySelector(".profile__search input");
+    handleProfileSearch(profileSearchInput.value);
+    profileSearchInput.oninput = () => { handleProfileSearch(profileSearchInput.value); };
+
+    document.querySelector('.modal__background').addEventListener('click', () => {
+        const modalContainer = document.querySelector('.modal-name__friend-profile');
+        if (modalContainer !== undefined)  modalContainer.remove();
     });
 }

@@ -14,13 +14,8 @@ export function setRankPage() {
         rankerStage.innerHTML += routes["/rank"].rankerStageTemplate("bronze");
 
         for (let i = 0; i < RankerNumber; i++) {
-            rankerList.innerHTML += routes["/rank"].rankerTemplate();
+            rankerList.innerHTML += routes["/rank"].rankerTemplate(i + 4, "ranker");
         }
-
-        const rankerNum = document.querySelectorAll(".rank__list--number");
-        for (let i = 0; i < RankerNumber; i++) {
-            rankerNum[i].innerHTML = i + 4;
-        }    
     }
 
     if (rankerStage.innerHTML === "")

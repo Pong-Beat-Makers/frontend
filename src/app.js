@@ -3,7 +3,7 @@ import Login from "./Login/loginTemplate.js"
 import changeUrl from "./route.js";
 import { LOCALHOST } from "./Public/global.js";
 import { initChatSocket } from "./Chat/chatSocketUtils.js";
-import { setFriendList, handleProfileSearch } from "./Login/loginUtils.js";
+import { setFriendList, handleAddFriendBtn } from "./Login/loginUtils.js";
 import { handleLoginBtn, handleNaviClick } from "./Public/clickUtils.js";
 import { handleHomeModal } from "./Home/homeUtils.js";
 import { handleEditUserModalUtils, handleFriendModalUtils } from "./Modals/modalUtils.js";
@@ -29,11 +29,7 @@ if (document.cookie) {
     handleFriendModalUtils();
 
     const friendAddButton = document.querySelector(".profile-section__friends--button");
-    friendAddButton.onclick = () => {
-        // user search modal
-        const profileSearchInput = document.querySelector("."); // profile search input
-        profileSearchInput.oninput = () => { handleProfileSearch(profileSearchInput.value); };
-    }
+    friendAddButton.onclick = handleAddFriendBtn;
 }
 else {
     app.innerHTML = Login.template();
