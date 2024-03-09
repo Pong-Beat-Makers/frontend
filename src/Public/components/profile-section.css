@@ -74,6 +74,7 @@
 }
 
 .profile-section__friends--list {
+    overflow-y: auto;
     flex-grow: 1;
 }
 
