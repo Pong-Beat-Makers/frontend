@@ -1,6 +1,6 @@
 import { BACKEND } from "../Public/global.js"
 import LoginSuccess from "./loginSuccessTemplate.js";
-import ProfileModal from "../Modals/profileModalTemplate.js";
+import ProfileModal from "../Profile/profileModalTemplate.js";
 
 export function socialLogin(site) {
     fetch(`${BACKEND}/api/user-management/accounts/${site}/login/`, {
