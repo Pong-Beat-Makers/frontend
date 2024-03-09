@@ -7,22 +7,18 @@ class Rank {
 		`
 	}
 
-	rankerTemplate() {
+	rankerTemplate(num, nickname) {
 		return `
 			<div class="rank__list--item">
-				<div class="rank__list--number"></div>
+				<div class="rank__list--number">${num}</div>
 				<div class="profile-section__friends--item">
 						<div class="profile-section__friends--profile">
-								<div></div>
-								<div>friend</div>
-						</div>
-						<div class="profile-section__friends--status online">
-								<div>online</div>
-								<div></div>
+							<div class="profile-section__friends--pic"></div>
+							<div class="profile-section__friends--name">${nickname}</div>
 						</div>
 				</div>
-		</div>
-		`;
+			</div>
+			`;
 	}
 
 	template() {
