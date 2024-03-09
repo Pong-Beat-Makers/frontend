@@ -1,4 +1,31 @@
 class ProfileModal {
+    profileSearchResultTemplate(nickname) {
+		return `
+            <div class="profile-section__friends--item">
+                <div class="profile-section__friends--profile">
+                    <div class="profile-section__friends--pic"></div>
+                    <div class="profile-section__friends--name">${nickname}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    profileSearchTemplate() {
+        return `
+        <div class="modal__container modal-name__friend-profile">
+            <div class="modal__background"></div>
+            <div class="profile__search__modal__container">
+                <form class="profile__search">
+                    <input id="profile__search--input" type="text" placeholder="Profile Search"/>
+                    <button class="profile__search--btn">🔍</button>
+                </form>
+                <div class="profile__result--list">
+                </div>
+            </div>
+        </div>
+        `;
+    }
+
     template() {
         return `
 <div class="modal__container modal-name__profile">
