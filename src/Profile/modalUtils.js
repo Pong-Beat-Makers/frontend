@@ -13,6 +13,63 @@ export function  modalRender(modalName, htmlCode) {
 
 export function friendModalClick() {
     modalRender("friend-profile", ProfileModal.friendModalTemplate());
+    const nickname = document.querySelector(".friend-modal__info--nickname");
+    const status = document.querySelector(".friend-modal__info--status");
+    const rate = document.querySelector(".friend-modal__game-info--rate");
+    const rank = document.querySelector(".friend-modal__game-info--rank");
+    const isFriend = document.querySelector(".friend-modal__btn");
+    // isFriend.innerHTML = `<i class="bi bi-person-plus"></i> add`
+    setMatchHistory(nickname);
+}
+
+function setMatchHistory(nickname) {
+    const matchHistoryList = document.querySelector(".friend-modal__history-list");
+    fetch(`${BACKEND}/api/game/histroy/?nickname=${nickname}`, {
+        method: 'GET',
+    })
+    .then(response => {
+        if (!response.ok)
+            throw new Error(`Error : ${response.status}`);
+        return response.json();
+    })
+    .then(data => {
+        if (data.error)
+            return ;
+        const obj = JSON.parse(data);
+        console.dir(obj);
+        // 유저 1이 자기 자신
+        for (let i = 0; i < obj.length; i++) {
+            matchHistoryList.innerHTML += ProfileModal.matchHistoryTemplate();
+        }
+        const date = document.querySelectorAll(".history-item__day");
+        const myPic = document.querySelectorAll(".match-my-avator");
+        const partnerPic = document.querySelectorAll(".match-your-avator");
+        const score = document.querySelectorAll(".history-item__score");
+        const stat = document.querySelectorAll(".history-item__status");
+        for (let i = 0; i < obj.length; i++) {
+            date[i].innerHTML = obj[i].created_at; // 파싱 필요할지도
+            myPic[i].innerHTML = "";
+            partnerPic[i].innerHTML = ""; // 다시 fetch 해야 하는 거 아님 ? ㅠㅠ ..
+            score[i].innerHTML = `Score ${obj[i].user1_score} : ${obj[i].user2_score}`;
+            if (obj[i].user1_score > obj[i].user2_score)
+                stat[i].innerHTML = "Win";
+            else if (obj[i].user1_score == obj[i].user2_score)
+                stat[i].innerHTML = "Draw";
+            else
+                stat[i].innerHTML = "Lose";
+        }
+/*
+{
+  "id": "< 게임 데이터 id>",
+  "user1_nickname": "<유저1 닉네임(게임 상 왼쪽에 있는 유저)>",
+  "user2_nickname": "<유저2 닉네임(게임 상 오른쪽에 있는 유저)>",
+  "user1_score": "<유저1 점수>",
+  "user2_score": "<유저2 점수>",
+  "match_type": "<랜덤인지 토너먼트인지 type>",
+  "created_at": "<게임이 끝난 날짜와 시간>",
+}
+*/
+    });
 }
 
 export function handleEditUserModalUtils() {

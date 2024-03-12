@@ -7,16 +7,16 @@ export function socialLogin(site) {
     fetch(`${BACKEND}/api/user-management/accounts/${site}/login/`, {
         method: 'GET',
     })
-        .then(response => {
-            if (!response.ok)
-                throw new Error(`Error : ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            if (data.error)
-                return ;
-            window.location.href = data.login_url;
-        });
+    .then(response => {
+        if (!response.ok)
+            throw new Error(`Error : ${response.status}`);
+        return response.json();
+    })
+    .then(data => {
+        if (data.error)
+            return ;
+        window.location.href = data.login_url;
+    });
 }
 
 function getCookie(cname) {
@@ -148,6 +148,9 @@ function handleProfileSearch(input) {
 }
 
 function showProfileDetail(input) {
+    modalRender("friend-profile", ProfileModal.friendModalTemplate());
+    // 이중모달 어케 처리할지 검토
+
     fetch(`${BACKEND}/api/user-management/profile/?friend=${input}`, {
         method: 'GET',
         headers: {
@@ -164,13 +167,13 @@ function showProfileDetail(input) {
         const obj = JSON.parse(data);
         // obj.nickname, obj.profile, obj.status_message, obj.win, obj.lose, obj.rank, obj.is_friend
         console.dir(obj);
-        // modalRender("friend-profile", ProfileModal.profileSearchTemplate());
-        // profileSearchResult.innerHTML += ProfileModal.profileSearchResultTemplate(data[i]);
+        modalRender("friend-profile", ProfileModal.friendModalTemplate());
+        // friendModalClick() 내부에서 유저 모든 정보 세팅하고 띄우기
     });
 }
 
 export function handleAddFriendBtn() {
-    modalRender("friend-profile", ProfileModal.profileSearchTemplate());
+    modalRender("profile-search", ProfileModal.profileSearchTemplate());
 
     const profileSearchInput = document.querySelector(".profile__search input");
     handleProfileSearch(profileSearchInput.value);

@@ -12,7 +12,7 @@ class ProfileModal {
 
     profileSearchTemplate() {
         return `
-        <div class="modal__container modal-name__friend-profile">
+        <div class="modal__container modal-name__profile-search">
             <div class="modal__background"></div>
             <div class="profile__search__modal__container">
                 <form class="profile__search">
@@ -96,30 +96,26 @@ class ProfileModal {
         <div class="friend-modal__wrapper">
             <div class="friend-modal__header">Match history</div>
             <div class="friend-modal__history-list">
-                <div class="friend-modal__history-item">
-                    <div class="history-item__day">24/01/26</div>
-                    <div class="history-item__profiles">
-                        <div class="history-item__profiles--avator match-my-avator"></div>
-                        <div>vs</div>
-                        <div class="history-item__profiles--avator match-your-avator"></div>
-                    </div>
-                    <div class="history-item__score">Score 7 : 3</div>
-                    <div class="history-item__status">Win</div>
-                </div>
-                <div class="friend-modal__history-item">
-                    <div class="history-item__day">24/01/26</div>
-                    <div class="history-item__profiles">
-                        <div class="history-item__profiles--avator match-my-avator"></div>
-                        <div>vs</div>
-                        <div class="history-item__profiles--avator match-your-avator"></div>
-                    </div>
-                    <div class="history-item__score">Score 7 : 3</div>
-                    <div class="history-item__status">Win</div>
-                </div>
+                ${this.matchHistoryTemplate()}
             </div>
         </div>
     </div>
 </div>
+        `;
+    }
+
+    matchHistoryTemplate() {
+        return `
+        <div class="friend-modal__history-item">
+            <div class="history-item__day">24/01/26</div>
+            <div class="history-item__profiles">
+                <div class="history-item__profiles--avator match-my-avator"></div>
+                <div>vs</div>
+                <div class="history-item__profiles--avator match-your-avator"></div>
+            </div>
+            <div class="history-item__score">Score 7 : 3</div>
+            <div class="history-item__status">Win</div>
+        </div>
         `;
     }
 }
