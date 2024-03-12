@@ -31,7 +31,7 @@ class Chat {
 			    search
             </button>
 		</form>
-		    <div class="chat__room--list"></div>
+		<div class="chat__room--list"></div>
         </div>
 		`;
     }

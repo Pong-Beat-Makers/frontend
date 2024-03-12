@@ -3,7 +3,7 @@ import Login from "./Login/loginTemplate.js"
 import changeUrl from "./route.js";
 import { LOCALHOST } from "./Public/global.js";
 import { initChatSocket } from "./Chat/chatSocketUtils.js";
-import { setFriendList, handleAddFriendBtn } from "./Login/loginUtils.js";
+import { setFriendList, handleAddFriendBtn, getCookie } from "./Login/loginUtils.js";
 import { handleLoginBtn, handleNaviClick } from "./Public/clickUtils.js";
 import { handleHomeModal } from "./Home/homeUtils.js";
 import { handleEditUserModalUtils, handleFriendModalUtils } from "./Profile/modalUtils.js";
@@ -11,7 +11,7 @@ import { handleEditUserModalUtils, handleFriendModalUtils } from "./Profile/moda
 const app = document.querySelector("#app");
 export let chatSocket;
 
-if (document.cookie) {
+if (getCookie("access_token")) {
     app.innerHTML = LoginSuccess.template();
     changeUrl("/home");
     document.querySelectorAll(".main-section__list--item")[0].classList.add("active");

@@ -1,4 +1,22 @@
 class Login {
+    modalTemplate() {
+        return `
+        <div class="modal__container modal-name__2FA">
+            <div class="modal__background"></div>
+                <div class="profile__search__modal__container">
+                    <form class="login__2FA">
+                        <input id="login__2FA--input" type="text" placeholder="type 2FA code in your email ..."/>
+                        <button class="login__2FA--btn">
+                            <i class="bi bi-search"></i>
+                            confirm
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        `;
+    }
+
 	template() {
 		return `
         <div class="modal__container">

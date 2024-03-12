@@ -2,6 +2,7 @@ import { BACKEND } from "../Public/global.js"
 import LoginSuccess from "./loginSuccessTemplate.js";
 import ProfileModal from "../Profile/profileModalTemplate.js";
 import { modalRender, showProfileDetail } from "../Profile/modalUtils.js";
+import { routes } from "../route.js";
 
 export function socialLogin(site) {
     fetch(`${BACKEND}/api/user-management/accounts/${site}/login/`, {
@@ -16,10 +17,33 @@ export function socialLogin(site) {
         if (data.error)
             return ;
         window.location.href = data.login_url;
+        // 아래부터 콜백 url 받고 실행되게 해야 함 ;; !! 수정하기
+        modalRender("2FA", routes["/login"].modalTemplate());
+        const TFAForm = document.querySelector(".login__2FA");
+        TFAForm.onsubmit = (e) => {
+            e.preventDefault();
+            handle2FAInput(TFAForm.input.value);
+        }
     });
 }
 
-function getCookie(cname) {
+function handle2FAInput(input) {
+    fetch(`${BACKEND}/api/user-management/accounts/email_verification/?2FAcode=${input}`, {
+        method: 'GET',
+    })
+    .then(response => {
+        if (!response.ok)
+            throw new Error(`Error : ${response.status}`);
+        return response.json();
+    })
+    .then(data => {
+        if (data.error)
+            return ;
+        console.log("login success!");
+    });
+}
+
+export function getCookie(cname) {
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
     let ca = decodedCookie.split(';');

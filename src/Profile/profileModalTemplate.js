@@ -16,8 +16,11 @@ class ProfileModal {
             <div class="modal__background"></div>
             <div class="profile__search__modal__container">
                 <form class="profile__search">
-                    <input id="profile__search--input" type="text" placeholder="Profile Search"/>
-                    <button class="profile__search--btn">🔍</button>
+                    <input id="profile__search--input" type="text" placeholder="type nickname here..."/>
+                    <button class="profile__search--btn">
+                        <i class="bi bi-search"></i>
+                        search
+                    </button>
                 </form>
                 <div class="profile__result--list">
                 </div>
