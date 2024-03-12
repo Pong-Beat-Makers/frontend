@@ -1,9 +1,10 @@
 import changeUrl from "../route.js";
-import { socialLogin } from "../Login/loginUtils.js";
+import { socialLogin, deleteCookieAll } from "../Login/loginUtils.js";
 import { setChatPage } from "../Chat/chatPageUtils.js";
 import { handleHomeModal } from "../Home/homeUtils.js";
 import { handleGameModal } from "../Game/gameUtils.js";
 import { setRankPage } from "../Rank/rankUtils.js";
+import { routes } from "../route.js";
 
 export function handleLoginBtn() {
     const loginBtns = document.querySelectorAll(".login-btn");
@@ -14,7 +15,9 @@ export function handleLoginBtn() {
 function handleLogoutBtn(event) {
     localStorage.clear();
     deleteCookieAll();
-    changeUrl("/login");
+    // changeUrl("/login");
+    const modal = document.querySelector(".modal");
+    modal.innerHTML = routes["/login"].template();
     handleLoginBtn();
 }
 

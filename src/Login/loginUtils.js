@@ -1,6 +1,7 @@
 import { BACKEND } from "../Public/global.js"
 import LoginSuccess from "./loginSuccessTemplate.js";
 import ProfileModal from "../Profile/profileModalTemplate.js";
+import { modalRender } from "../Profile/modalUtils.js";
 
 export function socialLogin(site) {
     fetch(`${BACKEND}/api/user-management/accounts/${site}/login/`, {
@@ -42,7 +43,7 @@ export function deleteCookieAll () {
     const cookies = document.cookie.split('; ');
     const expiration = 'Sat, 01 Jan 1972 00:00:00 GMT';
 
-    for (i = 0; i < cookies.length; i++) {
+    for (let i = 0; i < cookies.length; i++) {
         document.cookie = cookies[i].split('=')[0] + '=; expires=' + expiration;
     }
 }
@@ -78,8 +79,6 @@ export function setFriendList() {
     .then(data => {
         if (!data)
             return ;
-        // console.dir(data);
-        // const obj = JSON.parse(data);
         for (let i = 0; i < data.length; i++) {
             friendsArray.push([data[i].nickname, data[i].profile]);
         }
@@ -139,20 +138,41 @@ function handleProfileSearch(input) {
         for (let i = 0; i < data.length; i++) {
             profileSearchResult.innerHTML += ProfileModal.profileSearchResultTemplate(data[i]);
         }
-        // 각 element에 eventlistener 달아서 클릭시 세부정보 모달 띄우도록 하기
+        const profileItems = document.querySelectorAll(".profile-section__friends--item");
+        for (let i = 0; i < profileItems.length; i++) {
+            profileItems[i].onclick = () => {
+                showProfileDetail(data[i]);
+            }
+        }
+    });
+}
+
+function showProfileDetail(input) {
+    fetch(`${BACKEND}/api/user-management/profile/?friend=${input}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${(getCookie("access_token"))}`,
+        },
+    })
+    .then(response => {
+        if (!response.ok)
+            throw new Error(`Error : ${response.status}`);
+        return response.json();
+    })
+    .then(data => {
+        // {"nickname":"user1","profile":"default","status_message":"Hello","win":1,"lose":1,"rank":4,"is_friend":False}
+        const obj = JSON.parse(data);
+        // obj.nickname, obj.profile, obj.status_message, obj.win, obj.lose, obj.rank, obj.is_friend
+        console.dir(obj);
+        // modalRender("friend-profile", ProfileModal.profileSearchTemplate());
+        // profileSearchResult.innerHTML += ProfileModal.profileSearchResultTemplate(data[i]);
     });
 }
 
 export function handleAddFriendBtn() {
-    const modal = document.querySelector(".modal");
-    modal.innerHTML = ProfileModal.profileSearchTemplate();
+    modalRender("friend-profile", ProfileModal.profileSearchTemplate());
 
     const profileSearchInput = document.querySelector(".profile__search input");
     handleProfileSearch(profileSearchInput.value);
     profileSearchInput.oninput = () => { handleProfileSearch(profileSearchInput.value); };
-
-    document.querySelector('.modal__background').addEventListener('click', () => {
-        const modalContainer = document.querySelector('.modal-name__friend-profile');
-        if (modalContainer !== undefined)  modalContainer.remove();
-    });
 }

@@ -66,7 +66,7 @@ class ProfileModal {
     friendModalTemplate() {
         return `
 <div class="modal__container modal-name__friend-profile">
-    <div class="modal__background"></div>w
+    <div class="modal__background"></div>
     <div class="friend-modal__container">
         <div class="friend-modal__wrapper">
             <div class="friend-modal__box">
