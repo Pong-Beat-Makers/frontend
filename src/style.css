@@ -15,9 +15,10 @@
 @import "Public/components/note.css";
 
 /* Modal */
-@import "Modals/profile-modal.css";
-@import "Modals/friend-modal.css";
-@import "Modals/playgame-modal.css";
+@import "Profile/profile-modal.css";
+@import "Profile/friend-modal.css";
+@import "Game/game-modal.css";
+@import "Chat/chat-modal.css";
 
 /* screens */
 @import "Login/login.css";

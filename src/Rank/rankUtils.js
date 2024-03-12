@@ -1,5 +1,5 @@
 import { routes } from "../route.js";
-import { friendModalClick } from "../Modals/modalUtils.js";
+import { friendModalClick } from "../Profile/modalUtils.js";
 
 export function setRankPage() {
     const RankerNumber = 18; // 추후 백엔드에서 불러오기

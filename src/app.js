@@ -6,7 +6,7 @@ import { initChatSocket } from "./Chat/chatSocketUtils.js";
 import { setFriendList, handleAddFriendBtn } from "./Login/loginUtils.js";
 import { handleLoginBtn, handleNaviClick } from "./Public/clickUtils.js";
 import { handleHomeModal } from "./Home/homeUtils.js";
-import { handleEditUserModalUtils, handleFriendModalUtils } from "./Modals/modalUtils.js";
+import { handleEditUserModalUtils, handleFriendModalUtils } from "./Profile/modalUtils.js";
 
 const app = document.querySelector("#app");
 export let chatSocket;

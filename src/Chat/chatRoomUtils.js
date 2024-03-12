@@ -1,6 +1,7 @@
 import { BACKEND, FRONTEND, EXPIRY, chatTokenKey } from "../Public/global.js";
 import { routes } from "../route.js";
 import { chatSocket } from "../app.js";
+import {modalRender} from "../Profile/modalUtils.js";
 
 // 로그의 처음부터 끝까지 출력이라 처음에 채팅창 열 때 한번만 호출해야 함
 function loadChatLog(chatId) {
@@ -66,8 +67,7 @@ function handleBlockToggle() {
 }
 
 export function showChatroom(tokenInput) {
-    const chatModal = document.querySelector(".chat__modal");
-    chatModal.style.display = "block";
+    modalRender("chat", routes["/chat"].modalTemplate());
 
     const blockIcon = `<i class="bi bi-person-slash"></i>`;
 
@@ -91,13 +91,7 @@ export function showChatroom(tokenInput) {
         }
     });
 
-    chatModal.innerHTML += routes["/chat"].modalTemplate();
     document.querySelector(".chat__header--name").innerHTML = tokenInput;
-
-    document.querySelector(".chat__header--close").onclick = function() {
-		chatModal.style.display = "none";
-        chatModal.innerHTML -= document.querySelector(".chat__container");
-	}
 
     loadChatLog(`chatLog_${tokenInput}`);
     handleChatRoom();
