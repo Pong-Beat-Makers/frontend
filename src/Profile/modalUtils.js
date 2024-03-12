@@ -2,7 +2,6 @@ import ProfileModal from "./profileModalTemplate.js";
 
 export function  modalRender(modalName, htmlCode) {
     const modal = document.querySelector('.modal');
-
     modal.innerHTML += htmlCode;
 
     document.querySelector('.modal__background').addEventListener('click', () => {
@@ -13,13 +12,45 @@ export function  modalRender(modalName, htmlCode) {
 
 export function friendModalClick() {
     modalRender("friend-profile", ProfileModal.friendModalTemplate());
-    const nickname = document.querySelector(".friend-modal__info--nickname");
-    const status = document.querySelector(".friend-modal__info--status");
-    const rate = document.querySelector(".friend-modal__game-info--rate");
-    const rank = document.querySelector(".friend-modal__game-info--rank");
-    const isFriend = document.querySelector(".friend-modal__btn");
-    // isFriend.innerHTML = `<i class="bi bi-person-plus"></i> add`
-    setMatchHistory(nickname);
+    const nickname = document.querySelector(".profile-section__friends--name").innerHTML;
+    showProfileDetail(nickname);
+}
+
+export function showProfileDetail(input) {
+    fetch(`${BACKEND}/api/user-management/profile/?friend=${input}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${(getCookie("access_token"))}`,
+        },
+    })
+    .then(response => {
+        if (!response.ok)
+            throw new Error(`Error : ${response.status}`);
+        return response.json();
+    })
+    .then(data => {
+        // {"nickname":"user1","profile":"default","status_message":"Hello","win":1,"lose":1,"rank":4,"is_friend":False}
+        const obj = JSON.parse(data);
+        console.dir(obj);
+        // obj.nickname, obj.profile, obj.status_message, obj.win, obj.lose, obj.rank, obj.is_friend
+        
+        const nicknameInModal = document.querySelector(".friend-modal__info--nickname");
+        const status = document.querySelector(".friend-modal__info--status");
+        const rate = document.querySelector(".friend-modal__game-info--rate");
+        const rank = document.querySelector(".friend-modal__game-info--rank");
+        const isFriend = document.querySelector(".friend-modal__btn");
+
+        nicknameInModal.innerHTML = nickname;
+        status.innerHTML = obj.status_message;
+        rate.innerHTML = `${(obj.win / (obj.win + obj.lose)) * 100}%`
+        rank.innerHTML = obj.rank;
+        if (obj.is_friend == false)
+            isFriend.innerHTML = `<i class="bi bi-person-plus"></i> add`;
+        else
+            isFriend.innerHTML = `<i class="bi bi-person-plus"></i> delete`;
+
+        setMatchHistory(nickname);
+    });
 }
 
 function setMatchHistory(nickname) {
@@ -37,6 +68,17 @@ function setMatchHistory(nickname) {
             return ;
         const obj = JSON.parse(data);
         console.dir(obj);
+        /*
+        {
+        "id": "< 게임 데이터 id>",
+        "user1_nickname": "<유저1 닉네임(게임 상 왼쪽에 있는 유저)>",
+        "user2_nickname": "<유저2 닉네임(게임 상 오른쪽에 있는 유저)>",
+        "user1_score": "<유저1 점수>",
+        "user2_score": "<유저2 점수>",
+        "match_type": "<랜덤인지 토너먼트인지 type>",
+        "created_at": "<게임이 끝난 날짜와 시간>",
+        }
+        */
         // 유저 1이 자기 자신
         for (let i = 0; i < obj.length; i++) {
             matchHistoryList.innerHTML += ProfileModal.matchHistoryTemplate();
@@ -58,17 +100,6 @@ function setMatchHistory(nickname) {
             else
                 stat[i].innerHTML = "Lose";
         }
-/*
-{
-  "id": "< 게임 데이터 id>",
-  "user1_nickname": "<유저1 닉네임(게임 상 왼쪽에 있는 유저)>",
-  "user2_nickname": "<유저2 닉네임(게임 상 오른쪽에 있는 유저)>",
-  "user1_score": "<유저1 점수>",
-  "user2_score": "<유저2 점수>",
-  "match_type": "<랜덤인지 토너먼트인지 type>",
-  "created_at": "<게임이 끝난 날짜와 시간>",
-}
-*/
     });
 }
 
@@ -81,7 +112,6 @@ export function handleEditUserModalUtils() {
         document.querySelectorAll('textarea').forEach(element => {
             element.addEventListener('keyup', e => {
                 const textLenLimit = e.target.nextElementSibling.firstElementChild;
-
                 textLenLimit.innerHTML = `${e.target.value.length}`;
             });
         });

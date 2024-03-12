@@ -1,7 +1,7 @@
 import { BACKEND } from "../Public/global.js"
 import LoginSuccess from "./loginSuccessTemplate.js";
 import ProfileModal from "../Profile/profileModalTemplate.js";
-import { modalRender } from "../Profile/modalUtils.js";
+import { modalRender, showProfileDetail } from "../Profile/modalUtils.js";
 
 export function socialLogin(site) {
     fetch(`${BACKEND}/api/user-management/accounts/${site}/login/`, {
@@ -141,34 +141,11 @@ function handleProfileSearch(input) {
         const profileItems = document.querySelectorAll(".profile-section__friends--item");
         for (let i = 0; i < profileItems.length; i++) {
             profileItems[i].onclick = () => {
+                const modal = document.querySelector(".modal_double");
+                modal.innerHTML += ProfileModal.friendModalTemplate();
                 showProfileDetail(data[i]);
             }
         }
-    });
-}
-
-function showProfileDetail(input) {
-    modalRender("friend-profile", ProfileModal.friendModalTemplate());
-    // 이중모달 어케 처리할지 검토
-
-    fetch(`${BACKEND}/api/user-management/profile/?friend=${input}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${(getCookie("access_token"))}`,
-        },
-    })
-    .then(response => {
-        if (!response.ok)
-            throw new Error(`Error : ${response.status}`);
-        return response.json();
-    })
-    .then(data => {
-        // {"nickname":"user1","profile":"default","status_message":"Hello","win":1,"lose":1,"rank":4,"is_friend":False}
-        const obj = JSON.parse(data);
-        // obj.nickname, obj.profile, obj.status_message, obj.win, obj.lose, obj.rank, obj.is_friend
-        console.dir(obj);
-        modalRender("friend-profile", ProfileModal.friendModalTemplate());
-        // friendModalClick() 내부에서 유저 모든 정보 세팅하고 띄우기
     });
 }
 

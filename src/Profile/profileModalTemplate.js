@@ -23,6 +23,7 @@ class ProfileModal {
                 </div>
             </div>
         </div>
+        <div class="modal_double"></div>
         `;
     }
 
