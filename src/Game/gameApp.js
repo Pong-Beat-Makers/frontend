@@ -8,18 +8,16 @@ const BASE_DOMAIN = 'localhost:8000';
 const ROOM_ID = '69133283-5a26-48b8-bfe7-8ffbacd5206b';
 
 class PlayGameApp {
-    constructor() {
-        this._socket = new WebSocket(`ws://${BASE_DOMAIN}/ws/game/${ROOM_ID}/`);
-    }
-
-    gameRender(container) {
+    constructor(container) {
         this._container = container;
+        this._player = 1;
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
-        this._renderer = renderer;
         container.appendChild(renderer.domElement);
 
         const scene = new THREE.Scene();
+
+        this._renderer = renderer;
         this._scene = scene;
 
         this._setupCamera();
@@ -33,8 +31,27 @@ class PlayGameApp {
 
         window.resize = this.resize.bind(this);
         this.resize();
-        this.listen();
         requestAnimationFrame(this.render.bind(this));
+    }
+
+    setPlayer(player) {
+        this._player = player;
+    }
+
+    dataRander(data) {
+        if (this._player === 1) {
+            this.setupScore(data.score[0], data.score[1]);
+            this.renderBall(data.ball_coords[1], 470, -data.ball_coords[0]);
+
+            this.renderMyPaddle(data.player1_coords[1], 470, 340);
+            this.renderYourPaddle(data.player2_coords[1], 470, -340);
+        } else {
+            this.setupScore(data.score[1], data.score[0]);
+            this.renderBall(data.ball_coords[1], 470, data.ball_coords[0]);
+
+            this.renderMyPaddle(data.player2_coords[1], 470, 340);
+            this.renderYourPaddle(data.player1_coords[1], 470, -340);
+        }
     }
 
     _setupCamera(x, y, z) {
@@ -183,22 +200,9 @@ class PlayGameApp {
         this._renderer.setSize(width, height);
     }
 
-    render(time) {
+    render() {
         this._renderer.render(this._scene, this._camera);
-        this.update(time);
         requestAnimationFrame(this.render.bind(this));
-    }
-
-    update(time) {
-        // time *= 0.001;
-        // this._cube.rotation.x = time;
-        // this._cube.rotation.y = time;
-    }
-
-    moveMyPaddle(x, y, z) {
-        if (x !== undefined) this._myPaddle.position.x += x;
-        if (y !== undefined) this._myPaddle.position.y += y;
-        if (z !== undefined) this._myPaddle.position.z += z;
     }
 
     renderBall(x, y, z) {
@@ -217,72 +221,6 @@ class PlayGameApp {
         if (x !== undefined) this._yourPaddle.position.x = x;
         if (y !== undefined) this._yourPaddle.position.y = y;
         if (z !== undefined) this._yourPaddle.position.z = z;
-    }
-
-    listen() {
-        this._socket.addEventListener('message', e => {
-            /*
-                ball_coords: (2) [210, 210]
-                player1_coords: (2) [-335, 0]
-                player2_coords: (2) [335, 0]
-                score: (2) [0, 0]
-                type: "send_game_status"
-            */
-            const data = JSON.parse(e.data);
-            if (data.type === 'send_system_message') {
-                /*
-                message: "Game Start"
-                player: 1
-                type: "send_system_message"
-                */
-                if (data.message === 'Game Start') {
-                    this._player = data.player;
-                    console.log(this._player);
-                }
-                return;
-            } else if (this._player === 1) {
-                this.setupScore(data.score[0], data.score[1]);
-                this.renderBall(data.ball_coords[1], 470, -data.ball_coords[0]);
-
-                this.renderMyPaddle(data.player1_coords[1], 470, 340);
-                this.renderYourPaddle(data.player2_coords[1], 470, -340);
-
-                this._container.addEventListener('keydown', e => {
-                    if (e.key === 'ArrowLeft') this._send('up');
-                    else if (e.key === 'ArrowRight') this._send('down');
-                });
-                this._container.addEventListener('keyup', e => {
-                    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') this._send('stop');
-                });
-            } else if (this._player === 2) {
-                this.setupScore(data.score[1], data.score[0]);
-                this.renderBall(data.ball_coords[1], 470, data.ball_coords[0]);
-
-                this.renderMyPaddle(data.player2_coords[1], 470, 340);
-                this.renderYourPaddle(data.player1_coords[1], 470, -340);
-
-                this._container.addEventListener('keydown', e => {
-                    e.preventDefault();
-
-                    if (e.key === 'ArrowLeft') this._send('up');
-                    else if (e.key === 'ArrowRight') this._send('down');
-                });
-                this._container.addEventListener('keyup', e => {
-                    e.preventDefault();
-
-                    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') this._send('stop');
-                });
-            }
-        });
-    }
-
-    _send(eventName) {
-        if (this._socket !== undefined) {
-            const data = {
-                'move': eventName
-            };
-            this._socket.send(JSON.stringify(data));
-        }
     }
 }
 

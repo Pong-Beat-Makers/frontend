@@ -42,7 +42,9 @@ class Game {
 
 	playGameTemplate() {
 		return `
-		<div class="modal__container modal-name_play-game">
+		<div class="modal__container modal-name__play-game">
+			<div class="modal__background"></div>
+			<div class="modal__playgame--background"></div>
 			<div class="playgame__wrapper">
 				<div class="playgame__header">
 					<div class="playgame__header--profile">
