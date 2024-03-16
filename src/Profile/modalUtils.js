@@ -1,14 +1,16 @@
 import ProfileModal from "./profileModalTemplate.js";
 
-export function  modalRender(modalName, htmlCode) {
+export function  modalRender(modalName, htmlCode, backgroundClick = true) {
     const modal = document.querySelector('.modal');
 
     modal.innerHTML += htmlCode;
 
-    document.querySelector('.modal__background').addEventListener('click', () => {
-        const modalContainer = document.querySelector(`.modal-name__${modalName}`);
-        if (modalContainer !== undefined)  modalContainer.remove();
-    });
+    if (backgroundClick) {
+        document.querySelector('.modal__background').addEventListener('click', () => {
+            const modalContainer = document.querySelector(`.modal-name__${modalName}`);
+            if (modalContainer !== undefined) modalContainer.remove();
+        });
+    }
 }
 
 export function friendModalClick() {

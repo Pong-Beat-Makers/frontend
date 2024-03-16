@@ -1,4 +1,8 @@
-.modal__container.modal-name__play-game {
+.modal__playgame--background {
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 85px);
+    top: 85px;
     background-color: rgb(var(--sub-color));
 }
 
@@ -6,6 +10,7 @@
     width: 1000px;
     display: flex;
     flex-direction: column;
+    z-index: 10;
 }
 
 .playgame__header {
@@ -17,7 +22,6 @@
 }
 
 .playgame__header--profile {
-    width: 215px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -25,9 +29,14 @@
     color: white;
 }
 
+.playgame__header--profile:first-child > div:last-child {
+    margin-left: 15px;
+}
+
 .playgame__header--profile:last-child > div:last-child {
     color: rgb(var(--point-color));
     order: -1;
+    margin-right: 15px;
 }
 
 .playgame__header--avator {
