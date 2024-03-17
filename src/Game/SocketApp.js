@@ -1,10 +1,9 @@
 import {BACKEND} from "../Public/global.js";
 import {
     closeMatchingModal,
-    openTournamentModal,
-    openVersusModal,
-    setupAvatorAtTournament,
-    setupActiveReadyBtn, openPlayGameModal
+    setupActiveReadyBtn,
+    openPlayGameModal,
+    openBoardModal
 } from "./gameUtils.js";
 import GameApp from "./gameApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
@@ -38,8 +37,11 @@ class SocketApp {
     constructor() {
         this._waitSocket = undefined;
         this._gameSocket = undefined;
-        this._gameContiner = undefined;
+
+        this._matchingContainer = undefined;
         this._boardContainer = undefined;
+        this._gameContiner = undefined;
+
         this._gameCanvas = undefined;
     }
 
@@ -52,15 +54,27 @@ class SocketApp {
         }
     }
 
-     randomMatching() {
-        const waitSocket = new WebSocket(`ws://${GAME_SERVER_DOMAIN}/ws/game/waitingroom/random/`);
+     matching(gameType) {
+        let gameTypeUrl;
+
+        if (gameType === GAME_TYPE.RANDOM) {
+            gameTypeUrl = "random";
+        } else if (gameType === GAME_TYPE.TOURNAMENT) {
+            gameTypeUrl = "tournament";
+        }
+
+        const waitSocket = new WebSocket(`ws://${GAME_SERVER_DOMAIN}/ws/game/waitingroom/${gameTypeUrl}/`);
 
         waitSocket.addEventListener('message', e => {
             const data = JSON.parse(e.data);
 
-            closeMatchingModal(this);
-            openVersusModal(this, data.user_nicknames);
-            this._enterGameRoom(data.room_id, data.user_nicknames);
+            if (data.room_id !== undefined) {
+                openBoardModal(this, gameType, data.user_nicknames);
+                this._enterGameRoom(data.room_id, data.user_nicknames);
+            }
+            if (data.type === "send_waiting_number") {
+                // 인원 수
+            }
         });
 
         waitSocket.onopen = () => {
@@ -71,24 +85,8 @@ class SocketApp {
             this._waitSend(data);
         }
 
-        this._waitSocket = waitSocket;
-    }
-
-    tournamentMatching() {
-        const waitSocket = new WebSocket(`ws://${GAME_SERVER_DOMAIN}/ws/game/waitingroom/tournament/`);
-
-        waitSocket.addEventListener('message', e => {
-            const data = JSON.parse(e.data);
-
+        waitSocket.onclose = () => {
             closeMatchingModal(this);
-        });
-
-        waitSocket.onopen = () => {
-            const data = {
-                'token': getCookie('token')
-            }
-
-            this._waitSocket(data);
         }
 
         this._waitSocket = waitSocket;
@@ -165,6 +163,10 @@ class SocketApp {
 
     setGameContainer(gameContainer) {
         this._gameContiner = gameContainer;
+    }
+
+    setMatchingContainer(matchingContainer) {
+        this._matchingContainer = matchingContainer;
     }
 
     setBoardContainer(boardContainer) {

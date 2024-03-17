@@ -188,6 +188,7 @@ canvas {
 }
 
 .tournament__body {
+    position: relative;
     min-height: 0;
     flex-grow: 1;
     display: flex;

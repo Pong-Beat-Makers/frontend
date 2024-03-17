@@ -18,44 +18,63 @@ export function openPlayGameModal(socketApp, gameType, playerNames) {
     socketApp.setGameCanvas(modalContainer.querySelector('#game_playground'));
 }
 
+export function openMatchingModal(gameType) {
+    let modalName;
+    if (gameType === GAME_TYPE.TOURNAMENT) {
+
+    }
+    modalRender('matching-game', routes['/game'].matchModalTemplate(gameType), false);
+    const modalContainer = document.querySelector('.')
+    const socketApp = SocketApp;
+
+    socketApp.matching(gameType);
+
+    document.querySelector('.matching-game__btn').addEventListener('click', () => {
+        closeMatchingModal(socketApp);
+    });
+
+    socketApp.setMatchingContainer()
+}
+
 export function closeMatchingModal(socketApp) {
     const modalContainer = document.querySelector('.modal-name__matching-game');
     socketApp.waitClose();
     modalContainer.remove();
 }
 
-export function openVersusModal(socketApp, playerNames) {
-    modalRender('versus', routes['/game'].versusModalTemplate(), false);
+export function openBoardModal(socketApp, gameType, playerNames) {
+    let modalName;
+    let modalHtml;
 
-    const modalContainer = document.querySelector('.modal-name__versus');
+    if (gameType === GAME_TYPE.TOURNAMENT) {
+        modalName = "tournament";
+        modalHtml = routes['/game'].tournamentModalTemplate();
+    } else {
+        modalName  = "versus";
+        modalHtml = routes['/game'].versusModalTemplate();
+    }
 
-    modalContainer.querySelector('.versus-modal__btn').addEventListener('click', () => {
+    modalRender(modalName, modalHtml, false);
+
+    const modalContainer = document.querySelector(`.modal-name__${modalName}`);
+
+    modalContainer.querySelector('.modal__ready-btn').addEventListener('click', () => {
         const info = modalContainer.querySelector('.board-modal__info');
-        info.classList.add('ingAnimation');
-        info.innerHTML = "Waiting for the other one.";
 
-        setupDeActiveReadyBtn(modalContainer);
+        info.classList.add('ingAnimation');
+        info.innerHTML = "Waiting for the other one .";
+
+        setupActiveReadyBtn(modalContainer);
         socketApp.readyToPlay();
     });
-    setupNameAtModal(modalContainer, GAME_TYPE.RANDOM, playerNames);
 
+    setupNameAtModal(modalContainer, gameType, playerNames);
     socketApp.setBoardContainer(modalContainer);
 }
 
-export function openTournamentModal(socketApp) {
-    modalRender('tournament', routes['/game'].tournamentModalTemplate(), false);
-
-    const modalContainer = document.querySelector('.modal-name__tournament');
-
-    modalContainer.querySelector('.tournament__btn').addEventListener('click', () => {
-        socketApp.gameClose();
-        modalContainer.remove();
-    });
-}
-
-export function setupNameAtModal(container, type, playerNames) {
+export function setupNameAtModal(container, gameType, playerNames) {
     if (Array.isArray(playerNames)) {
-        if (type === GAME_TYPE.RANDOM) {
+        if (gameType === GAME_TYPE.RANDOM) {
             const insertNameContainer = container.querySelectorAll('.insert-playerName');
 
             if (playerNames[0] !== undefined) {
@@ -66,6 +85,10 @@ export function setupNameAtModal(container, type, playerNames) {
             }
         }
     }
+}
+
+export function setupConnectPeopleAtMatchingModal(container, playerNumber) {
+
 }
 
 export function setupDeActiveReadyBtn(container) {
@@ -85,24 +108,10 @@ export function handleGameModal() {
     const playBtn = document.querySelectorAll('.game__playbtn');
 
     playBtn[GAME_TYPE.RANDOM].addEventListener('click', () => {
-        modalRender('matching-game', routes['/game'].matchModalTemplate(GAME_TYPE.RANDOM), false);
-        const socketApp = SocketApp;
-
-        socketApp.randomMatching();
-
-        document.querySelector('.matching-game__btn').addEventListener('click', () => {
-            closeMatchingModal(socketApp);
-        });
+        openMatchingModal(GAME_TYPE.RANDOM);
     });
 
     playBtn[GAME_TYPE.TOURNAMENT].addEventListener('click', () => {
-        modalRender('matching-game', routes['/game'].matchModalTemplate(GAME_TYPE.TOURNAMENT), false);
-        const socketApp = SocketApp;
-
-        socketApp.tournamentMatching();
-
-        document.querySelector('.matching-game__btn').addEventListener('click', () => {
-            closeMatchingModal(socketApp);
-        });
+        openMatchingModal(GAME_TYPE.TOURNAMENT);
     });
 }

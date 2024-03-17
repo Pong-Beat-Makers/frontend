@@ -153,6 +153,7 @@ class Game {
 							<div class="tournament__avator"></div>
 						</div>
 					</div>
+					<div class="board-modal__info"></div>
 					<button class="modal__btn tournament__btn modal__ready-btn" disabled>
 						<i class="bi bi-check-square"></i>
 						ready

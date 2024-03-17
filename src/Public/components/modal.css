@@ -35,6 +35,7 @@
 
 .modal__btn:disabled {
     filter: brightness(0.5);
+    cursor: default;
 }
 
 .ingAnimation::after {
