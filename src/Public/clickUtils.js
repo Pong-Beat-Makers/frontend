@@ -4,6 +4,7 @@ import { setChatPage } from "../Chat/chatPageUtils.js";
 import { handleHomeModal } from "../Home/homeUtils.js";
 import { handleGameModal } from "../Game/gameUtils.js";
 import { setRankPage } from "../Rank/rankUtils.js";
+import { deleteCookie } from "./cookieUtils.js";
 
 export function handleLoginBtn() {
     const loginBtns = document.querySelectorAll(".login-btn");
@@ -13,9 +14,8 @@ export function handleLoginBtn() {
 
 function handleLogoutBtn(event) {
     localStorage.clear();
-    deleteCookieAll();
-    changeUrl("/login");
-    handleLoginBtn();
+    deleteCookie('access_token');
+    location.reload();
 }
 
 export function handleNaviClick() {

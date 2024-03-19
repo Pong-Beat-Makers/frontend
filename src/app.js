@@ -1,37 +1,21 @@
-import LoginSuccess from "./Login/loginSuccessTemplate.js";
-import Login from "./Login/loginTemplate.js"
-import changeUrl from "./route.js";
-import { LOCALHOST } from "./Public/global.js";
-import { initChatSocket } from "./Chat/chatSocketUtils.js";
-import { setFriendList, handleAddFriendBtn } from "./Login/loginUtils.js";
-import { handleLoginBtn, handleNaviClick } from "./Public/clickUtils.js";
-import { handleHomeModal } from "./Home/homeUtils.js";
-import { handleEditUserModalUtils, handleFriendModalUtils } from "./Profile/modalUtils.js";
+import {renderMainPage} from "./Login/loginUtils.js";
+import Player, {USER_STATUS} from "./Login/player.js";
+import {getCookie} from '../src/Public/cookieUtils.js';
 
-const app = document.querySelector("#app");
 export let chatSocket;
 
-if (document.cookie) {
-    app.innerHTML = LoginSuccess.template();
-    changeUrl("/home");
-    document.querySelectorAll(".main-section__list--item")[0].classList.add("active");
-    // handleHomeModal();
-    
-    chatSocket = new WebSocket(
-        'ws://' + LOCALHOST + ':8000' + '/ws/chatting/'
-    );
-    initChatSocket();
-    handleNaviClick();
-    setFriendList();
+const app = async () => {
+    const token = getCookie("access_token");
 
-    // 메인 섹션 프로필 이벤트 등록
-    handleEditUserModalUtils();
-    handleFriendModalUtils();
+    if (token) {
+        const player = new Player(token);
+        await player.whoAmI();
+        await player.getFriendList();
 
-    const friendAddButton = document.querySelector(".profile-section__friends--button");
-    friendAddButton.onclick = handleAddFriendBtn;
+        renderMainPage(player);
+    } else {
+        renderMainPage();
+    }
 }
-else {
-    app.innerHTML = Login.template();
-    handleLoginBtn();
-}
+
+await app();
