@@ -33,8 +33,33 @@
     margin-top: 20px;
 }
 
+div[data-name="avator__image-bird"] {
+    background-image: url('../../assets/bird.svg');
+    background-size: cover;
+}
+
+div[data-name="avator__image-cat"] {
+    background-image: url('../../assets/cat.svg');
+    background-size: cover;
+}
+
+div[data-name="avator__image-crocodile"] {
+    background-image: url('../../assets/crocodile.svg');
+    background-size: cover;
+}
+
+div[data-name="avator__image-whale"] {
+    background-image: url('../../assets/whale.svg');
+    background-size: cover;
+}
+
+div[data-name="avator__image-gadget"] {
+    background-image: url('../../assets/gadget.svg');
+    background-size: cover;
+}
+
 .modal__btn:disabled {
-    filter: brightness(0.5);
+    filter: brightness(.5);
     cursor: default;
 }
 

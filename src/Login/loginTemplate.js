@@ -22,6 +22,19 @@ class Login {
         </div>
 		`;
 	}
+
+  twoFATempate() {
+    return `
+    <div class="login__body--message">Please enter the 6-digit</div>
+    <div class="login__body--message"> code sent to your email.</div>
+    <div class="login__body--info"></div>
+    <input type="text" class="login__body--input" maxlength="6" />
+    <button class="login__2fa-btn" disabled>
+      <i class="bi bi-person-check"></i>
+      verify
+    </button>
+    `
+  }
 }
 
 export default new Login();

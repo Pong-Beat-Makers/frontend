@@ -1,12 +1,12 @@
-import {BACKEND} from "../Public/global.js";
 import {
     closeMatchingModal,
     setupActiveReadyBtn,
     openPlayGameModal,
-    openBoardModal
+    openBoardModal, openErrorModal
 } from "./gameUtils.js";
 import GameApp from "./gameApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
+import { getCookie } from '../Public/cookieUtils.js';
 
 const GAME_SERVER_DOMAIN = 'localhost:8001';
 
@@ -15,22 +15,6 @@ export const SOCKET_STATE = {
     OPEN: 1,
     CLOSING: 2,
     CLOSED: 3,
-}
-
-function getCookie(cname) {
-    let name = cname + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let ca = decodedCookie.split(';');
-    for(let i = 0; i <ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
 }
 
 class SocketApp {
@@ -85,8 +69,12 @@ class SocketApp {
             this._waitSend(data);
         }
 
+        waitSocket.onerror = () => {
+            openErrorModal('There was a problem with the game server.');
+        }
+
         waitSocket.onclose = () => {
-            closeMatchingModal(this);
+            closeMatchingModal(this._matchingContainer, this);
         }
 
         this._waitSocket = waitSocket;

@@ -1,6 +1,13 @@
-import { BACKEND } from "../Public/global.js"
+import {BACKEND, LOCALHOST} from "../Public/global.js"
 import LoginSuccess from "./loginSuccessTemplate.js";
+import Login from "./loginTemplate.js";
 import ProfileModal from "../Profile/profileModalTemplate.js";
+import {USER_STATUS} from "./player.js";
+import changeUrl from "../route.js";
+import {initChatSocket} from "../Chat/chatSocketUtils.js";
+import {handleLoginBtn, handleNaviClick} from "../Public/clickUtils.js";
+import {handleEditUserModalUtils, handleFriendModalUtils} from "../Profile/modalUtils.js";
+import {chatSocket} from "../app.js";
 
 export function socialLogin(site) {
     fetch(`${BACKEND}/api/user-management/accounts/${site}/login/`, {
@@ -18,45 +25,6 @@ export function socialLogin(site) {
         });
 }
 
-function getCookie(cname) {
-    let name = cname + "=";
-    let decodedCookie = decodeURIComponent(document.cookie);
-    let ca = decodedCookie.split(';');
-    for(let i = 0; i <ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
-}
-
-function deleteCookie(name) {
-    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-}
-
-export function deleteCookieAll () {
-    const cookies = document.cookie.split('; ');
-    const expiration = 'Sat, 01 Jan 1972 00:00:00 GMT';
-
-    for (i = 0; i < cookies.length; i++) {
-        document.cookie = cookies[i].split('=')[0] + '=; expires=' + expiration;
-    }
-}
-/*
-function moveRefresh() {
-    if (getCookie("refresh_token")) {
-        const cookies = Object.fromEntries(
-            document.cookie.split(';').map((cookie) => cookie.trim().split('=')),
-        );
-        localStorage.setItem("refresh_token", cookies["refresh_token"]);
-        deleteCookie("refresh_token");
-    }
-}
-*/
 export function setFriendList() {
     let friendsArray = [];
 
@@ -155,4 +123,86 @@ export function handleAddFriendBtn() {
         const modalContainer = document.querySelector('.modal-name__friend-profile');
         if (modalContainer !== undefined)  modalContainer.remove();
     });
+}
+
+export function changeTo2FAPage(loginUser) {
+  const loginBody = document.querySelector(".login__container--body");
+
+  loginBody.querySelector(".login__wrapper--header").innerHTML = "<span class='login__wrapper--header_'>Verification</span>";
+  loginBody.querySelector(".login__wrapper--list").innerHTML = Login.twoFATempate();
+
+  const codeInput = loginBody.querySelector('.login__body--input');
+  const twoFABtn = loginBody.querySelector('.login__2fa-btn');
+
+  codeInput.addEventListener('keyup', e => {
+          twoFABtn.disabled = e.target.value.length !== 6;
+  });
+
+  twoFABtn.addEventListener('click', async () => {
+        const status = await loginUser.send2FACode(codeInput.value);
+        const infoContainer = loginBody.querySelector('.login__body--info');
+
+        infoContainer.innerHTML = "";
+        if (status === 200) {
+            location.reload();
+        } else if (400 <= status < 500) {
+            infoContainer.innerHTML = "Wrong code!";
+        }
+  });
+}
+
+export function getInfoJWT(token) {
+    const base64Payload = token.split('.')[1];
+    const base64 = base64Payload.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
+export function renderMainPage(player) {
+    const app = document.getElementById('app');
+
+    if (player !== undefined && player.getStatus() === USER_STATUS.AUTHORIZED) {
+        app.innerHTML = LoginSuccess.template();
+
+        changeUrl("/home");
+        app.querySelectorAll(".main-section__list--item")[0].classList.add("active");
+        // handleHomeModal();
+        handleNaviClick();
+        setProfileSection(app, player);
+
+        chatSocket = new WebSocket(
+            'ws://' + LOCALHOST + ':8000' + '/ws/chatting/'
+        );
+        initChatSocket();
+        setFriendList();
+
+        const friendAddButton = document.querySelector(".profile-section__friends--button");
+        friendAddButton.onclick = handleAddFriendBtn;
+    } else {
+        app.innerHTML = Login.template();
+        handleLoginBtn();
+        if (player !== undefined && player.getStatus() === USER_STATUS.NOT_AUTHORIZED) {
+            changeTo2FAPage(player);
+        }
+    }
+}
+
+export function setProfileSection(app, player) {
+    const profileSection = app.querySelector('.profile-section');
+
+    const profile = profileSection.querySelector('.profile-section__profile');
+    const avator = profile.querySelector('.profile-section__profile--avator');
+    const infoNode = profile.querySelector('.profile-section__profile--info').children;
+
+    avator.setAttribute('data-name', 'avator__image-cat');
+
+    infoNode[0].innerHTML = player.getNickName();
+    infoNode[1].innerHTML = player.getStatusMessage();
+
+    // 메인 섹션 프로필 이벤트 등록
+    handleEditUserModalUtils(app);
+    handleFriendModalUtils(app);
 }

@@ -48,7 +48,6 @@ class Game {
 
 	playGameTemplate() {
 		return `
-		<div class="modal__container modal-name__play-game">
 			<div class="modal__background"></div>
 			<div class="modal__playgame--background"></div>
 			<div class="playgame__wrapper">
@@ -69,7 +68,6 @@ class Game {
 					</botton>
 				</div>
 			</div>
-		</div>
 		`
 	}
 
@@ -84,7 +82,6 @@ class Game {
 						</div>`;
 		}
 		return `
-        <div class="modal__container modal-name__matching-game">
             <div class="modal__background"></div>
             <div class="matching-game__wrapper">
             	<span class="ingAnimation">${ comment }</span>
@@ -94,13 +91,11 @@ class Game {
                     cancel & exit
                 </button>
             </div>
-        </div>
         `;
 	}
 
 	versusModalTemplate() {
 		return `
-		<div class="modal__container modal-name__versus">
 			<div class="modal__background"></div>
 			<div class="modal__playgame--background"></div>
 			<div class="versus-modal__wrapper">
@@ -122,13 +117,11 @@ class Game {
 					</button>
 				</div>
 			</div>
-		</div>
 		`;
 	}
 
 	tournamentModalTemplate() {
 		return `
-		<div class="modal__container modal-name__tournament">
 			<div class="modal__background"></div>
 			<div class="modal__playgame--background"></div>
 			<div class="tournament__wrapper">
@@ -160,8 +153,20 @@ class Game {
 					</button>
 				</div>
 			</div>
-		</div>
 		`;
+	}
+
+	errorModalTemplate(comment) {
+		return `
+            <div class="modal__background"></div>
+            <div class="matching-game__wrapper">
+            	<span>${ comment }</span>
+                <button class="modal__btn matching-game__btn">
+                    <i class="bi bi-x-square"></i>
+                    cancel & exit
+                </button>
+            </div>
+        `;
 	}
 }
 

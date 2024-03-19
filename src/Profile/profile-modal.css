@@ -45,31 +45,6 @@
     margin: 0 5px;
 }
 
-.profile-modal__avator.image_bird {
-    background-image: url('../assets/bird.png');
-    background-size: cover;
-}
-
-.profile-modal__avator.image_cat {
-    background-image: url('../assets/cat.png');
-    background-size: cover;
-}
-
-.profile-modal__avator.image_crocodile {
-    background-image: url('../assets/crocodile.png');
-    background-size: cover;
-}
-
-.profile-modal__avator.image_dolphin {
-    background-image: url('../assets/dolphin.png');
-    background-size: cover;
-}
-
-.profile-modal__avator.image_gadget {
-    background-image: url('../assets/gadget.png');
-    background-size: cover;
-}
-
 .profile-modal__avator.profile-modal__big-avator::after {
     content: '';
     position: absolute;

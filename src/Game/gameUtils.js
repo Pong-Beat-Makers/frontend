@@ -4,9 +4,7 @@ import SocketApp from "./SocketApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
 
 export function openPlayGameModal(socketApp, gameType, playerNames) {
-    modalRender('play-game', routes['/game'].playGameTemplate(), false);
-
-    const modalContainer = document.querySelector('.modal-name__play-game');
+    const modalContainer = modalRender('play-game', routes['/game'].playGameTemplate(), false);
 
     modalContainer.querySelector('.playgame__btn').addEventListener('click', () => {
         socketApp.gameClose();
@@ -19,27 +17,21 @@ export function openPlayGameModal(socketApp, gameType, playerNames) {
 }
 
 export function openMatchingModal(gameType) {
-    let modalName;
-    if (gameType === GAME_TYPE.TOURNAMENT) {
-
-    }
-    modalRender('matching-game', routes['/game'].matchModalTemplate(gameType), false);
-    const modalContainer = document.querySelector('.')
+    const modalContainer = modalRender('matching-game', routes['/game'].matchModalTemplate(gameType), false);
     const socketApp = SocketApp;
 
     socketApp.matching(gameType);
 
     document.querySelector('.matching-game__btn').addEventListener('click', () => {
-        closeMatchingModal(socketApp);
+        closeMatchingModal(modalContainer, socketApp);
     });
 
-    socketApp.setMatchingContainer()
+    socketApp.setMatchingContainer(modalContainer);
 }
 
-export function closeMatchingModal(socketApp) {
-    const modalContainer = document.querySelector('.modal-name__matching-game');
+export function closeMatchingModal(matchingContainer, socketApp) {
     socketApp.waitClose();
-    modalContainer.remove();
+    matchingContainer.remove();
 }
 
 export function openBoardModal(socketApp, gameType, playerNames) {
@@ -54,9 +46,7 @@ export function openBoardModal(socketApp, gameType, playerNames) {
         modalHtml = routes['/game'].versusModalTemplate();
     }
 
-    modalRender(modalName, modalHtml, false);
-
-    const modalContainer = document.querySelector(`.modal-name__${modalName}`);
+    const modalContainer = modalRender(modalName, modalHtml, false);
 
     modalContainer.querySelector('.modal__ready-btn').addEventListener('click', () => {
         const info = modalContainer.querySelector('.board-modal__info');
@@ -113,5 +103,13 @@ export function handleGameModal() {
 
     playBtn[GAME_TYPE.TOURNAMENT].addEventListener('click', () => {
         openMatchingModal(GAME_TYPE.TOURNAMENT);
+    });
+}
+
+export function openErrorModal(comment) {
+    const modalContainer = modalRender('matching-game', routes['/game'].errorModalTemplate(comment));
+
+    modalContainer.querySelector('.matching-game__btn').addEventListener('click', () => {
+        modalContainer.remove();
     });
 }

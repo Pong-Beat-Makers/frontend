@@ -2,28 +2,32 @@ import ProfileModal from "./profileModalTemplate.js";
 
 export function  modalRender(modalName, htmlCode, backgroundClick = true) {
     const modal = document.querySelector('.modal');
+    const modalContainer = document.createElement('div');
 
-    modal.innerHTML += htmlCode;
+    modalContainer.classList.add('modal__container', `modal-name__${modalName}`);
+    modalContainer.innerHTML = htmlCode;
+
+    modal.appendChild(modalContainer);
 
     if (backgroundClick) {
-        document.querySelector('.modal__background').addEventListener('click', () => {
-            const modalContainer = document.querySelector(`.modal-name__${modalName}`);
+        modalContainer.querySelector('.modal__background').addEventListener('click', () => {
             if (modalContainer !== undefined) modalContainer.remove();
         });
     }
+    return modalContainer;
 }
 
 export function friendModalClick() {
     modalRender("friend-profile", ProfileModal.friendModalTemplate());
 }
 
-export function handleEditUserModalUtils() {
-    const profileBtn = document.querySelector('.profile-section__profile');
+export function handleEditUserModalUtils(app) {
+    const profileBtn = app.querySelector('.profile-section__profile');
 
     profileBtn.addEventListener('click', () => {
-        modalRender("profile", ProfileModal.template());
+        const modalContainer = modalRender("profile", ProfileModal.template());
 
-        document.querySelectorAll('textarea').forEach(element => {
+        modalContainer.querySelectorAll('textarea').forEach(element => {
             element.addEventListener('keyup', e => {
                 const textLenLimit = e.target.nextElementSibling.firstElementChild;
 
@@ -31,20 +35,23 @@ export function handleEditUserModalUtils() {
             });
         });
 
-        document.querySelectorAll('.profile-modal__avatorlist > .profile-modal__avator').forEach(element => {
+        modalContainer.querySelectorAll('.profile-modal__avatorlist > .profile-modal__avator').forEach(element => {
+            const bigAvatar = modalContainer.querySelector('.profile-modal__big-avator');
+            const dataName = 'avator__image-';
+
             element.addEventListener('click', e => {
-                e.target.classList.forEach(c => {
-                    if (c.startsWith('image_')) {
-                        document.querySelector('.profile-modal__big-avator').classList.remove()
-                    }
-                });
+                const currAvatar = bigAvatar.getAttribute('data-name').substring(dataName.length);
+                const clickAvatar = e.target.getAttribute('data-name').substring(dataName.length);
+
+                bigAvatar.setAttribute('data-name', dataName + clickAvatar);
+                e.target.setAttribute('data-name', dataName + currAvatar);
             });
         });
     })
 }
 
-export function handleFriendModalUtils() {
-    const frendItems = document.querySelectorAll('.profile-section__friends--item');
+export function handleFriendModalUtils(app) {
+    const frendItems = app.querySelectorAll('.profile-section__friends--item');
 
     frendItems.forEach(item => {
         item.removeEventListener('click', friendModalClick, true);

@@ -38,7 +38,6 @@ class Chat {
 
 	modalTemplate() {
 		return `
-        <div class="modal__container modal-name__chat">
             <div class="modal__background"></div>
             <div class="chat__container">
                 <div class="chat__header">
@@ -73,7 +72,6 @@ class Chat {
                     </div>
                 </div>
             </div>
-        </div>
 		`;
 	}
 }
