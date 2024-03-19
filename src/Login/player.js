@@ -10,12 +10,13 @@ export const USER_STATUS = {
 const USER_MANAGEMENT_DOMAIN = 'api/user-management';
 
 class Player {
-    constructor(token) {
+    constructor() {
         this._status = USER_STATUS.DOSE_NOT_EXIST;
-        this._token = token;
     }
 
-    async whoAmI() {
+    async whoAmI(token) {
+        this._token = token;
+
         const { user_id, nickname } = getInfoJWT(this._token);
         this._id = user_id;
         this._nickName = nickname;
@@ -99,4 +100,4 @@ class Player {
     }
 }
 
-export default Player;
+export default new Player();
