@@ -21,18 +21,20 @@ export async function socialLogin(site) {
     window.location.href = data.login_url;
 }
 
-export async function setFriendList(app, player) {
+export async function setFriendList(app) {
     // make friends elements
-    const friendList = await player.getFriendList();
+    const friendList = await Player.getFriendList();
     const friendListElement = app.querySelector(".profile-section__friends--list");
+    friendListElement.innerHTML = "";
     for (let i = 0; i < friendList.length; i++) {
         friendListElement.innerHTML += LoginSuccess.friendBoxTemplate();
     }
     if (friendListElement.innerHTML === "") {
-        friendListElement.innerHTML += `<div class="profile-section__friends--msg">
+        friendListElement.innerHTML = `<div class="profile-section__friends--msg">
         Let's play the game
         <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         & make new friends 🤝</div>`;
+        return ;
     }
 
     // set friends info
@@ -138,17 +140,22 @@ async function handleProfileBtns (modal, obj) {
         const data = {
                 method: methodSelected,
                 headers: {
+                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${Player._token}`,   
                 },
-                body: {
+                body: JSON.stringify({
                     'friend' : obj.nickname,
-                }
+                })
         };
-        // TODO: 친구추가 정상동작 확인
-        console.dir(data);
         const res = await fetch(`${BACKEND}/${USER_MANAGEMENT_DOMAIN}/friends/`, data);
         if (!res.ok)
             throw new Error(`Error : ${response.status}`);
+        else if (methodSelected == 'POST')
+            profileBtns[1].innerHTML = `<i class="bi bi-person-plus"></i> delete`;
+        else if (methodSelected == 'DELETE')
+            profileBtns[1].innerHTML = `<i class="bi bi-person-plus"></i> add`;
+        // TODO: SPA기 때문에 .. 실시간으로 친구목록 innerHTML 업데이트 해주어야 한다뇌요..^.^
+        await setFriendList(document.querySelector(".profile-section"));
     }
 }
 
@@ -256,7 +263,7 @@ export function renderMainPage(player) {
         // handleHomeModal();
         handleNaviClick();
         setProfileSection(app, player);
-        setFriendList(app, player);
+        setFriendList(app);
 
         const friendAddButton = app.querySelector(".profile-section__friends--button");
         friendAddButton.onclick = handleAddFriendBtn;
