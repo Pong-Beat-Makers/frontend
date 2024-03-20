@@ -4,7 +4,7 @@ import {
     openBoardModal,
     openErrorModal,
     setupConnectPeopleAtMatchingModal,
-    changeGiveUpToEnd, renderEndStatus, setupActiveReadyBtn
+    changeGiveUpToEnd, renderEndStatus, setupActiveReadyBtn, setInfoMessageAtModal
 } from "./gameUtils.js";
 import GameApp from "./gameApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
@@ -57,6 +57,9 @@ class SocketApp {
 
             if (data.room_id !== undefined) {
                 openBoardModal(this, gameType, data.user_nicknames);
+                if (gameType !== GAME_TYPE.TWO_PLAYER) {
+                    this._boardContainer.querySelector('.modal__ready-btn').remove();
+                }
                 if (data.player === 2) {
                     data.user_nicknames = data.user_nicknames.reverse();
                 }
@@ -101,7 +104,9 @@ class SocketApp {
 
             if (data.type === 'send_system_message') {
                 if (data.message === 'Game Ready') {
-                    if (data.counter === 5) {
+                    if (5 < data.counter) {
+                        setInfoMessageAtModal(this._boardContainer, data.counter - 5);
+                    } else if (data.counter === 5) {
                         openPlayGameModal(this, gameType, playerNames);
                         this._gameApp = new GameApp(this._gameCanvas, gameType);
                         this._gameApp.setPlayer(data.player);

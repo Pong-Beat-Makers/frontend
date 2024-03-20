@@ -100,6 +100,16 @@ export function changeGiveUpToEnd(container) {
     giveUpBtn.innerHTML = '<i class="bi bi-door-closed"></i> Exit';
 }
 
+export function setInfoMessageAtModal(modalContainer, message, ingAnimation = false) {
+    const info = modalContainer.querySelector('.board-modal__info');
+
+    if (ingAnimation) {
+        info.classList.add('ingAnimation');
+    }
+
+    info.innerHTML = message;
+}
+
 export function setupAvatarAtTournament(container, players) {
     // profile 추가
     console.log("users:", players);
