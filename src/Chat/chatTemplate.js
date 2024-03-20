@@ -31,19 +31,18 @@ class Chat {
 			    search
             </button>
 		</form>
-		<div class="chat__room--list"></div>
+		    <div class="chat__room--list"></div>
         </div>
 		`;
     }
 
 	modalTemplate() {
 		return `
-        <div class="modal__container modal-name__chat">
             <div class="modal__background"></div>
             <div class="chat__container">
                 <div class="chat__header">
                     <div class="chat__header--profile">
-                        <div class="chat__header--avator"></div>
+                        <div class="chat__header--avatar"></div>
                         <div class="chat__header--name">friend</div>
                     </div>
                     <div class="chat__header--controlls">
@@ -73,7 +72,6 @@ class Chat {
                     </div>
                 </div>
             </div>
-        </div>
 		`;
 	}
 }

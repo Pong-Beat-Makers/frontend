@@ -30,7 +30,7 @@ class LoginSuccess {
         <div class="wrapper">
             <section class="profile-section">
                 <div class="profile-section__profile">
-                    <div class="profile-section__profile--avator"></div>
+                    <div class="profile-section__profile--avatar"></div>
                     <div class="profile-section__profile--info">
                         <div>nickname</div>
                         <div>status_message here</div>

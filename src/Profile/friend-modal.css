@@ -33,7 +33,7 @@
     border-bottom: 1px solid #FFFFFF4D;
 }
 
-.friend-modal__avator {
+.friend-modal__avatar {
     width: 215px;
     height: 215px;
     border-radius: 50%;
@@ -108,7 +108,7 @@
     font-size: 18px;
 }
 
-.history-item__profiles--avator {
+.history-item__profiles--avatar {
     width: 42px;
     height: 42px;
     border-radius: 50%;

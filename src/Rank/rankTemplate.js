@@ -2,7 +2,7 @@ class Rank {
 	rankerStageTemplate(tier) {
 		return `
 			<div class="rank__stage--table">
-				<div class="rank__stage--avator rank__profile--${tier}"></div>
+				<div class="rank__stage--avatar rank__profile--${tier}"></div>
 		</div>
 		`
 	}

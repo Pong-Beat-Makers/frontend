@@ -29,7 +29,7 @@
     color: #FFFFFFBD;
 }
 
-.profile-modal__avator {
+.profile-modal__avatar {
     width: 70px;
     height: 70px;
     border-radius: 50%;
@@ -38,39 +38,14 @@
     transition: .3s ease-in-out;
 }
 
-.profile-modal__big-avator {
+.profile-modal__big-avatar {
     position: relative;
     width: 160px;
     height: 160px;
     margin: 0 5px;
 }
 
-.profile-modal__avator.image_bird {
-    background-image: url('../assets/bird.png');
-    background-size: cover;
-}
-
-.profile-modal__avator.image_cat {
-    background-image: url('../assets/cat.png');
-    background-size: cover;
-}
-
-.profile-modal__avator.image_crocodile {
-    background-image: url('../assets/crocodile.png');
-    background-size: cover;
-}
-
-.profile-modal__avator.image_dolphin {
-    background-image: url('../assets/dolphin.png');
-    background-size: cover;
-}
-
-.profile-modal__avator.image_gadget {
-    background-image: url('../assets/gadget.png');
-    background-size: cover;
-}
-
-.profile-modal__avator.profile-modal__big-avator::after {
+.profile-modal__avatar.profile-modal__big-avatar::after {
     content: '';
     position: absolute;
     top: -5px;
@@ -81,7 +56,7 @@
     border: 2px solid rgb(var(--point-color));
 }
 
-.profile-modal__avatorlist {
+.profile-modal__avatarlist {
     width: 145px;
     height: 145px;
     display: flex;

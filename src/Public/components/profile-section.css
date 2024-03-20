@@ -17,12 +17,10 @@
     margin-bottom: 20px;
 }
 
-.profile-section__profile--avator {
+.profile-section__profile--avatar {
     background: #D9D9D9;
     width: 272px;
     height: 272px;
-    top: 126px;
-    left: 42px;
     border-radius: 50%;
     box-shadow: 0px 0px 20px 0px #00000040;
 }

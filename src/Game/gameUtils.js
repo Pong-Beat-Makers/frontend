@@ -1,58 +1,115 @@
 import { routes } from "../route.js";
 import {modalRender} from "../Profile/modalUtils.js";
-import SocketApp, {SOCKET_STATE} from "./SocketApp.js";
+import SocketApp from "./SocketApp.js";
+import { GAME_TYPE } from "./gameTemplate.js";
 
-const TWO_PLAYER_BTN = 0;
-const RANDOM_BTN = 1;
-const TOURNAMENT_BTN = 2;
-
-
-export function openPlayGameModal(socketApp) {
-    modalRender('play-game', routes['/game'].playGameTemplate(), false);
-
-    const modalContainer = document.querySelector('.modal-name__play-game');
+export function openPlayGameModal(socketApp, gameType, playerNames) {
+    const modalContainer = modalRender('play-game', routes['/game'].playGameTemplate(), false);
 
     modalContainer.querySelector('.playgame__btn').addEventListener('click', () => {
-        if (socketApp.isGameState() === SOCKET_STATE.OPEN || socketApp.isGameState() === SOCKET_STATE.CONNECTING) {
-            socketApp.gameClose();
-        }
-
+        socketApp.gameClose();
         modalContainer.remove();
     });
-    return modalContainer;
-}
-export function closeMatchingModal(socketApp) {
-    const modalContainer = document.querySelector('.modal-name__matching-game');
+    setupNameAtModal(modalContainer, gameType, playerNames);
 
-    if (socketApp.isWaitState() === SOCKET_STATE.OPEN || socketApp.isWaitState() === SOCKET_STATE.CONNECTING) {
-        socketApp.waitClose();
-    }
-
-    modalContainer.remove();
+    socketApp.setGameContainer(modalContainer);
+    socketApp.setGameCanvas(modalContainer.querySelector('#game_playground'));
 }
 
-export function setupName(container, player1, player2) {
-    const proiles = container.querySelectorAll('.playgame__header--profile');
-    if (player1 !== undefined) {
-        proiles[0].querySelector('.playgame__header--name').innerHTML = player1;
+export function openMatchingModal(gameType) {
+    const modalContainer = modalRender('matching-game', routes['/game'].matchModalTemplate(gameType), false);
+    const socketApp = SocketApp;
+
+    socketApp.matching(gameType);
+
+    document.querySelector('.matching-game__btn').addEventListener('click', () => {
+        closeMatchingModal(modalContainer, socketApp);
+    });
+
+    socketApp.setMatchingContainer(modalContainer);
+}
+
+export function closeMatchingModal(matchingContainer, socketApp) {
+    socketApp.waitClose();
+    matchingContainer.remove();
+}
+
+export function openBoardModal(socketApp, gameType, playerNames) {
+    let modalName;
+    let modalHtml;
+
+    if (gameType === GAME_TYPE.TOURNAMENT) {
+        modalName = "tournament";
+        modalHtml = routes['/game'].tournamentModalTemplate();
+    } else {
+        modalName  = "versus";
+        modalHtml = routes['/game'].versusModalTemplate();
     }
 
-    if (player2 !== undefined) {
-        proiles[1].querySelector('.playgame__header--name').innerHTML = player2;
+    const modalContainer = modalRender(modalName, modalHtml, false);
+
+    modalContainer.querySelector('.modal__ready-btn').addEventListener('click', () => {
+        const info = modalContainer.querySelector('.board-modal__info');
+
+        info.classList.add('ingAnimation');
+        info.innerHTML = "Waiting for the other one .";
+
+        setupActiveReadyBtn(modalContainer);
+        socketApp.readyToPlay();
+    });
+
+    setupNameAtModal(modalContainer, gameType, playerNames);
+    socketApp.setBoardContainer(modalContainer);
+}
+
+export function setupNameAtModal(container, gameType, playerNames) {
+    if (Array.isArray(playerNames)) {
+        if (gameType === GAME_TYPE.RANDOM) {
+            const insertNameContainer = container.querySelectorAll('.insert-playerName');
+
+            if (playerNames[0] !== undefined) {
+                insertNameContainer[0].innerHTML = playerNames[0];
+            }
+            if (playerNames[1] !== undefined) {
+                insertNameContainer[1].innerHTML = playerNames[1];
+            }
+        }
     }
+}
+
+export function setupConnectPeopleAtMatchingModal(container, playerNumber) {
+
+}
+
+export function setupDeActiveReadyBtn(container) {
+    container.querySelector('.modal__ready-btn').disabled = true;
+}
+
+export function setupActiveReadyBtn(container) {
+        container.querySelector('.modal__ready-btn').disabled = false;
+}
+
+export function setupavatarAtTournament(container, players) {
+    // profile 추가
+    console.log("users:", players);
 }
 
 export function handleGameModal() {
     const playBtn = document.querySelectorAll('.game__playbtn');
 
-    playBtn[RANDOM_BTN].addEventListener('click', () => {
-        modalRender('matching-game', routes['/game'].matchModalTemplate(), false);
-        const socketApp = SocketApp;
+    playBtn[GAME_TYPE.RANDOM].addEventListener('click', () => {
+        openMatchingModal(GAME_TYPE.RANDOM);
+    });
 
-        socketApp.randomMatching();
+    playBtn[GAME_TYPE.TOURNAMENT].addEventListener('click', () => {
+        openMatchingModal(GAME_TYPE.TOURNAMENT);
+    });
+}
 
-        document.querySelector('.matching-game__btn').addEventListener('click', () => {
-            closeMatchingModal(socketApp);
-        });
+export function openErrorModal(comment) {
+    const modalContainer = modalRender('matching-game', routes['/game'].errorModalTemplate(comment));
+
+    modalContainer.querySelector('.matching-game__btn').addEventListener('click', () => {
+        modalContainer.remove();
     });
 }

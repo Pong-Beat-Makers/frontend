@@ -1,22 +1,4 @@
 class Login {
-    modalTemplate() {
-        return `
-        <div class="modal__container modal-name__2FA">
-            <div class="modal__background"></div>
-                <div class="profile__search__modal__container">
-                    <form class="login__2FA">
-                        <input id="login__2FA--input" type="text" placeholder="type 2FA code in your email ..."/>
-                        <button class="login__2FA--btn">
-                            <i class="bi bi-search"></i>
-                            confirm
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-        `;
-    }
-
 	template() {
 		return `
         <div class="modal__container">
@@ -40,6 +22,19 @@ class Login {
         </div>
 		`;
 	}
+
+  twoFATempate() {
+    return `
+    <div class="login__body--message">Please enter the 6-digit</div>
+    <div class="login__body--message"> code sent to your email.</div>
+    <div class="login__body--info"></div>
+    <input type="text" class="login__body--input" maxlength="6" />
+    <button class="login__2fa-btn" disabled>
+      <i class="bi bi-person-check"></i>
+      verify
+    </button>
+    `
+  }
 }
 
 export default new Login();

@@ -23,3 +23,59 @@
     background-color: black;
     opacity: .3;
 }
+
+.modal__btn {
+    background: white;
+    font-size: 18px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    color: rgba(var(--sub-color) / 70%);
+    margin-top: 20px;
+}
+
+div[data-name="avatar__image-bird"] {
+    background-image: url('../../assets/bird.svg');
+    background-size: cover;
+}
+
+div[data-name="avatar__image-cat"] {
+    background-image: url('../../assets/cat.svg');
+    background-size: cover;
+}
+
+div[data-name="avatar__image-crocodile"] {
+    background-image: url('../../assets/crocodile.svg');
+    background-size: cover;
+}
+
+div[data-name="avatar__image-whale"] {
+    background-image: url('../../assets/whale.svg');
+    background-size: cover;
+}
+
+div[data-name="avatar__image-gadget"] {
+    background-image: url('../../assets/gadget.svg');
+    background-size: cover;
+}
+
+.modal__btn:disabled {
+    filter: brightness(.5);
+    cursor: default;
+}
+
+.ingAnimation::after {
+    content: "";
+    animation: isIng 2s ease-in infinite;
+}
+
+@keyframes isIng {
+    0% {
+        content: "";
+    }
+    50% {
+        content: ".";
+    }
+    100% {
+        content: "..";
+    }
+}
