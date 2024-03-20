@@ -36,7 +36,7 @@ export async function setFriendList(app) {
         return ;
     }
 
-    // TODO: add event listener !! 
+    // TODO: add event listener !!
     const friendsAll = app.querySelectorAll(".profile-section__friends--item");
     const friendsName = app.querySelectorAll(".profile-section__friends--name");
     const frinedsPic = app.querySelectorAll(".profile-section__friends--pic");
@@ -44,6 +44,7 @@ export async function setFriendList(app) {
     const friendsStatText = app.querySelectorAll(".profile-section__friends--status--text");
     let isOnline = 1; // TODO: online status update !!
     for (let i = 0; i < friendList.length; i++) {
+        friendsAll[i].id = 'friends-list-' + friendList[i][0]; // nickname을 기준으로 id 지정
         friendsName[i].innerHTML = friendList[i][0];
         frinedsPic[i].innerHTML = ""; // TODO: update profile pic by friendList[i][1];
         if (isOnline === "online") {
@@ -58,6 +59,20 @@ export async function setFriendList(app) {
             await showProfileDetail(detailProfileModal, friendList[i][0]);
         }
     }
+}
+
+export async function setFriendStatus(nickname, status) {
+    // const app = document.querySelector(".profile-section__friends--list");
+
+    const targetFriendItem = document.getElementById('friends-list-' + nickname);
+    const targetFriendStatus = targetFriendItem.querySelector(".profile-section__friends--status");
+    const targetFriendText = targetFriendItem.querySelector(".profile-section__friends--status--text");
+    if (status === 'online') {
+        targetFriendStatus.classList.replace("offline", status);
+    } else if (status === 'offline') {
+        targetFriendStatus.classList.replace("online", status);
+    }
+    targetFriendText.innerHTML = status;
 }
 
 async function handleProfileSearch(modal, input) {
@@ -93,7 +108,7 @@ async function showProfileDetail(modal, input) {
     const res = await fetch(`${BACKEND}/${USER_MANAGEMENT_DOMAIN}/profile/?friend=${input}`, {
         method: 'GET',
         headers: {
-            // TODO: getCookie로 토큰 불러온 부분 모두 수정 ;; => player에 함수 넣기 ! 
+            // TODO: getCookie로 토큰 불러온 부분 모두 수정 ;; => player에 함수 넣기 !
             'Authorization': `Bearer ${Player._token}`,
         },
     });
@@ -101,7 +116,7 @@ async function showProfileDetail(modal, input) {
         throw new Error(`Error : ${response.status}`);
 
     const data = await res.json();
-        
+
     // TODO: avatar 사용하는 부분 수정 필요 !
     const nickname = modal.querySelector(".friend-modal__info--nickname");
     // const avatar = modal.querySelector(".friend-modal__avatar");
@@ -145,7 +160,7 @@ async function handleProfileBtns (modal, obj) {
                 method: methodSelected,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${Player._token}`,   
+                    'Authorization': `Bearer ${Player._token}`,
                 },
                 body: JSON.stringify({
                     'friend' : obj.nickname,
