@@ -1,12 +1,16 @@
 import {
     closeMatchingModal,
-    setupActiveReadyBtn,
     openPlayGameModal,
-    openBoardModal, openErrorModal
+    openBoardModal,
+    openErrorModal,
+    setupConnectPeopleAtMatchingModal,
+    changeGiveUpToEnd, renderEndStatus, setupActiveReadyBtn
 } from "./gameUtils.js";
 import GameApp from "./gameApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
 import { getCookie } from '../Public/cookieUtils.js';
+import {player} from "../app.js";
+
 import { GAME_SERVER_DOMAIN } from '../Public/global.js';
 
 export const SOCKET_STATE = {
@@ -30,7 +34,7 @@ class SocketApp {
 
     readyToPlay() {
         const data = {
-            'token': getCookie("token")
+            'token': player._token
         }
         if (this.isGameState() === SOCKET_STATE.OPEN) {
             this._gameSend(data);
@@ -53,16 +57,18 @@ class SocketApp {
 
             if (data.room_id !== undefined) {
                 openBoardModal(this, gameType, data.user_nicknames);
-                this._enterGameRoom(data.room_id, data.user_nicknames);
-            }
-            if (data.type === "send_waiting_number") {
-                // 인원 수
+                if (data.player === 2) {
+                    data.user_nicknames = data.user_nicknames.reverse();
+                }
+                this._enterGameRoom(data.room_id, gameType, data.user_nicknames);
+            } else if (data.type === "send_waiting_number") {
+                setupConnectPeopleAtMatchingModal(this._matchingContainer, data.waiting_number);
             }
         });
 
         waitSocket.onopen = () => {
             const data = {
-                'token': getCookie("token")
+                'token': player._token
             }
 
             this._waitSend(data);
@@ -79,7 +85,14 @@ class SocketApp {
         this._waitSocket = waitSocket;
     }
 
-    _enterGameRoom(room_id, playerNames) {
+    localPlay() {
+        const userNickname = [player.getNickName(), 'GUEST'];
+
+        openBoardModal(this, GAME_TYPE.TWO_PLAYER, userNickname);
+        this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.TWO_PLAYER, userNickname);
+    }
+
+    _enterGameRoom(room_id, gameType, playerNames) {
         const gameSocket = new WebSocket(`ws://${GAME_SERVER_DOMAIN}/ws/game/${room_id}/`);
         console.log(`enter the room id: ${room_id}`);
 
@@ -87,22 +100,56 @@ class SocketApp {
             const data = JSON.parse(e.data);
 
             if (data.type === 'send_system_message') {
-                if (data.message === 'Game Start') {
-                    this._boardContainer.remove();
-                    this._boardContainer = undefined;
+                if (data.message === 'Game Ready') {
+                    if (data.counter === 5) {
+                        openPlayGameModal(this, gameType, playerNames);
+                        this._gameApp = new GameApp(this._gameCanvas, gameType);
+                        this._gameApp.setPlayer(data.player);
 
-                    openPlayGameModal(this, GAME_TYPE.RANDOM, playerNames);
-                    this._gameApp = new GameApp(this._gameCanvas);
-                    this._gameApp.setPlayer(data.player);
+                        this._boardContainer.remove();
+                        this._boardContainer = undefined;
 
-                    this._gameContiner.addEventListener('keydown', e => {
-                        if (e.key === 'ArrowLeft') this._gameSend({'move': 'up'});
-                        else if (e.key === 'ArrowRight') this._gameSend({'move': 'down'});
-                    });
+                        this._gameApp.renderConter(data.counter);
+                    } else if (data.counter < 5) {
+                        this._gameApp.renderConter(data.counter);
+                    }
+                } else if (data.message === 'Game Start') {
+                    if (gameType === GAME_TYPE.TWO_PLAYER) {
+                        openPlayGameModal(this, gameType, [player.getNickName(), 'GUEST']);
+                        changeGiveUpToEnd(this._gameContiner);
+                        this._gameApp = new GameApp(this._gameCanvas, gameType);
+                        this._gameApp.setPlayer(2);
 
-                    this._gameContiner.addEventListener('keyup', e => {
-                        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') this._gameSend({'move': 'stop'});
-                    });
+                        this._boardContainer.remove();
+                        this._boardContainer = undefined;
+
+                        this._gameContiner.addEventListener('keydown', e => {
+                            if (e.key === 'ArrowDown') this._gameSend({'player': 2, 'move': 'up'});
+                            else if (e.key === 'ArrowUp') this._gameSend({'player': 2, 'move': 'down'});
+                            else if (e.keyCode === 83) this._gameSend({'player': 1, 'move': 'up'});
+                            else if (e.keyCode === 87) this._gameSend({'player': 1, 'move': 'down'});
+                        });
+
+                        this._gameContiner.addEventListener('keyup', e => {
+                            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') this._gameSend({'player': 2, 'move': 'stop'});
+                            else if (e.keyCode === 83 || e.keyCode === 87) this._gameSend({'player': 1, 'move': 'stop'});
+                        });
+                    } else {
+                        this._gameApp.renderConter(data.counter);
+
+                        this._gameContiner.addEventListener('keydown', e => {
+                            if (e.key === 'ArrowLeft') this._gameSend({'move': 'up'});
+                            else if (e.key === 'ArrowRight') this._gameSend({'move': 'down'});
+                            else if (e.keyCode === 67) this._gameApp.toggleCamera();
+                        });
+
+                        this._gameContiner.addEventListener('keyup', e => {
+                            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') this._gameSend({'move': 'stop'});
+                        });
+                    }
+                } else if (data.message === 'Game End') {
+                    renderEndStatus(this._gameCanvas, this._gameApp.getPlayer(), data.score, gameType);
+                    changeGiveUpToEnd(this._gameContiner);
                 }
             } else if (data.type === 'send_game_status') {
                 this._gameApp.dataRander(data);
@@ -110,7 +157,17 @@ class SocketApp {
         });
 
        gameSocket.onopen = () => {
-           setupActiveReadyBtn(this._boardContainer);
+           if (gameType === GAME_TYPE.TWO_PLAYER) {
+               setupActiveReadyBtn(this._boardContainer);
+           } else {
+               this.readyToPlay();
+           }
+       }
+
+       gameSocket.onerror = () => {
+           this._boardContainer.remove();
+           this.gameClose();
+           openErrorModal('There was a problem with the game server.');
        }
 
         this._gameSocket = gameSocket;
@@ -133,7 +190,9 @@ class SocketApp {
     }
 
     _gameSend(data) {
-        this._gameSocket.send(JSON.stringify(data));
+        if (this.isGameState() === SOCKET_STATE.OPEN) {
+            this._gameSocket.send(JSON.stringify(data));
+        }
     }
 
     isGameState() {

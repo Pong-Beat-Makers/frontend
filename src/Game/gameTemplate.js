@@ -146,12 +146,24 @@ class Game {
 							<div class="tournament__avatar"></div>
 						</div>
 					</div>
-					<div class="board-modal__info"></div>
-					<button class="modal__btn tournament__btn modal__ready-btn" disabled>
-						<i class="bi bi-check-square"></i>
-						ready
-					</button>
+					<div class="tournament__controller">
+						<div class="board-modal__info"></div>
+						<button class="modal__btn tournament__btn modal__ready-btn" disabled>
+							<i class="bi bi-check-square"></i>
+							ready
+						</button>
+					</div>
 				</div>
+			</div>
+		`;
+	}
+
+	gameEndModalTemplate(status, score) {
+		return `
+			<div class="game-modal__background"></div>
+			<div class="game-modal__wrapper">
+				<div class="game-modal__status">${ status }</div>
+				<div class="game-modal__score">${score[0]}:${score[1]}</div>
 			</div>
 		`;
 	}
