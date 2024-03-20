@@ -53,10 +53,10 @@ class Game {
 			<div class="playgame__wrapper">
 				<div class="playgame__header">
 					<div class="playgame__header--profile">
-					<div class="playgame__header--avator"></div>
+					<div class="playgame__header--avatar"></div>
 					<div class="playgame__header--name insert-playerName">Player1</div>
 					</div><div class="playgame__header--profile">
-					<div class="playgame__header--avator"></div>
+					<div class="playgame__header--avatar"></div>
 					<div class="playgame__header--name insert-playerName">Player2</div>
 					</div>
 				</div>
@@ -102,12 +102,12 @@ class Game {
 				<div class="versus-modal__header">Get ready for the match!</div>
 				<div class="versus-modal__body">
 					<div class="versus-modal__profile">
-						<div class="versus-modal__avator"></div>
+						<div class="versus-modal__avatar"></div>
 						<div class="versus-modal__name insert-playerName">Player 1</div>
 					</div>
 					<div class="versus-modal__versus">vs</div>
 					<div class="versus-modal__profile">
-						<div class="versus-modal__avator"></div>
+						<div class="versus-modal__avatar"></div>
 						<div class="versus-modal__name insert-playerName">Player 2</div>
 					</div>
 					<div class="board-modal__info"></div>
@@ -128,22 +128,22 @@ class Game {
 				<div class="tournament__header">Knockout Rounds Bracket</div>
 				<div class="tournament__body">
 					<div class="tournament__layer">
-						<div class="tournament__avator tournament__champion anonymous-avator"></div>
+						<div class="tournament__avatar tournament__champion anonymous-avatar"></div>
 					</div>
 					<div class="tournament__layer">
 						<div class="tournament__versus">
-							<div class="tournament__avator anonymous-avator"></div>
-							<div class="tournament__avator anonymous-avator"></div>
+							<div class="tournament__avatar anonymous-avatar"></div>
+							<div class="tournament__avatar anonymous-avatar"></div>
 						</div>
 					</div>
 					<div class="tournament__layer">
 						<div class="tournament__versus">
-							<div class="tournament__avator"></div>
-							<div class="tournament__avator"></div>
+							<div class="tournament__avatar"></div>
+							<div class="tournament__avatar"></div>
 						</div>
 						<div class="tournament__versus">
-							<div class="tournament__avator"></div>
-							<div class="tournament__avator"></div>
+							<div class="tournament__avatar"></div>
+							<div class="tournament__avatar"></div>
 						</div>
 					</div>
 					<div class="board-modal__info"></div>

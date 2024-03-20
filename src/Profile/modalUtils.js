@@ -35,9 +35,9 @@ export function handleEditUserModalUtils(app) {
             });
         });
 
-        modalContainer.querySelectorAll('.profile-modal__avatorlist > .profile-modal__avator').forEach(element => {
-            const bigAvatar = modalContainer.querySelector('.profile-modal__big-avator');
-            const dataName = 'avator__image-';
+        modalContainer.querySelectorAll('.profile-modal__avatarlist > .profile-modal__avatar').forEach(element => {
+            const bigAvatar = modalContainer.querySelector('.profile-modal__big-avatar');
+            const dataName = 'avatar__image-';
 
             element.addEventListener('click', e => {
                 const currAvatar = bigAvatar.getAttribute('data-name').substring(dataName.length);

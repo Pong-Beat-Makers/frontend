@@ -1,6 +1,6 @@
-import { BACKEND, FRONTEND, EXPIRY, chatTokenKey } from "../Public/global.js";
+import { BACKEND, FRONTEND, CHAT_API_DOMAIN, EXPIRY, chatTokenKey } from "../Public/global.js";
 import { routes } from "../route.js";
-import { chatSocket } from "../app.js";
+import { chatSocket } from "../Login/loginUtils.js";
 import {modalRender} from "../Profile/modalUtils.js";
 
 // 로그의 처음부터 끝까지 출력이라 처음에 채팅창 열 때 한번만 호출해야 함
@@ -63,33 +63,29 @@ function handleBlockToggle() {
         })
     };
     
-    fetch(`${BACKEND}/api/chatting/blockedusers/`, data); // 예외처리 필요
+    fetch(`${BACKEND}/${CHAT_API_DOMAIN}/blockedusers/`, data); // 예외처리 필요
 }
 
-export function showChatroom(tokenInput) {
+export async function showChatroom(tokenInput) {
     modalRender("chat", routes["/chat"].modalTemplate());
 
     const blockIcon = `<i class="bi bi-person-slash"></i>`;
 
-    // 이미 차단된 사람인지 체크 => 내부 창 block 버튼 unblock으로 바꾸기 위해
-    fetch(`${BACKEND}/api/chatting/blockedusers/?target_nickname=${tokenInput}_test_id`, {
+    const response = await fetch(`${BACKEND}/${CHAT_API_DOMAIN}/blockedusers/?target_nickname=${tokenInput}_test_id`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem(chatTokenKey)}`,
         },
-    })
-    .then(response => {
-        if (!response.ok)
-            throw new Error(`Error : ${response.status}`);
-        return  response.json();
-    })
-    .then(data => {
-        if (data.is_blocked === true) {
-            const blockToggleBtn = document.querySelectorAll(".chat__header--btn")[1];
-            blockToggleBtn.innerHTML = `${blockIcon} Unblock`;
-            blockToggleBtn.classList.replace("block", "unblock");
-        }
     });
+    if (!response.ok)
+        throw new Error(`Error : ${response.status}`);
+    
+    const data = await response.json();
+    if (data.is_blocked === true) {
+        const blockToggleBtn = document.querySelectorAll(".chat__header--btn")[1];
+        blockToggleBtn.innerHTML = `${blockIcon} Unblock`;
+        blockToggleBtn.classList.replace("block", "unblock");
+    };
 
     document.querySelector(".chat__header--name").innerHTML = tokenInput;
 

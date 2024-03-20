@@ -1,6 +1,6 @@
 import { EXPIRY, chatTokenKey } from "../Public/global.js";
 import { routes } from "../route.js";
-import { chatSocket } from "../app.js";
+import { chatSocket } from "../Login/loginUtils.js";
 import { showChatList, chatListOnclick } from "./chatPageUtils.js";
 
 function saveNewMsg(chatId, newMsgObj) {

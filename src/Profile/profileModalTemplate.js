@@ -34,12 +34,12 @@ class ProfileModal {
             <div class="profile-modal__body">
                 <div class="profile-modal__body--header">profile</div>
                 <div class="profile-modal__body--content">
-                    <div data-name="avator__image-cat" class="profile-modal__avator profile-modal__big-avator"></div>
-                    <div class="profile-modal__avatorlist">
-                        <div data-name="avator__image-bird" class="profile-modal__avator"></div>
-                        <div data-name="avator__image-gadget" class="profile-modal__avator"></div>
-                        <div data-name="avator__image-crocodile" class="profile-modal__avator"></div>
-                        <div data-name="avator__image-whale" class="profile-modal__avator"></div>
+                    <div data-name="avatar__image-cat" class="profile-modal__avatar profile-modal__big-avatar"></div>
+                    <div class="profile-modal__avatarlist">
+                        <div data-name="avatar__image-bird" class="profile-modal__avatar"></div>
+                        <div data-name="avatar__image-gadget" class="profile-modal__avatar"></div>
+                        <div data-name="avatar__image-crocodile" class="profile-modal__avatar"></div>
+                        <div data-name="avatar__image-whale" class="profile-modal__avatar"></div>
                     </div>
                 </div>
                 <div class="profile-modal__body--header">nickname</div>
@@ -58,16 +58,16 @@ class ProfileModal {
                 </button>
             </div>
         </div>
-        `
+        `;
     }
 
     friendModalTemplate() {
         return `
-        <div class="modal__background"></div>w
+        <div class="modal__background"></div>
         <div class="friend-modal__container">
             <div class="friend-modal__wrapper">
                 <div class="friend-modal__box">
-                    <div class="friend-modal__avator"></div>
+                    <div class="friend-modal__avatar"></div>
                     <div class="friend-modal__info">
                         <div class="friend-modal__info--nickname">friend name</div>
                         <div class="friend-modal__info--status">status_message here</div>
@@ -93,31 +93,28 @@ class ProfileModal {
             <div class="friend-modal__wrapper">
                 <div class="friend-modal__header">Match history</div>
                 <div class="friend-modal__history-list">
-                    <div class="friend-modal__history-item">
-                        <div class="history-item__day">24/01/26</div>
-                        <div class="history-item__profiles">
-                            <div class="history-item__profiles--avator match-my-avator"></div>
-                            <div>vs</div>
-                            <div class="history-item__profiles--avator match-your-avator"></div>
-                        </div>
-                        <div class="history-item__score">Score 7 : 3</div>
-                        <div class="history-item__status">Win</div>
-                    </div>
-                    <div class="friend-modal__history-item">
-                        <div class="history-item__day">24/01/26</div>
-                        <div class="history-item__profiles">
-                            <div class="history-item__profiles--avator match-my-avator"></div>
-                            <div>vs</div>
-                            <div class="history-item__profiles--avator match-your-avator"></div>
-                        </div>
-                        <div class="history-item__score">Score 7 : 3</div>
-                        <div class="history-item__status">Win</div>
-                    </div>
+                    ${this.matchHistoryTemplate()}
                 </div>
             </div>
         </div>
         `;
     }
+    
+    matchHistoryTemplate() {
+        return `
+        <div class="friend-modal__history-item">
+            <div class="history-item__day">24/01/26</div>
+            <div class="history-item__profiles">
+                <div class="history-item__profiles--avatar match-my-avatar"></div>
+                <div>vs</div>
+                <div class="history-item__profiles--avatar match-your-avatar"></div>
+            </div>
+            <div class="history-item__score">Score 7 : 3</div>
+            <div class="history-item__status">Win</div>
+        </div>
+        `;
+    }
 }
+
 
 export default new ProfileModal();

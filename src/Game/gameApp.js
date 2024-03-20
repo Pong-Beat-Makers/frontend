@@ -4,9 +4,6 @@ import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import {TextGeometry} from 'three/addons/geometries/TextGeometry.js'
 
-const BASE_DOMAIN = 'localhost:8000';
-const ROOM_ID = '69133283-5a26-48b8-bfe7-8ffbacd5206b';
-
 class PlayGameApp {
     constructor(container) {
         this._container = container;

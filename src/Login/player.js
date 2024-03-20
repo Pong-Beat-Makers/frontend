@@ -1,13 +1,11 @@
 import {changeTo2FAPage, getInfoJWT} from "./loginUtils.js";
-import {BACKEND} from "../Public/global.js";
+import { BACKEND, USER_MANAGEMENT_DOMAIN } from "../Public/global.js";
 
 export const USER_STATUS = {
     "DOSE_NOT_EXIST": 0,
     "NOT_AUTHORIZED": 1,
     "AUTHORIZED": 2
 }
-
-const USER_MANAGEMENT_DOMAIN = 'api/user-management';
 
 class Player {
     constructor() {
@@ -55,7 +53,11 @@ class Player {
         this._friendList = [];
         const res = await this._getServer(`${BACKEND}/${USER_MANAGEMENT_DOMAIN}/friends/`);
         if (res.status === 200) {
-            console.log(await res.json());
+            const data = await res.json();
+            for (let i = 0; i < data.length; i++) {
+                // TODO: data 형식 확인 필요 !!
+                this._friendList.push([data[i].nickname, data[i].profile]);
+            }
         }
         return this._friendList;
     }

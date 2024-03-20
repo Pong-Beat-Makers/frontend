@@ -33,27 +33,27 @@
     margin-top: 20px;
 }
 
-div[data-name="avator__image-bird"] {
+div[data-name="avatar__image-bird"] {
     background-image: url('../../assets/bird.svg');
     background-size: cover;
 }
 
-div[data-name="avator__image-cat"] {
+div[data-name="avatar__image-cat"] {
     background-image: url('../../assets/cat.svg');
     background-size: cover;
 }
 
-div[data-name="avator__image-crocodile"] {
+div[data-name="avatar__image-crocodile"] {
     background-image: url('../../assets/crocodile.svg');
     background-size: cover;
 }
 
-div[data-name="avator__image-whale"] {
+div[data-name="avatar__image-whale"] {
     background-image: url('../../assets/whale.svg');
     background-size: cover;
 }
 
-div[data-name="avator__image-gadget"] {
+div[data-name="avatar__image-gadget"] {
     background-image: url('../../assets/gadget.svg');
     background-size: cover;
 }

@@ -7,8 +7,7 @@ import {
 import GameApp from "./gameApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
 import { getCookie } from '../Public/cookieUtils.js';
-
-const GAME_SERVER_DOMAIN = 'localhost:8001';
+import { GAME_SERVER_DOMAIN } from '../Public/global.js';
 
 export const SOCKET_STATE = {
     CONNECTING: 0,

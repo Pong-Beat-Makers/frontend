@@ -42,7 +42,7 @@ class Chat {
             <div class="chat__container">
                 <div class="chat__header">
                     <div class="chat__header--profile">
-                        <div class="chat__header--avator"></div>
+                        <div class="chat__header--avatar"></div>
                         <div class="chat__header--name">friend</div>
                     </div>
                     <div class="chat__header--controlls">

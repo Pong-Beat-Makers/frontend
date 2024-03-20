@@ -89,7 +89,7 @@ export function setupActiveReadyBtn(container) {
         container.querySelector('.modal__ready-btn').disabled = false;
 }
 
-export function setupAvatorAtTournament(container, players) {
+export function setupAvatarAtTournament(container, players) {
     // profile 추가
     console.log("users:", players);
 }
