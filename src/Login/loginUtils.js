@@ -37,6 +37,7 @@ export async function setFriendList(app) {
     }
 
     // TODO: add event listener !! 
+    const friendsAll = app.querySelectorAll(".profile-section__friends--item");
     const friendsName = app.querySelectorAll(".profile-section__friends--name");
     const frinedsPic = app.querySelectorAll(".profile-section__friends--pic");
     const friendsStat = app.querySelectorAll(".profile-section__friends--status");
@@ -51,6 +52,10 @@ export async function setFriendList(app) {
         } else {
             friendsStat[i].classList.add("offline");
             friendsStatText[i].innerHTML = "offline";
+        }
+        friendsAll[i].onclick = async () => {
+            const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
+            await showProfileDetail(detailProfileModal, friendList[i][0]);
         }
     }
 }
