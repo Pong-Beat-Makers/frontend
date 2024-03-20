@@ -8,7 +8,6 @@ import {initChatSocket} from "../Chat/chatSocketUtils.js";
 import {handleLoginBtn, handleNaviClick} from "../Public/clickUtils.js";
 import {handleEditUserModalUtils, handleFriendModalUtils, modalRender} from "../Profile/modalUtils.js";
 import Player from "./player.js";
-import {chatSocket} from "../app.js";
 
 export async function socialLogin(site) {
     const response = await fetch(`${BACKEND}/${USER_MANAGEMENT_DOMAIN}/accounts/${site}/login/`, {
@@ -37,7 +36,7 @@ export async function setFriendList(app) {
         return ;
     }
 
-    // set friends info
+    // TODO: add event listener !! 
     const friendsName = app.querySelectorAll(".profile-section__friends--name");
     const frinedsPic = app.querySelectorAll(".profile-section__friends--pic");
     const friendsStat = app.querySelectorAll(".profile-section__friends--status");
@@ -251,6 +250,8 @@ export function getInfoJWT(token) {
 
     return JSON.parse(jsonPayload);
 }
+
+export let chatSocket;
 
 export function renderMainPage(player) {
     const app = document.getElementById('app');

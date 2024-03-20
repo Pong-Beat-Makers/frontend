@@ -1,6 +1,6 @@
 import { BACKEND, FRONTEND, CHAT_API_DOMAIN, EXPIRY, chatTokenKey } from "../Public/global.js";
 import { routes } from "../route.js";
-import { chatSocket } from "../app.js";
+import { chatSocket } from "../Login/loginUtils.js";
 import {modalRender} from "../Profile/modalUtils.js";
 
 // 로그의 처음부터 끝까지 출력이라 처음에 채팅창 열 때 한번만 호출해야 함

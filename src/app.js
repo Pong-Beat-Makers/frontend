@@ -2,7 +2,6 @@ import {renderMainPage} from "./Login/loginUtils.js";
 import Player, {USER_STATUS} from "./Login/player.js";
 import {getCookie} from '../src/Public/cookieUtils.js';
 
-export let chatSocket;
 export const player = Player;
 
 const app = async () => {
