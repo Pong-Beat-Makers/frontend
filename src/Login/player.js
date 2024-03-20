@@ -78,6 +78,7 @@ class Player {
     getId() {
         return this._id;
     }
+
     getNickName() {
         return this._nickName;
     }

@@ -8,6 +8,7 @@ import {initChatSocket} from "../Chat/chatSocketUtils.js";
 import {handleLoginBtn, handleNaviClick} from "../Public/clickUtils.js";
 import {handleEditUserModalUtils, handleFriendModalUtils, modalRender} from "../Profile/modalUtils.js";
 import Player from "./player.js";
+import {chatSocket} from "../app.js";
 
 export async function socialLogin(site) {
     const response = await fetch(`${BACKEND}/${USER_MANAGEMENT_DOMAIN}/accounts/${site}/login/`, {
