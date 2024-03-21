@@ -32,6 +32,7 @@ class LoginSuccess {
                 <div class="profile-section__profile">
                     <div class="profile-section__profile--avatar"></div>
                     <div class="profile-section__profile--info">
+                        <div>advice_message</div>
                         <div>nickname</div>
                         <div>status_message here</div>
                     </div>
