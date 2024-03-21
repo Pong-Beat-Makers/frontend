@@ -13,3 +13,4 @@ export const GAME_API_DOMAIN = 'api/game';
 
 // Chatting
 export const CHAT_WEBSOCKET = 'ws://localhost:8001'
+export const GAME_WEBSOCKET = 'ws://localhost:8002'
