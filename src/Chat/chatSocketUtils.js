@@ -1,8 +1,7 @@
-import { EXPIRY, chatTokenKey } from "../Public/global.js";
 import { routes } from "../route.js";
 import { chatSocket, setFriendStatus } from "../Login/loginUtils.js";
 import { showChatList, chatListOnclick } from "./chatPageUtils.js";
-import { getCookie } from "../Public/cookieUtils.js";
+import Player from "../Login/player.js";
 
 function saveNewMsg(chatId, newMsgObj) {
     let chatLog = localStorage.getItem(chatId);
@@ -37,8 +36,7 @@ function updateChatList() {
 export function initChatSocket() {
     chatSocket.onopen = function (e) {
         chatSocket.send(JSON.stringify({
-            // 'token' : localStorage.getItem(chatTokenKey),
-            'token' : getCookie("access_token"), // 실제 토큰 처리
+            'token' : Player._token, // 실제 토큰 처리
         }));
     };
 
@@ -55,27 +53,21 @@ export function initChatSocket() {
         }
 
         // 채팅
-
-        const fromToken = data.from.slice(0, -8); // token_test_id에서 _test_id 제거
-        // successfully logged in 메시지는 from이 없어서 에러뜸, 추후 지우기 ㅎㅎ
-        // const exp = new Date().getTime() + EXPIRY * 24 * 60 * 60 * 1000;
-        const exp = "1111";
-
+        const fromNickname = data.from;
         let chatSide;
         let chatId;
-        if (fromToken === localStorage.getItem(chatTokenKey)) {
+        if (fromNickname === Player._nickName) {
             chatSide = "me";
             chatId = document.querySelector(".chat__header--name").innerText;
         } else {
             chatSide = "you";
-            chatId = fromToken;
+            chatId = fromNickname;
         }
 
         const newMsgObj = {
             from: chatSide,
             msg: data.message,
             time: data.time,
-            exp: exp,
         };
         saveNewMsg(`chatLog_${chatId}`, newMsgObj);
         updateChatLog(newMsgObj);
