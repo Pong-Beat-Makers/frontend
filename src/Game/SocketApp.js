@@ -10,8 +10,7 @@ import GameApp from "./gameApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
 import { getCookie } from '../Public/cookieUtils.js';
 import {player} from "../app.js";
-
-import { GAME_SERVER_DOMAIN } from '../Public/global.js';
+import { GAME_SERVER_DOMAIN, GAME_WEBSOCKET } from '../Public/global.js';
 
 export const SOCKET_STATE = {
     CONNECTING: 0,
@@ -50,7 +49,7 @@ class SocketApp {
             gameTypeUrl = "tournament";
         }
 
-        const waitSocket = new WebSocket(`ws://${GAME_SERVER_DOMAIN}/ws/game/waitingroom/${gameTypeUrl}/`);
+        const waitSocket = new WebSocket(`${GAME_WEBSOCKET}/ws/game/waitingroom/${gameTypeUrl}/`);
 
         waitSocket.addEventListener('message', e => {
             const data = JSON.parse(e.data);
