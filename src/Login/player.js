@@ -1,5 +1,5 @@
 import {changeTo2FAPage, getInfoJWT} from "./loginUtils.js";
-import { BACKEND, USER_MANAGEMENT_DOMAIN } from "../Public/global.js";
+import { BACKEND, USER_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN } from "../Public/global.js";
 
 export const USER_STATUS = {
     "DOSE_NOT_EXIST": 0,
@@ -19,7 +19,7 @@ class Player {
         this._id = user_id;
         this._nickName = nickname;
 
-        const res = await this._getServer(`${BACKEND}/${USER_MANAGEMENT_DOMAIN}/profile/?friend=${nickname}`);
+        const res = await this._getServer(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/profile/?friend=${nickname}`);
         if (res.status === 200) {
             this._status = USER_STATUS.AUTHORIZED;
 
@@ -42,7 +42,7 @@ class Player {
     }
 
     async send2FACode(code) {
-        const { status } = await this._getServer(`${BACKEND}/${USER_MANAGEMENT_DOMAIN}/accounts/email_verification/?verification_code=${code}`);
+        const { status } = await this._getServer(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/accounts/email_verification/?verification_code=${code}`);
         if (status === 200) {
             this._status = USER_STATUS.AUTHORIZED;
         }
@@ -51,7 +51,7 @@ class Player {
 
     async getFriendList() {
         this._friendList = [];
-        const res = await this._getServer(`${BACKEND}/${USER_MANAGEMENT_DOMAIN}/friends/`);
+        const res = await this._getServer(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/friends/`);
         if (res.status === 200) {
             const data = await res.json();
             for (let i = 0; i < data.length; i++) {

@@ -1,4 +1,4 @@
-import { BACKEND, USER_MANAGEMENT_DOMAIN, CHAT_SERVER_DOMAIN, GAME_API_DOMAIN } from "../Public/global.js"
+import { BACKEND, USER_SERVER_DOMAIN, GAME_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN, GAME_API_DOMAIN, CHAT_WEBSOCKET } from "../Public/global.js"
 import LoginSuccess from "./loginSuccessTemplate.js";
 import Login from "./loginTemplate.js";
 import ProfileModal from "../Profile/profileModalTemplate.js";
@@ -8,9 +8,10 @@ import {initChatSocket} from "../Chat/chatSocketUtils.js";
 import {handleLoginBtn, handleNaviClick} from "../Public/clickUtils.js";
 import {handleEditUserModalUtils, handleFriendModalUtils, modalRender} from "../Profile/modalUtils.js";
 import Player from "./player.js";
+import { showChatroom } from "../Chat/chatRoomUtils.js";
 
 export async function socialLogin(site) {
-    const response = await fetch(`${BACKEND}/${USER_MANAGEMENT_DOMAIN}/accounts/${site}/login/`, {
+    const response = await fetch(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/accounts/${site}/login/`, {
         method: 'GET',
     });
     if (!response.ok)
@@ -84,7 +85,7 @@ async function handleProfileSearch(modal, input) {
     profileSearchResult.innerHTML = "";
     if (input == "")
         return ;
-    const res = await fetch(`${BACKEND}/${USER_MANAGEMENT_DOMAIN}/profile/search/?keyword=${input}`, {
+    const res = await fetch(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/profile/search/?keyword=${input}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${Player._token}`,
@@ -109,7 +110,7 @@ async function handleProfileSearch(modal, input) {
 }
 
 async function showProfileDetail(modal, input) {
-    const res = await fetch(`${BACKEND}/${USER_MANAGEMENT_DOMAIN}/profile/?friend=${input}`, {
+    const res = await fetch(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/profile/?friend=${input}`, {
         method: 'GET',
         headers: {
             // TODO: getCookie로 토큰 불러온 부분 모두 수정 ;; => player에 함수 넣기 !
@@ -147,7 +148,7 @@ async function handleProfileBtns (modal, obj) {
 
     profileBtns[0].onclick = () => {
         // TODO: move to chat page
-        console.log("move to chat page !!");
+        showChatroom(document.querySelector(".friend-modal__info--nickname").innerText);
     }
 
     let methodSelected;
@@ -170,20 +171,19 @@ async function handleProfileBtns (modal, obj) {
                     'friend' : obj.nickname,
                 })
         };
-        const res = await fetch(`${BACKEND}/${USER_MANAGEMENT_DOMAIN}/friends/`, data);
+        const res = await fetch(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/friends/`, data);
         if (!res.ok)
             throw new Error(`Error : ${response.status}`);
         else if (methodSelected == 'POST')
             profileBtns[1].innerHTML = `<i class="bi bi-person-plus"></i> delete`;
         else if (methodSelected == 'DELETE')
             profileBtns[1].innerHTML = `<i class="bi bi-person-plus"></i> add`;
-        // TODO: SPA기 때문에 .. 실시간으로 친구목록 innerHTML 업데이트 해주어야 한다뇌요..^.^
         await setFriendList(document.querySelector(".profile-section"));
     }
 }
 
 async function setMatchHistory(modal, nickname) {
-    const res = await fetch(`${BACKEND}/${GAME_API_DOMAIN}/histroy/?nickname=${nickname}`, {
+    const res = await fetch(`${GAME_SERVER_DOMAIN}/${GAME_API_DOMAIN}/histroy/?nickname=${nickname}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${Player._token}`,
@@ -294,7 +294,7 @@ export function renderMainPage(player) {
         friendAddButton.onclick = handleAddFriendBtn;
 
         chatSocket = new WebSocket(
-            `ws://${CHAT_SERVER_DOMAIN}/ws/chatting/`
+            `${CHAT_WEBSOCKET}/ws/chatting/`
         );
         initChatSocket();
     } else {
