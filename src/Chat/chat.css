@@ -80,10 +80,16 @@ input#chat__search--input::placeholder {
 .chat__room--name {
     font-size: 24px;
     font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .chat__room--msg {
     font-size: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .chat__room--time {

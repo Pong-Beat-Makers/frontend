@@ -95,7 +95,7 @@ class SocketApp {
     }
 
     _enterGameRoom(room_id, gameType, playerNames) {
-        const gameSocket = new WebSocket(`ws://${GAME_SERVER_DOMAIN}/ws/game/${room_id}/`);
+        const gameSocket = new WebSocket(`${GAME_WEBSOCKET}/ws/game/${room_id}/`);
         console.log(`enter the room id: ${room_id}`);
 
         gameSocket.addEventListener('message', e => {

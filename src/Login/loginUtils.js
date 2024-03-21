@@ -6,7 +6,7 @@ import {USER_STATUS} from "./player.js";
 import changeUrl from "../route.js";
 import {initChatSocket} from "../Chat/chatSocketUtils.js";
 import {handleLoginBtn, handleNaviClick} from "../Public/clickUtils.js";
-import {handleEditUserModalUtils, handleFriendModalUtils, modalRender} from "../Profile/modalUtils.js";
+import {handleEditUserModalUtils, handleFriendModalUtils, modalRender, setAvator} from "../Profile/modalUtils.js";
 import Player from "./player.js";
 import { showChatroom } from "../Chat/chatRoomUtils.js";
 
@@ -250,6 +250,9 @@ export function changeTo2FAPage(loginUser) {
 
   codeInput.addEventListener('keyup', e => {
           twoFABtn.disabled = e.target.value.length !== 6;
+          if (e.keyCode === 13) {
+              twoFABtn.click();
+          }
   });
 
   twoFABtn.addEventListener('click', async () => {
@@ -313,9 +316,9 @@ export function setProfileSection(app, player) {
     const avatar = profile.querySelector('.profile-section__profile--avatar');
     const infoNode = profile.querySelector('.profile-section__profile--info').children;
 
-    avatar.setAttribute('data-name', 'avatar__image-cat');
+    setAvator(player.getProfile(), avatar);
 
-    if (player.getNickName().includes("User")) {
+    if (player.getNickName().startsWith("User")) {
         infoNode[0].innerHTML = "We advise you to change your nickname!";
     } else {
         infoNode[0].innerHTML = "";
