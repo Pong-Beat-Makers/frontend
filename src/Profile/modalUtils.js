@@ -54,7 +54,7 @@ export function handleEditUserModalUtils(app) {
         let nicknameTextArea = modalContainer.querySelector(".profile-modal__nickname");
         let statusMessageTextArea = modalContainer.querySelector(".profile-modal__status-message");
         nicknameTextArea.value = Player.getNickName();
-        statusMessageTextArea = Player.getStatusMessage();
+        statusMessageTextArea.value = Player.getStatusMessage();
 
         // save button 이벤트 리스너 등록
         let saveButton = modalContainer.querySelector(".profile-modal__save-btn");
