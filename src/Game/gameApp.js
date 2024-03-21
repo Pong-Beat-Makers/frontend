@@ -3,9 +3,23 @@ import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
 import { FontLoader } from 'three/addons/loaders/FontLoader.js';
 import {TextGeometry} from 'three/addons/geometries/TextGeometry.js'
+import {GAME_TYPE} from "./gameTemplate.js";
+
+const CAM_INDEX = {
+    'MY': 0,
+    'MID': 1,
+    'YOU': 2
+};
+const CAM = [
+    {'x': 0, 'y': 715, 'z': 425},
+    {'x': -150, 'y': 800, 'z': 0},
+    {'x': 0, 'y': 715, 'z': -425}
+];
 
 class PlayGameApp {
-    constructor(container) {
+    constructor(container, gameType) {
+        this._gameType = gameType;
+        this._camPosition = CAM_INDEX.MY;
         this._container = container;
         this._player = 1;
 
@@ -17,6 +31,9 @@ class PlayGameApp {
         this._renderer = renderer;
         this._scene = scene;
 
+        if (gameType === GAME_TYPE.TWO_PLAYER) {
+            this._camPosition = CAM_INDEX.MID;
+        }
         this._setupCamera();
         this._setupAmbientLight();
         this._setupLight(-10, 200, 0);
@@ -29,6 +46,10 @@ class PlayGameApp {
         window.resize = this.resize.bind(this);
         this.resize();
         requestAnimationFrame(this.render.bind(this));
+    }
+
+    getPlayer() {
+        return this._player;
     }
 
     setPlayer(player) {
@@ -51,20 +72,34 @@ class PlayGameApp {
         }
     }
 
-    _setupCamera(x, y, z) {
+    _setupCamera() {
         const width = this._container.clientWidth;
         const height = this._container.clientHeight;
         const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 10000);
-        camera.position.set(0, 715, 425);
-        camera.lookAt(0, 120, 0);
+        camera.position.set(CAM[this._camPosition].x, CAM[this._camPosition].y, CAM[this._camPosition].z);
+
         this._camera = camera;
+        this._setLookCamera();
     }
 
-    _moveCamera(x, y, z) {
-        if (x !== undefined) this._camera.position.x += x;
-        if (y !== undefined) this._camera.position.y += y;
-        if (z !== undefined) this._camera.position.z += z;
-        // this._camera.lookAt(0, 500, 0);
+    _setLookCamera() {
+        if (this._camPosition === CAM_INDEX.MID) {
+            this._camera.lookAt(50, 120, 0);
+        } else {
+            this._camera.lookAt(0, 120, 0);
+        }
+    }
+
+    toggleCamera() {
+        this._camPosition = (this._camPosition + 1) % CAM.length;
+        this.setCamera(CAM[this._camPosition]);
+    }
+
+    setCamera(camPosition) {
+        if (camPosition !== undefined) {
+            this._camera.position.set(camPosition.x, camPosition.y, camPosition.z);
+            this._setLookCamera();
+        }
     }
 
     _setupAmbientLight() {
@@ -104,6 +139,32 @@ class PlayGameApp {
             },
             (err) => console.error('Error:', err)
         );
+    }
+
+    renderConter(counter) {
+        if (counter !== undefined && (0 < counter && counter < 6)) {
+            const loader = new FontLoader();
+            loader.load('src/assets/Poetsen_One_Regular.json', font => {
+                if (this._counter !== undefined) this._scene.remove(this._counter);
+
+                const counterGeometry = new TextGeometry(`${counter}`, {
+                    font: font,
+                    size: 60,
+                    height: 50,
+                    curveSegments: 12,
+                    bevelEnabled: false
+                });
+                const counterMaterial = new THREE.MeshPhongMaterial({color: 0xAE70FF});
+                const counterMesh = new THREE.Mesh(counterGeometry, counterMaterial);
+
+                counterMesh.position.set(-30, 520, 0);
+
+                this._scene.add(counterMesh);
+                this._counter = counterMesh;
+            });
+        } else {
+            if (this._counter !== undefined) this._scene.remove(this._counter);
+        }
     }
 
     setupScore(my, your) {
