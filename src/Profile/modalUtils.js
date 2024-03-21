@@ -1,6 +1,7 @@
 import ProfileModal from "./profileModalTemplate.js";
 import {PROFILE_DEFAULT_IMAGE} from '../Login/player.js';
 import {player} from "../app.js";
+import {openErrorModal} from "../Game/gameUtils.js";
 
 export function  modalRender(modalName, htmlCode, backgroundClick = true) {
     const modal = document.querySelector('.modal');
@@ -139,8 +140,13 @@ export function handleEditUserModalUtils(app) {
                 'status_message_to': status_message.value,
                 'set_2fa_to': get2FAData(toggleItems)
             };
-            if (player.setProfile(data)) {
-                // location.reload();
+
+            if ((player.getNickName() !== nickname.value && /User\d+$/.test(nickname.value)) || nickname.value.includes('\n')) {
+                openErrorModal(`${nickname.value} is not vaild.`);
+            } else {
+                if (player.setProfile(data)) {
+                    location.reload();
+                }
             }
         });
     });
