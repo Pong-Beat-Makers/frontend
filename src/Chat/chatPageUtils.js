@@ -46,11 +46,10 @@ function showSearchResult(input) {
     let isFound = false;
     for (let i = 0; i < localStorage.length; i++) {
         let key = localStorage.key(i);
-        // localStorage key 중 input을 포함하는 chatLog가 있다면,
         if (key.includes(input) && key.startsWith("chatLog_")) {
             isFound = true;
             chatRoomList.innerHTML += routes["/chat"].chatRoomTemplate(
-                key.slice(8),  // name : key에서 chatLog_ 뒤부터 끝까지
+                key.slice(8),
                 getLastObj(key).msg, getLastObj(key).time);
             }
         }

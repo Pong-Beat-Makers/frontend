@@ -5,6 +5,7 @@
 }
 
 .modal__container {
+    position: absolute;
     min-width: var(--min-width-size);
     min-height: var(--min-height-size);
     width: 100vw;
@@ -33,28 +34,39 @@
     margin-top: 20px;
 }
 
-div[data-name="avatar__image-bird"] {
+div[data-image="bird"] {
     background-image: url('../../assets/bird.svg');
-    background-size: cover;
 }
 
-div[data-name="avatar__image-cat"] {
+div[data-image="cat"] {
     background-image: url('../../assets/cat.svg');
-    background-size: cover;
 }
 
-div[data-name="avatar__image-crocodile"] {
+div[data-image="crocodile"] {
     background-image: url('../../assets/crocodile.svg');
-    background-size: cover;
 }
 
-div[data-name="avatar__image-whale"] {
+div[data-image="whale"] {
     background-image: url('../../assets/whale.svg');
-    background-size: cover;
 }
 
-div[data-name="avatar__image-gadget"] {
-    background-image: url('../../assets/gadget.svg');
+div[data-image="deer"] {
+    background-image: url('../../assets/deer.svg');
+}
+
+div[data-image="upload"] {
+    background-color: #00000000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+div[data-image="upload"]:before {
+    position: absolute;
+    content: "";
+    width: 20%;
+    height: 20%;
+    background-image: url('../../assets/upload.svg');
     background-size: cover;
 }
 
