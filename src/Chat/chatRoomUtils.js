@@ -98,7 +98,9 @@ function handleChatRoom() {
     chatHeaderBtns[0].onclick = handleInvite;
     chatHeaderBtns[1].onclick = handleBlockToggle;
 
-    // document.querySelector('.chat__controller--text').focus();
+    const chatRoom = document.querySelector(".chat__body--frame");
+    chatRoom.scrollTop = chatRoom.scrollHeight;
+    
     document.querySelector('.chat__body--text').onkeydown = function(e) {
         if (e.keyCode === 13) {  // enter, return
             document.querySelector('.chat__controller--btn').click();
