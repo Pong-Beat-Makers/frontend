@@ -67,6 +67,7 @@ export async function setFriendStatus(friend, status) {
     let id = friend[0]
     let nickname = friend[1]
     const targetFriendItem = document.getElementById('friends-list-' + id);
+    // TODO: check error
     const targetFriendStatus = targetFriendItem.querySelector(".profile-section__friends--status");
     const targetFriendText = targetFriendItem.querySelector(".profile-section__friends--status--text");
     if (status === 'online') {
@@ -109,7 +110,7 @@ async function handleProfileSearch(modal, input) {
     }
 }
 
-async function showProfileDetail(modal, input) {
+export async function showProfileDetail(modal, input) {
     const res = await fetch(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/profile/?friend=${input}`, {
         method: 'GET',
         headers: {
@@ -118,7 +119,7 @@ async function showProfileDetail(modal, input) {
         },
     });
     if (!res.ok)
-        throw new Error(`Error : ${response.status}`);
+        throw new Error(`Error : ${res.status}`);
 
     const data = await res.json();
 
@@ -148,7 +149,7 @@ async function handleProfileBtns (modal, obj) {
 
     profileBtns[0].onclick = () => {
         // TODO: move to chat page
-        showChatroom(document.querySelector(".friend-modal__info--nickname").innerText);
+        showChatroom(modal.querySelector(".friend-modal__info--nickname").innerText);
     }
 
     let methodSelected;
@@ -173,7 +174,7 @@ async function handleProfileBtns (modal, obj) {
         };
         const res = await fetch(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/friends/`, data);
         if (!res.ok)
-            throw new Error(`Error : ${response.status}`);
+            throw new Error(`Error : ${res.status}`);
         else if (methodSelected == 'POST')
             profileBtns[1].innerHTML = `<i class="bi bi-person-plus"></i> delete`;
         else if (methodSelected == 'DELETE')

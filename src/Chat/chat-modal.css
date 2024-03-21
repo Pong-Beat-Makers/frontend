@@ -20,6 +20,7 @@
 }
 
 .chat__header--profile {
+    cursor: pointer;
     display: flex;
     align-items: center;
     color: white;
