@@ -44,8 +44,8 @@ export async function setFriendList(app) {
     const friendsStatText = app.querySelectorAll(".profile-section__friends--status--text");
     let isOnline = 1; // TODO: online status update !!
     for (let i = 0; i < friendList.length; i++) {
-        friendsAll[i].id = 'friends-list-' + friendList[i][0]; // nickname을 기준으로 id 지정
-        friendsName[i].innerHTML = friendList[i][0];
+        friendsAll[i].id = 'friends-list-' + friendList[i][0]; // user id 기준으로 id 지정
+        friendsName[i].innerHTML = friendList[i][1]; // 닉네임 설정
         frinedsPic[i].innerHTML = ""; // TODO: update profile pic by friendList[i][1];
         if (isOnline === "online") {
             friendsStat[i].classList.add("online");
@@ -56,15 +56,16 @@ export async function setFriendList(app) {
         }
         friendsAll[i].onclick = async () => {
             const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
-            await showProfileDetail(detailProfileModal, friendList[i][0]);
+            await showProfileDetail(detailProfileModal, friendList[i][1]);
         }
     }
 }
 
-export async function setFriendStatus(nickname, status) {
+export async function setFriendStatus(friend, status) {
     // const app = document.querySelector(".profile-section__friends--list");
-
-    const targetFriendItem = document.getElementById('friends-list-' + nickname);
+    let id = friend[0]
+    let nickname = friend[1]
+    const targetFriendItem = document.getElementById('friends-list-' + id);
     const targetFriendStatus = targetFriendItem.querySelector(".profile-section__friends--status");
     const targetFriendText = targetFriendItem.querySelector(".profile-section__friends--status--text");
     if (status === 'online') {
@@ -72,6 +73,9 @@ export async function setFriendStatus(nickname, status) {
     } else if (status === 'offline') {
         targetFriendStatus.classList.replace("online", status);
     }
+    let friendName = document.querySelector(`#friends-list-${id} .profile-section__friends--name`);
+    friendName.innerHTML = nickname;
+
     targetFriendText.innerHTML = status;
 }
 

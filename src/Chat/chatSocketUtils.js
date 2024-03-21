@@ -37,8 +37,8 @@ function updateChatList() {
 export function initChatSocket() {
     chatSocket.onopen = function (e) {
         chatSocket.send(JSON.stringify({
-            'token' : localStorage.getItem(chatTokenKey),
-            // 'token' : getCookie("access_token"), // 실제 토큰 처리
+            // 'token' : localStorage.getItem(chatTokenKey),
+            'token' : getCookie("access_token"), // 실제 토큰 처리
         }));
     };
 
@@ -50,7 +50,7 @@ export function initChatSocket() {
             initFriendsStatus(data.online_friends);
             return;
         } else if (data.type === 'send_status') { // 실시간 반영
-            updateFriendStatus(data.from, data.status);
+            updateFriendStatus([data.from_id, data.from], data.status);
             return;
         }
 
@@ -93,6 +93,6 @@ function initFriendsStatus(onlineFriendsList) {
     });
 }
 
-function updateFriendStatus(updatedFriendNickname, status) {
-    setFriendStatus(updatedFriendNickname, status);
+function updateFriendStatus(updatedFriend, status) {
+    setFriendStatus(updatedFriend, status);
 }

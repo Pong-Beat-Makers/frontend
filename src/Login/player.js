@@ -56,7 +56,7 @@ class Player {
             const data = await res.json();
             for (let i = 0; i < data.length; i++) {
                 // TODO: data 형식 확인 필요 !!
-                this._friendList.push([data[i].nickname, data[i].profile]);
+                this._friendList.push([data[i].pk, data[i].nickname, data[i].profile]);
             }
         }
         return this._friendList;
