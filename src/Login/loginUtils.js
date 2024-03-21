@@ -315,8 +315,13 @@ export function setProfileSection(app, player) {
 
     avatar.setAttribute('data-name', 'avatar__image-cat');
 
-    infoNode[0].innerHTML = player.getNickName();
-    infoNode[1].innerHTML = player.getStatusMessage();
+    if (player.getNickName().includes("User")) {
+        infoNode[0].innerHTML = "We advise you to change your nickname!";
+    } else {
+        infoNode[0].innerHTML = "";
+    }
+    infoNode[1].innerHTML = player.getNickName();
+    infoNode[2].innerHTML = player.getStatusMessage();
 
     handleEditUserModalUtils(app);
     handleFriendModalUtils(app);

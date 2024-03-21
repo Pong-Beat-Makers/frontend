@@ -32,9 +32,21 @@
 }
 
 .profile-section__profile--info div:first-child {
+    font-weight: 400;
+    font-size: 13px;
+    margin-bottom: 5px;
+    color: rgb(255, 114, 114);
+}
+
+.profile-section__profile--info div {
     font-weight: 800;
     font-size: 30px;
     margin-bottom: 30px;
+}
+
+.profile-section__profile--info div:last-child {
+    font-weight: 400;
+    font-size: 20px;
 }
 
 .profile-section__friends {
