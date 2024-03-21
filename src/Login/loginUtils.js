@@ -6,7 +6,7 @@ import {USER_STATUS} from "./player.js";
 import changeUrl from "../route.js";
 import {initChatSocket} from "../Chat/chatSocketUtils.js";
 import {handleLoginBtn, handleNaviClick} from "../Public/clickUtils.js";
-import {handleEditUserModalUtils, handleFriendModalUtils, modalRender, setAvator} from "../Profile/modalUtils.js";
+import {handleEditUserModalUtils, handleFriendModalUtils, modalRender, setAvatar} from "../Profile/modalUtils.js";
 import Player from "./player.js";
 import { showChatroom } from "../Chat/chatRoomUtils.js";
 
@@ -317,9 +317,9 @@ export function setProfileSection(app, player) {
     const avatar = profile.querySelector('.profile-section__profile--avatar');
     const infoNode = profile.querySelector('.profile-section__profile--info').children;
 
-    setAvator(player.getProfile(), avatar);
+    setAvatar(player.getProfile(), avatar);
 
-    if (player.getNickName().startsWith("User")) {
+    if (/User\d+$/.test(player.getNickName())) {
         infoNode[0].innerHTML = "We advise you to change your nickname!";
     } else {
         infoNode[0].innerHTML = "";

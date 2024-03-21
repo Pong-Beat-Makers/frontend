@@ -51,7 +51,7 @@ export function handleFileInputAtDiv(avatars, selectedClassName) {
 function getAvatarData(avatars) {
     const selectedClassName = 'profile-modal__selected-avatar';
 
-    if (avatars[1].classList.contains(selectedClassName) && avatars[1].getAttribute('data-image').length) {
+    if (avatars[1].classList.contains(selectedClassName) && avatars[1].getAttribute('data-image') !== 'upload') {
         return avatars[1].getAttribute('data-image');
     }
     return avatars[0].getAttribute('data-image');
@@ -85,6 +85,14 @@ export function handleEditUserModalUtils(app) {
 
         const avatars = modalContainer.querySelectorAll('.profile-modal__avatar');
 
+        if (PROFILE_DEFAULT_IMAGE.indexOf(player.getProfile()) === -1) {
+            setAvatar(player.getProfile(), avatars[1]);
+            avatars[0].classList.toggle('profile-modal__selected-avatar');
+            avatars[1].classList.toggle('profile-modal__selected-avatar');
+        } else {
+            setAvatar(player.getProfile(), avatars[0]);
+        }
+
         avatars.forEach((element, i) => {
             element.addEventListener('click', e => {
                 const selectedClassName = 'profile-modal__selected-avatar';
@@ -108,6 +116,11 @@ export function handleEditUserModalUtils(app) {
 
         const toggleItems = modalContainer.querySelectorAll('.profile-modal__toggle-item');
 
+        if (!player.getSet2fa()) {
+            toggleItems[0].classList.toggle('profile-modal__toggle-selected');
+            toggleItems[1].classList.toggle('profile-modal__toggle-selected');
+        }
+
         toggleItems.forEach((element, i) => {
             element.addEventListener('click', e => {
                 const selectedClassName = 'profile-modal__toggle-selected';
@@ -127,7 +140,7 @@ export function handleEditUserModalUtils(app) {
                 'set_2fa_to': get2FAData(toggleItems)
             };
             if (player.setProfile(data)) {
-                location.reload();
+                // location.reload();
             }
         });
     });
@@ -142,7 +155,7 @@ export function handleFriendModalUtils(app) {
     });
 }
 
-export function setAvator(playerProfile, divNode) {
+export function setAvatar(playerProfile, divNode) {
     if (PROFILE_DEFAULT_IMAGE.indexOf(playerProfile) === -1) {
         divNode.style.backgroundImage = `url(${playerProfile})`;
     } else {
