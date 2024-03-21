@@ -33,7 +33,7 @@ function handleInvite(chatModal) {
     window.location.href(roomAddress);
 }
 
-function handleBlockToggle(chatModal) {
+async function handleBlockToggle(chatModal) {
     const targetNickname = chatModal.querySelector(".chat__header--name").innerHTML;
     const blockToggleBtn = chatModal.querySelectorAll(".chat__header--btn")[1];
     const blockIcon = `<i class="bi bi-person-slash"></i>`;
@@ -65,7 +65,9 @@ function handleBlockToggle(chatModal) {
         })
     };
     
-    fetch(`${CHAT_SERVER_DOMAIN}/${CHAT_API_DOMAIN}/blockedusers/`, data); // 예외처리 필요
+    const res = await fetch(`${CHAT_SERVER_DOMAIN}/${CHAT_API_DOMAIN}/blockedusers/`, data);
+    if (!res.ok)
+        throw new Error(`Error : ${res.status}`);
 }
 
 export async function showChatroom(toNickname) {
@@ -104,7 +106,7 @@ async function handleChatRoom(chatModal, toNickname) {
 
     const chatHeaderBtns = chatModal.querySelectorAll(".chat__header--btn");
     chatHeaderBtns[0].onclick = () => { handleInvite(chatModal) };
-    chatHeaderBtns[1].onclick = () => { handleBlockToggle(chatModal) };
+    chatHeaderBtns[1].onclick = async () => { await handleBlockToggle(chatModal) };
 
     const chatRoom = chatModal.querySelector(".chat__body--frame");
     chatRoom.scrollTop = chatRoom.scrollHeight;
