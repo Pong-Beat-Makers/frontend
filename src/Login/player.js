@@ -30,7 +30,8 @@ class Player {
                 status_message,
                 win,
                 lose,
-                rank
+                rank,
+                set_2fa
             } = await res.json();
 
             this._profile = profile;
@@ -38,6 +39,7 @@ class Player {
             this._win = win;
             this._lose = lose;
             this._rank = rank;
+            this._set_2fa = set_2fa;
         } else if (res.status === 403) {
             this._status = USER_STATUS.NOT_AUTHORIZED;
         }
@@ -111,6 +113,9 @@ class Player {
     }
     getRank() {
         return this._rank;
+    }
+    getSet2fa() {
+        return this._set_2fa;
     }
     getStatus() {
         return this._status;
