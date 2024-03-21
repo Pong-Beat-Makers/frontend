@@ -18,14 +18,14 @@ function handleLogoutBtn(event) {
     location.reload();
 }
 
-export function handleNaviClick() {
-    const headerElements = document.querySelectorAll(".main-section__list--item");
-    const logoutBtn = document.querySelector(".header__logout--btn");
+export function handleNaviClick(app) {
+    const headerElements = app.querySelectorAll(".main-section__list--item");
+    const logoutBtn = app.querySelector(".header__logout--btn");
     headerElements[0].onclick = () => {
         changeUrl("/home");
         // handleHomeModal();
         headerElements[0].classList.add("active");
-    };
+    }
     headerElements[1].onclick = () => {
         changeUrl("/chat");
         setChatPage();
@@ -39,7 +39,7 @@ export function handleNaviClick() {
     headerElements[3].onclick = () => {
         changeUrl("/rank");
         headerElements[3].classList.add("active");
-        setRankPage();
+        setRankPage(app);
     }
     logoutBtn.onclick = handleLogoutBtn;
 }

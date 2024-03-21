@@ -3,9 +3,11 @@ import { routes } from "../route.js";
 import { chatSocket } from "../Login/loginUtils.js";
 import {modalRender} from "../Profile/modalUtils.js";
 import Player from "../Login/player.js";
+import ProfileModal from "../Profile/profileModalTemplate.js";
+import {showProfileDetail} from "../Login/loginUtils.js"
 
-function loadChatLog(chatId) {
-    const chatFrame = document.querySelector(".chat__body--frame");
+function loadChatLog(chatModal, chatId) {
+    const chatFrame = chatModal.querySelector(".chat__body--frame");
 
     let chatLog = localStorage.getItem(chatId);
     if (!chatLog)
@@ -18,8 +20,8 @@ function loadChatLog(chatId) {
     }
 }
 
-function handleInvite() {
-    const targetNickname = document.querySelector(".chat__header--name").innerHTML;
+function handleInvite(chatModal) {
+    const targetNickname = chatModal.querySelector(".chat__header--name").innerHTML;
     const roomAddress = `${FRONTEND}/game/${crypto.randomUUID()}`;
 
     chatSocket.send(JSON.stringify({
@@ -31,9 +33,9 @@ function handleInvite() {
     window.location.href(roomAddress);
 }
 
-function handleBlockToggle() {
-    const targetNickname = document.querySelector(".chat__header--name").innerHTML;
-    const blockToggleBtn = document.querySelectorAll(".chat__header--btn")[1];
+async function handleBlockToggle(chatModal) {
+    const targetNickname = chatModal.querySelector(".chat__header--name").innerHTML;
+    const blockToggleBtn = chatModal.querySelectorAll(".chat__header--btn")[1];
     const blockIcon = `<i class="bi bi-person-slash"></i>`;
     
     let methodSelected;
@@ -63,11 +65,13 @@ function handleBlockToggle() {
         })
     };
     
-    fetch(`${CHAT_SERVER_DOMAIN}/${CHAT_API_DOMAIN}/blockedusers/`, data); // 예외처리 필요
+    const res = await fetch(`${CHAT_SERVER_DOMAIN}/${CHAT_API_DOMAIN}/blockedusers/`, data);
+    if (!res.ok)
+        throw new Error(`Error : ${res.status}`);
 }
 
 export async function showChatroom(toNickname) {
-    modalRender("chat", routes["/chat"].modalTemplate());
+    const chatModal = modalRender("chat", routes["/chat"].modalTemplate());
 
     const blockIcon = `<i class="bi bi-person-slash"></i>`;
 
@@ -82,32 +86,40 @@ export async function showChatroom(toNickname) {
     
     const data = await response.json();
     if (data.is_blocked === true) {
-        const blockToggleBtn = document.querySelectorAll(".chat__header--btn")[1];
+        const blockToggleBtn = chatModal.querySelectorAll(".chat__header--btn")[1];
         blockToggleBtn.innerHTML = `${blockIcon} Unblock`;
         blockToggleBtn.classList.replace("block", "unblock");
     };
 
-    document.querySelector(".chat__header--name").innerHTML = toNickname;
+    chatModal.querySelector(".chat__header--name").innerHTML = toNickname;
 
-    loadChatLog(`chatLog_${toNickname}`);
-    handleChatRoom();
+    loadChatLog(chatModal, `chatLog_${toNickname}`);
+    handleChatRoom(chatModal, toNickname);
 }
 
-function handleChatRoom() {
-    const chatHeaderBtns = document.querySelectorAll(".chat__header--btn");
-    chatHeaderBtns[0].onclick = handleInvite;
-    chatHeaderBtns[1].onclick = handleBlockToggle;
+async function handleChatRoom(chatModal, toNickname) {
+    const targetProfile = chatModal.querySelector(".chat__header--profile");
+    targetProfile.onclick = async () => {
+        const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
+        await showProfileDetail(detailProfileModal, toNickname);
+    }
 
-    // document.querySelector('.chat__controller--text').focus();
-    document.querySelector('.chat__body--text').onkeydown = function(e) {
+    const chatHeaderBtns = chatModal.querySelectorAll(".chat__header--btn");
+    chatHeaderBtns[0].onclick = () => { handleInvite(chatModal) };
+    chatHeaderBtns[1].onclick = async () => { await handleBlockToggle(chatModal) };
+
+    const chatRoom = chatModal.querySelector(".chat__body--frame");
+    chatRoom.scrollTop = chatRoom.scrollHeight;
+
+    chatModal.querySelector('.chat__body--text').onkeydown = function(e) {
         if (e.keyCode === 13) {  // enter, return
-            document.querySelector('.chat__controller--btn').click();
+            chatModal.querySelector('.chat__controller--btn').click();
         }
     };
 
-    document.querySelector('.chat__send--btn').onclick = function(e) {
-        const messageInputDom = document.querySelector('.chat__body--text');
-        const targetNickname = document.querySelector('.chat__header--name').innerHTML;
+    chatModal.querySelector('.chat__send--btn').onclick = function(e) {
+        const messageInputDom = chatModal.querySelector('.chat__body--text');
+        const targetNickname = chatModal.querySelector('.chat__header--name').innerHTML;
         const message = messageInputDom.value;
         const obj = {
             'target_nickname' : targetNickname,

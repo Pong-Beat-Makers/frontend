@@ -37,13 +37,12 @@ export async function setFriendList(app) {
         return ;
     }
 
-    // TODO: add event listener !!
     const friendsAll = app.querySelectorAll(".profile-section__friends--item");
     const friendsName = app.querySelectorAll(".profile-section__friends--name");
     const frinedsPic = app.querySelectorAll(".profile-section__friends--pic");
     const friendsStat = app.querySelectorAll(".profile-section__friends--status");
     const friendsStatText = app.querySelectorAll(".profile-section__friends--status--text");
-    let isOnline = 1; // TODO: online status update !!
+    let isOnline = 1;
     for (let i = 0; i < friendList.length; i++) {
         friendsAll[i].id = 'friends-list-' + friendList[i][0]; // user id 기준으로 id 지정
         friendsName[i].innerHTML = friendList[i][1]; // 닉네임 설정
@@ -67,6 +66,7 @@ export async function setFriendStatus(friend, status) {
     let id = friend[0]
     let nickname = friend[1]
     const targetFriendItem = document.getElementById('friends-list-' + id);
+    // TODO: check error
     const targetFriendStatus = targetFriendItem.querySelector(".profile-section__friends--status");
     const targetFriendText = targetFriendItem.querySelector(".profile-section__friends--status--text");
     if (status === 'online') {
@@ -109,7 +109,7 @@ async function handleProfileSearch(modal, input) {
     }
 }
 
-async function showProfileDetail(modal, input) {
+export async function showProfileDetail(modal, input) {
     const res = await fetch(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/profile/?friend=${input}`, {
         method: 'GET',
         headers: {
@@ -118,7 +118,7 @@ async function showProfileDetail(modal, input) {
         },
     });
     if (!res.ok)
-        throw new Error(`Error : ${response.status}`);
+        throw new Error(`Error : ${res.status}`);
 
     const data = await res.json();
 
@@ -133,9 +133,9 @@ async function showProfileDetail(modal, input) {
     // avatar.classList.add(data.profile);
     status.innerHTML = data.status_message;
     let winRate = 0;
-    if ((data.win + data.lose) != 0)
+    if ((data.win + data.lose) !== 0)
         winRate = data.win / (data.win + data.lose);
-    rate.innerHTML = `${winRate * 100}%`
+    rate.innerHTML = `${winRate.toPrecision(5) * 100}%`
     rank.innerHTML = data.rank;
 
     await handleProfileBtns(modal, data);
@@ -148,7 +148,7 @@ async function handleProfileBtns (modal, obj) {
 
     profileBtns[0].onclick = () => {
         // TODO: move to chat page
-        showChatroom(document.querySelector(".friend-modal__info--nickname").innerText);
+        showChatroom(modal.querySelector(".friend-modal__info--nickname").innerText);
     }
 
     let methodSelected;
@@ -173,7 +173,7 @@ async function handleProfileBtns (modal, obj) {
         };
         const res = await fetch(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/friends/`, data);
         if (!res.ok)
-            throw new Error(`Error : ${response.status}`);
+            throw new Error(`Error : ${res.status}`);
         else if (methodSelected == 'POST')
             profileBtns[1].innerHTML = `<i class="bi bi-person-plus"></i> delete`;
         else if (methodSelected == 'DELETE')
@@ -183,7 +183,7 @@ async function handleProfileBtns (modal, obj) {
 }
 
 async function setMatchHistory(modal, nickname) {
-    const res = await fetch(`${GAME_SERVER_DOMAIN}/${GAME_API_DOMAIN}/histroy/?nickname=${nickname}`, {
+    const res = await fetch(`${GAME_SERVER_DOMAIN}/${GAME_API_DOMAIN}/history/?nickname=${nickname}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${Player._token}`,
@@ -286,7 +286,7 @@ export function renderMainPage(player) {
         changeUrl("/home");
         app.querySelectorAll(".main-section__list--item")[0].classList.add("active");
         // handleHomeModal();
-        handleNaviClick();
+        handleNaviClick(app);
         setProfileSection(app, player);
         setFriendList(app);
 
