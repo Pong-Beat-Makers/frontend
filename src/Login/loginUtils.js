@@ -183,7 +183,7 @@ async function handleProfileBtns (modal, obj) {
 }
 
 async function setMatchHistory(modal, nickname) {
-    const res = await fetch(`${GAME_SERVER_DOMAIN}/${GAME_API_DOMAIN}/histroy/?nickname=${nickname}`, {
+    const res = await fetch(`${GAME_SERVER_DOMAIN}/${GAME_API_DOMAIN}/game-data/history/?nickname=${nickname}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${Player._token}`,
@@ -192,9 +192,8 @@ async function setMatchHistory(modal, nickname) {
     if (!res.ok)
         throw new Error(`Error : ${res.status}`);
 
-    const data = await res.json();
-    const obj = JSON.parse(data);
-    console.dir(obj);
+    const data = await res.json()
+
 /*
 {
     "id": "< 게임 데이터 id>",
@@ -208,7 +207,7 @@ async function setMatchHistory(modal, nickname) {
 }
 */
     const matchHistoryList = modal.querySelector(".friend-modal__history-list");
-    for (let i = 0; i < obj.length; i++) {
+    for (let i = 0; i < data.length; i++) {
         matchHistoryList.innerHTML += ProfileModal.matchHistoryTemplate();
     }
 
@@ -217,14 +216,16 @@ async function setMatchHistory(modal, nickname) {
     const partnerPic = modal.querySelectorAll(".match-your-avatar");
     const score = modal.querySelectorAll(".history-item__score");
     const stat = modal.querySelectorAll(".history-item__status");
-    for (let i = 0; i < obj.length; i++) {
-        date[i].innerHTML = obj[i].created_at; // TODO: 파싱 필요할지도
+    for (let i = 0; i < data.length; i++) {
+        const create_at =  new Date(data[i].created_at);
+        console.log(create_at);
+        date[i].innerHTML = `${create_at.getFullYear()}/${create_at.getMonth()}/${create_at.getDate()}` // TODO: 파싱 필요할지도
         myPic[i].innerHTML = "";
         partnerPic[i].innerHTML = ""; // TODO: 다시 fetch 해야 하는 거 아님 ? ㅠㅠ ..
-        score[i].innerHTML = `Score ${obj[i].user1_score} : ${obj[i].user2_score}`;
-        if (obj[i].user1_score > obj[i].user2_score)
+        score[i].innerHTML = `Score ${data[i].user1_score} : ${data[i].user2_score}`;
+        if (data[i].user1_score > data[i].user2_score)
             stat[i].innerHTML = "Win";
-        else if (obj[i].user1_score == obj[i].user2_score)
+        else if (data[i].user1_score == data[i].user2_score)
             stat[i].innerHTML = "Draw";
         else
             stat[i].innerHTML = "Lose";
