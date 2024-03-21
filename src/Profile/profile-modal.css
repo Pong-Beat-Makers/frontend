@@ -30,39 +30,42 @@
 }
 
 .profile-modal__avatar {
-    width: 70px;
-    height: 70px;
+    position: relative;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     background-color: #787878;
+    background-size: cover;
     box-shadow: inset 0px 4px 4px 0px #00000040;
     transition: .3s ease-in-out;
 }
 
-.profile-modal__big-avatar {
-    position: relative;
-    width: 160px;
-    height: 160px;
-    margin: 0 5px;
+.profile-modal__profile-name {
+    margin-top: 10px;
+    font-size: 15px;
 }
 
-.profile-modal__avatar.profile-modal__big-avatar::after {
+.profile-modal__avatar::after {
     content: '';
     position: absolute;
     top: -5px;
     left: -5px;
-    width: 165px;
-    height: 165px;
-    border-radius: 50%;
-    border: 2px solid rgb(var(--point-color));
-}
-
-.profile-modal__avatarlist {
     width: 145px;
     height: 145px;
+    border-radius: 50%;
+    border: 2px solid black;
+}
+
+.profile-modal__avatar.profile-modal__selected-avatar::after {
+    border-color: rgb(var(--point-color));
+}
+
+.profile-modal__profile {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-content: space-between;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
 }
 
 .profile-modal__body--header {
@@ -74,6 +77,7 @@
     position: relative;
     width: 100%;
     display: flex;
+    justify-content: space-between;
     align-items: center;
 }
 
@@ -104,6 +108,27 @@
 
 .profile-modal__status-message {
     height: 115px;
+}
+
+.profile-modal__toggle-btn {
+    width: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 22px;
+    background-color: #9546FC80;
+    padding: 10px;
+    border-radius: 25px;
+    color: black;
+    transition: .3s ease-in-out;
+}
+
+.profile-modal__toggle-item {
+    transition: .3s ease-in-out;
+}
+
+.profile-modal__toggle-selected {
+    color: rgb(var(--point-color));
 }
 
 .profile-modal__save-btn {

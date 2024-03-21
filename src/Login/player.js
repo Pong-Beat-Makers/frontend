@@ -1,6 +1,8 @@
 import {changeTo2FAPage, getInfoJWT} from "./loginUtils.js";
 import { BACKEND, USER_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN } from "../Public/global.js";
 
+export const PROFILE_DEFAULT_IMAGE = ['cat', 'bird', 'crocodile', 'deer', 'whale'];
+
 export const USER_STATUS = {
     "DOSE_NOT_EXIST": 0,
     "NOT_AUTHORIZED": 1,
@@ -62,6 +64,18 @@ class Player {
         return this._friendList;
     }
 
+    async setProfile(data) {
+        const { status } = await this._getServer(`${BACKEND}/${USER_MANAGEMENT_DOMAIN}/profile/`, 'PATCH', data);
+
+        if (status === 200) {
+            this._profile = data.profile_to;
+            this._nickName = data.nickname_to;
+            this._status_message = data.status_message_to;
+            return true;
+        }
+        return false;
+    }
+
     async _getServer(url, method = 'GET', bodyData) {
         let sendData = {
             method: method,
@@ -71,6 +85,7 @@ class Player {
         }
         if (bodyData) {
             sendData.body = JSON.stringify(bodyData);
+            sendData.headers['content-type'] = 'application/json';
         }
         return await fetch(url, sendData);
     }
