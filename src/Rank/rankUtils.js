@@ -1,20 +1,49 @@
 import { routes } from "../route.js";
 import { friendModalClick } from "../Profile/modalUtils.js";
+import { USER_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN } from "../Public/global.js";
+import Player from "../Login/player.js";
+import { showProfileDetail } from "../Login/loginUtils.js";
+import {modalRender} from "../Profile/modalUtils.js";
+import ProfileModal from "../Profile/profileModalTemplate.js";
 
-export function setRankPage() {
-    const RankerNumber = 18; // 추후 백엔드에서 불러오기
-    const rankerStage = document.querySelector(".rank__stage");
-    const rankerList = document.querySelector(".rank__list--friends");
+export async function setRankPage(app) {
+    const res = await fetch(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/profile/ranker/`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${Player._token}`,
+        },
+    });
+    if (!res.ok)
+        throw new Error(`Error : ${res.status}`);
 
-    if (1) // 2등이 있다면
-        rankerStage.innerHTML += routes["/rank"].rankerStageTemplate("silver");
-    if (1) // 1등이 있다면
-        rankerStage.innerHTML += routes["/rank"].rankerStageTemplate("gold");
-    if (1) { // 3등이 있다면
-        rankerStage.innerHTML += routes["/rank"].rankerStageTemplate("bronze");
+    const obj = await res.json();
+    const data = obj.results;
+    const rankerNumber = data.length;
+    const rankerStage = app.querySelector(".rank__stage");
+    const rankerList = app.querySelector(".rank__list--friends");
 
-        for (let i = 0; i < RankerNumber; i++) {
-            rankerList.innerHTML += routes["/rank"].rankerTemplate(i + 4, "ranker");
+/*
+{{
+"nickname": "User2",
+"profile": ""
+}, {
+"nickname": "User2",
+"profile": ""
+}, {
+"nickname": "User2",
+"profile": ""
+}}
+*/
+    // TODO: rankerStage profile 등록 -> background image ! 
+    if (rankerNumber >= 2)
+        rankerStage.innerHTML += routes["/rank"].rankerStageTemplate("silver", data[1].nickname);
+    if (rankerNumber >= 1)
+        rankerStage.innerHTML += routes["/rank"].rankerStageTemplate("gold", data[0].nickname);
+    if (rankerNumber >= 3) {
+        rankerStage.innerHTML += routes["/rank"].rankerStageTemplate("bronze", data[2].nickname);
+
+        for (let i = 4; i <= rankerNumber; i++) {
+            rankerList.innerHTML += routes["/rank"].rankerTemplate(i, data[i].nickname);
         }
     }
 
@@ -22,20 +51,27 @@ export function setRankPage() {
         rankerStage.innerHTML = `<div class="chat__search--error">
         No ranker presents yet. Be the first ranker!
         </div>`
-    rankerOnclick();
+    await rankerOnclick(app.querySelector(".main-section__main"));
 }
 
-function rankerOnclick() {
-    const rankStage = document.querySelectorAll(".rank__stage--table");
-    const rankerList = document.querySelectorAll('.profile-section__friends--item');
+async function rankerOnclick(app) {
+    const rankStage = app.querySelectorAll(".rank__stage--table");
+    const stageName = app.querySelectorAll(".rank__stage--avatar");
 
-    rankStage.forEach(item => {
-        item.removeEventListener('click', friendModalClick, true);
-        item.addEventListener('click', friendModalClick);
-    })
+    const rankerList = app.querySelectorAll(".profile-section__friends--item");
+    const rankerName = app.querySelectorAll(".profile-section__friends--name");
 
-    rankerList.forEach(item => {
-        item.removeEventListener('click', friendModalClick, true);
-        item.addEventListener('click', friendModalClick);
-    });
+    for (let i = 0; i < rankStage.length; i++) {
+        rankStage[i].onclick = async () => {
+            const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
+            await showProfileDetail(detailProfileModal, stageName[i].getAttribute('name'));
+        };
+    }
+
+    for (let i = 0; i < rankerList.length; i++) {
+        rankerList[i].onclick = async () => {
+            const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
+            await showProfileDetail(detailProfileModal, rankerName[i]);            
+        };
+    }
 }

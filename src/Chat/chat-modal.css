@@ -60,6 +60,7 @@
 }
 
 .chatbox {
+    word-break: break-all;
     display: flex;
     align-items: center;
     min-height: 59px;

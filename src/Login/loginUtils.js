@@ -37,13 +37,12 @@ export async function setFriendList(app) {
         return ;
     }
 
-    // TODO: add event listener !!
     const friendsAll = app.querySelectorAll(".profile-section__friends--item");
     const friendsName = app.querySelectorAll(".profile-section__friends--name");
     const frinedsPic = app.querySelectorAll(".profile-section__friends--pic");
     const friendsStat = app.querySelectorAll(".profile-section__friends--status");
     const friendsStatText = app.querySelectorAll(".profile-section__friends--status--text");
-    let isOnline = 1; // TODO: online status update !!
+    let isOnline = 1;
     for (let i = 0; i < friendList.length; i++) {
         friendsAll[i].id = 'friends-list-' + friendList[i][0]; // user id 기준으로 id 지정
         friendsName[i].innerHTML = friendList[i][1]; // 닉네임 설정
@@ -134,9 +133,9 @@ export async function showProfileDetail(modal, input) {
     // avatar.classList.add(data.profile);
     status.innerHTML = data.status_message;
     let winRate = 0;
-    if ((data.win + data.lose) != 0)
+    if ((data.win + data.lose) !== 0)
         winRate = data.win / (data.win + data.lose);
-    rate.innerHTML = `${winRate * 100}%`
+    rate.innerHTML = `${winRate.toPrecision(5) * 100}%`
     rank.innerHTML = data.rank;
 
     await handleProfileBtns(modal, data);
@@ -184,7 +183,7 @@ async function handleProfileBtns (modal, obj) {
 }
 
 async function setMatchHistory(modal, nickname) {
-    const res = await fetch(`${GAME_SERVER_DOMAIN}/${GAME_API_DOMAIN}/histroy/?nickname=${nickname}`, {
+    const res = await fetch(`${GAME_SERVER_DOMAIN}/${GAME_API_DOMAIN}/history/?nickname=${nickname}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${Player._token}`,
@@ -287,7 +286,7 @@ export function renderMainPage(player) {
         changeUrl("/home");
         app.querySelectorAll(".main-section__list--item")[0].classList.add("active");
         // handleHomeModal();
-        handleNaviClick();
+        handleNaviClick(app);
         setProfileSection(app, player);
         setFriendList(app);
 

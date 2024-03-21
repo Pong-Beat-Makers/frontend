@@ -76,7 +76,7 @@ class ProfileModal {
                 <div class="friend-modal__box">
                     <div class="friend-modal__game-info">
                         <div class="friend-modal__game-info--rate">Win rate<span>30%</span></div>
-                        <div class="friend-modal__game-info--rank">Rank<span>3rd</span></div>
+                        <div class="friend-modal__game-info--rank">Rank point<span>3rd</span></div>
                     </div>
                     <div class="friend-modal__controll">
                         <button class="friend-modal__btn">
