@@ -1,4 +1,6 @@
 import ProfileModal from "./profileModalTemplate.js";
+import Player from "../Login/player.js";
+import { USER_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN } from "../Public/global.js"
 
 export function  modalRender(modalName, htmlCode, backgroundClick = true) {
     const modal = document.querySelector('.modal');
@@ -46,6 +48,18 @@ export function handleEditUserModalUtils(app) {
                 bigAvatar.setAttribute('data-name', dataName + clickAvatar);
                 e.target.setAttribute('data-name', dataName + currAvatar);
             });
+        });
+
+        // nickname 및 status message 미리 띄우기
+        let nicknameTextArea = modalContainer.querySelector(".profile-modal__nickname");
+        let statusMessageTextArea = modalContainer.querySelector(".profile-modal__status-message");
+        nicknameTextArea.value = Player.getNickName();
+        statusMessageTextArea = Player.getStatusMessage();
+
+        // save button 이벤트 리스너 등록
+        let saveButton = modalContainer.querySelector(".profile-modal__save-btn");
+        saveButton.addEventListener('click', e => {
+            // TODO : 구현해야함.
         });
     })
 }
