@@ -152,6 +152,19 @@ class Player {
     getStatus() {
         return this._status;
     }
+    getInfo() {
+        return {
+            id: this._id,
+            nickname: this._nickName,
+            profile: this._profile,
+            status_message: this._status_message,
+            win: this._win,
+            lose: this._lose,
+            rank: this._rank,
+            set_2fa: this._set_2fa,
+            status: this._status
+        };
+    }
 }
 
 export default new Player();
