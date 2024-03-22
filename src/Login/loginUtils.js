@@ -3,12 +3,14 @@ import LoginSuccess from "./loginSuccessTemplate.js";
 import Login from "./loginTemplate.js";
 import ProfileModal from "../Profile/profileModalTemplate.js";
 import player, {USER_STATUS} from "./player.js";
-import changeUrl from "../route.js";
+import changeUrl, {routes} from "../route.js";
 import {initChatSocket} from "../Chat/chatSocketUtils.js";
 import {handleLoginBtn, handleNaviClick} from "../Public/clickUtils.js";
-import {handleEditUserModalUtils, handleFriendModalUtils, modalRender, setAvatar} from "../Profile/modalUtils.js";
+import {handleEditUserModalUtils, handleFriendItemUtils, modalRender, setAvatar} from "../Profile/modalUtils.js";
 import Player from "./player.js";
 import { showChatroom } from "../Chat/chatRoomUtils.js";
+
+export const loginSuccessTemplate = LoginSuccess;
 
 export async function socialLogin(site) {
     const response = await fetch(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/accounts/${site}/login/`, {
@@ -21,44 +23,62 @@ export async function socialLogin(site) {
     window.location.href = data.login_url;
 }
 
+export function setFriendItem(friendListElement, friendData) {
+    const itemContainer = document.createElement('div');
+    itemContainer.classList.add('profile-section__friends--item');
+    itemContainer.id = friendData.nickname;
+
+    itemContainer.innerHTML = loginSuccessTemplate.friendBoxTemplate(friendData.nickname);
+    const avatarNode = itemContainer.querySelector('.profile-section__friends--pic');
+
+    setAvatar(friendData.profile, avatarNode);
+
+    friendListElement.appendChild(itemContainer);
+
+    itemContainer.addEventListener('click', async () => {
+        await handleFriendItemUtils(friendData.nickname);
+    });
+}
+
 export async function setFriendList(app) {
     // make friends elements
     const friendList = await Player.getFriendList();
     const friendListElement = app.querySelector(".profile-section__friends--list");
     friendListElement.innerHTML = "";
-    for (let i = 0; i < friendList.length; i++) {
-        friendListElement.innerHTML += LoginSuccess.friendBoxTemplate();
-    }
-    if (friendListElement.innerHTML === "") {
+
+    if (friendList.length > 0) {
+        friendList.forEach(friendData => {
+            setFriendItem(friendListElement, friendData);
+        });
+    } else {
         friendListElement.innerHTML = `<div class="profile-section__friends--msg">
         Let's play the game
         <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         & make new friends 🤝</div>`;
-        return ;
     }
 
-    const friendsAll = app.querySelectorAll(".profile-section__friends--item");
-    const friendsName = app.querySelectorAll(".profile-section__friends--name");
-    const frinedsPic = app.querySelectorAll(".profile-section__friends--pic");
-    const friendsStat = app.querySelectorAll(".profile-section__friends--status");
-    const friendsStatText = app.querySelectorAll(".profile-section__friends--status--text");
-    let isOnline = 1;
-    for (let i = 0; i < friendList.length; i++) {
-        friendsAll[i].id = 'friends-list-' + friendList[i][0]; // user id 기준으로 id 지정
-        friendsName[i].innerHTML = friendList[i][1]; // 닉네임 설정
-        frinedsPic[i].innerHTML = ""; // TODO: update profile pic by friendList[i][1];
-        if (isOnline === "online") {
-            friendsStat[i].classList.add("online");
-            friendsStatText[i].innerHTML = "online";
-        } else {
-            friendsStat[i].classList.add("offline");
-            friendsStatText[i].innerHTML = "offline";
-        }
-        friendsAll[i].onclick = async () => {
-            const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
-            await showProfileDetail(detailProfileModal, friendList[i][1]);
-        }
-    }
+    // const friendsAll = app.querySelectorAll(".profile-section__friends--item");
+    // const friendsName = app.querySelectorAll(".profile-section__friends--name");
+    // const frinedsPic = app.querySelectorAll(".profile-section__friends--pic");
+    // const friendsStat = app.querySelectorAll(".profile-section__friends--status");
+    // const friendsStatText = app.querySelectorAll(".profile-section__friends--status--text");
+    // let isOnline = 1;
+    // for (let i = 0; i < friendList.length; i++) {
+    //     friendsAll[i].id = 'friends-list-' + friendList[i][0]; // user id 기준으로 id 지정
+    //     friendsName[i].innerHTML = friendList[i][1]; // 닉네임 설정
+    //     frinedsPic[i].innerHTML = ""; // TODO: update profile pic by friendList[i][1];
+    //     if (isOnline === "online") {
+    //         friendsStat[i].classList.add("online");
+    //         friendsStatText[i].innerHTML = "online";
+    //     } else {
+    //         friendsStat[i].classList.add("offline");
+    //         friendsStatText[i].innerHTML = "offline";
+    //     }
+    //     friendsAll[i].onclick = async () => {
+    //         const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
+    //         await showProfileDetail(detailProfileModal, friendList[i][1]);
+    //     }
+    // }
 }
 
 export async function setFriendStatus(friend, status) {
@@ -104,7 +124,7 @@ async function handleProfileSearch(modal, input) {
     for (let i = 0; i < profileItems.length; i++) {
         profileItems[i].onclick = async () => {
             const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
-            await showProfileDetail(detailProfileModal, data[i].nickname);
+            // await showProfileDetail(detailProfileModal, data[i].nickname);
         }
     }
 }
@@ -183,11 +203,9 @@ async function handleProfileBtns (modal, obj) {
 }
 
 async function setProfileByNickname(divNode, nickname) {
-    const res = await player._getServer(
-        `${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/profile/?friend=${nickname}`);
-    const data = await res.json();
-    const playerProfile = data.profile;
-    await setAvatar(playerProfile, divNode);
+    const data = await player.getUserDetail(nickname);
+    console.log(data);
+    // setAvatar(playerProfile, divNode);
 }
 
 async function setMatchHistory(modal, nickname) {
@@ -331,9 +349,8 @@ export function setProfileSection(app, player) {
     } else {
         infoNode[0].innerHTML = "";
     }
-    infoNode[1].innerHTML = player.getNickName();
+    infoNode[1].children[0].innerHTML = player.getNickName();
     infoNode[2].innerHTML = player.getStatusMessage();
 
     handleEditUserModalUtils(app);
-    handleFriendModalUtils(app);
 }

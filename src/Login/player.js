@@ -9,6 +9,12 @@ export const USER_STATUS = {
     "AUTHORIZED": 2
 }
 
+export const DOING = {
+    "ADD": 0,
+    "UPDATE": 1,
+    "DELETE": 2,
+}
+
 class Player {
     constructor() {
         this._status = USER_STATUS.DOSE_NOT_EXIST;
@@ -58,11 +64,9 @@ class Player {
         const res = await this._getServer(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/friends/`);
         if (res.status === 200) {
             const data = await res.json();
-            for (let i = 0; i < data.length; i++) {
-                // TODO: data 형식 확인 필요 !!
-                this._friendList.push([data[i].pk, data[i].nickname, data[i].profile]);
-            }
+            data.forEach(friend => this._friendList.push(friend));
         }
+        // friendList 형식 : [{pk: <int>, nickname: <string>, profile: <string>,]
         return this._friendList;
     }
 
@@ -78,6 +82,34 @@ class Player {
         return false;
     }
 
+    async getUserDetail(nickname) {
+        const res = await this._getServer(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/profile/?friend=${nickname}`);
+
+        /* DetailData: {
+            nickname: <string>,
+            profile: <string>,
+            status_message: <string>,
+            win: <int>,
+            lose: <int>,
+            rank: <int>,
+            is_friend: <boolean>
+        } */
+        if (res.status === 200) {
+            return await res.json();
+        } else {
+            return {'error': res.status};
+        }
+    }
+
+    async friend(nickname, doing = DOING.ADD) {
+        const data = JSON.stringify({'friend': nickname});
+        const method = doing === DOING.ADD? 'POST' : 'DELETE';
+
+        const { status } = await this._getServer(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/friends/`, method, data);
+
+        return status === 200;
+    }
+
     async _getServer(url, method = 'GET', bodyData) {
         let sendData = {
             method: method,
@@ -87,7 +119,7 @@ class Player {
         }
         if (bodyData) {
             sendData.body = JSON.stringify(bodyData);
-            sendData.headers['content-type'] = 'application/json';
+            sendData.headers['Content-Type'] = 'application/json';
         }
         return await fetch(url, sendData);
     }

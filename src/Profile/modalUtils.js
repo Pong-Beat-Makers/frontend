@@ -1,7 +1,39 @@
 import ProfileModal from "./profileModalTemplate.js";
-import {PROFILE_DEFAULT_IMAGE} from '../Login/player.js';
+import {DOING, PROFILE_DEFAULT_IMAGE} from '../Login/player.js';
 import {player} from "../app.js";
 import {openErrorModal} from "../Game/gameUtils.js";
+import {showChatroom} from "../Chat/chatRoomUtils.js";
+
+export function toggleAddAndDeleteBtn(btnNode, nickname, doing) {
+    const buttonMsg = ['<i class="bi bi-person-plus"></i> add', '<i class="bi bi-person-plus"></i> delete'];
+
+    btnNode.innerHTML = doing === DOING.ADD? buttonMsg[0]:buttonMsg[1];
+    if (doing === DOING.ADD) {
+        btnNode.onclick = async () => {
+            const result = await player.friend(nickname, doing);
+
+            if (result) {
+                btnNode.innerHTML = buttonMsg[1];
+                toggleAddAndDeleteBtn(btnNode, nickname, DOING.DELETE);
+            } else {
+                btnNode.innerHTML = buttonMsg[0];
+                toggleAddAndDeleteBtn(btnNode, nickname, DOING.ADD);
+            }
+        }
+    } else {
+        btnNode.onclick = async () => {
+            const result = await player.friend(nickname, doing);
+
+            if (result) {
+                btnNode.innerHTML = buttonMsg[1];
+                toggleAddAndDeleteBtn(btnNode, nickname, DOING.ADD);
+            } else {
+                btnNode.innerHTML = buttonMsg[0];
+                toggleAddAndDeleteBtn(btnNode, nickname, DOING.DELETE);
+            }
+        }
+    }
+}
 
 export function  modalRender(modalName, htmlCode, backgroundClick = true) {
     const modal = document.querySelector('.modal');
@@ -20,8 +52,38 @@ export function  modalRender(modalName, htmlCode, backgroundClick = true) {
     return modalContainer;
 }
 
-export function friendModalClick() {
-    modalRender("friend-profile", ProfileModal.friendModalTemplate());
+export async function friendModalClick(nickname, me = false) {
+    const data = await player.getUserDetail(nickname);
+    const modalContainer = modalRender("friend-profile", ProfileModal.friendModalTemplate());
+
+    const {
+        nickname: name,
+        profile,
+        status_message,
+        win,
+        lose,
+        rank,
+        is_friend
+    } = data;
+
+    const avatarNode = modalContainer.querySelector('.friend-modal__avatar');
+    const friendInfo = modalContainer.querySelector('.friend-modal__info').children;
+    const winRate = modalContainer.querySelector('.friend-modal__game-info--rate').children[0];
+    const rankPoint = modalContainer.querySelector('.friend-modal__game-info--rank').children[0];
+    const profileBtns = modalContainer.querySelectorAll(".friend-modal__btn");
+
+    setAvatar(profile, avatarNode);
+
+    friendInfo[0].innerHTML = name;
+    friendInfo[1].innerHTML = status_message;
+
+    winRate.innerHTML = (win + lose)? `${(win/(win+lose)).toPrecision(5) * 100}%` : '0';
+    rankPoint.innerHTML = rank;
+
+    profileBtns[0].onclick = () => {
+        showChatroom(nickname);
+    }
+    toggleAddAndDeleteBtn(profileBtns[1], nickname, is_friend? DOING.DELETE : DOING.ADD);
 }
 
 export function handleFileInputAtDiv(avatars, selectedClassName) {
@@ -66,8 +128,14 @@ function get2FAData(toggleItems) {
 
 export function handleEditUserModalUtils(app) {
     const profileBtn = app.querySelector('.profile-section__profile');
+    const avatar = profileBtn.querySelector('.profile-section__profile--avatar');
+    const editBtn = profileBtn.querySelector('.profile-section__profile--info > div:nth-child(2) div:last-child');
 
-    profileBtn.addEventListener('click', () => {
+    avatar.addEventListener('click', async () => {
+        await friendModalClick(player.getNickName(), true);
+    });
+
+    editBtn.addEventListener('click', () => {
         const modalContainer = modalRender("profile", ProfileModal.template());
 
         const nickname = modalContainer.querySelector('.profile-modal__nickname');
@@ -152,13 +220,8 @@ export function handleEditUserModalUtils(app) {
     });
 }
 
-export function handleFriendModalUtils(app) {
-    const frendItems = app.querySelectorAll('.profile-section__friends--item');
-
-    frendItems.forEach(item => {
-        item.removeEventListener('click', friendModalClick, true);
-        item.addEventListener('click', friendModalClick);
-    });
+export async function handleFriendItemUtils(nickname) {
+    await friendModalClick(nickname);
 }
 
 export function setAvatar(playerProfile, divNode) {
