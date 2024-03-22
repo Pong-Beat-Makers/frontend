@@ -1,12 +1,13 @@
 class Chat {
     alertTemplate(name, msg, time) {
         return `
-            <div class="header__logout--btn">
+            <div class="chat__alert">
                 <div class="chat__room--contents">
                     <div class="chat__room--name">${name}</div>
                     <div class="chat__room--msg">${msg}</div>
                 </div>
                 <div class="chat__room--time">${time}</div>
+                <button class="chat__alert--close">❌</div>
             </div>
         `;
     }

@@ -97,9 +97,13 @@ export async function showChatroom(toNickname) {
     chatModal.querySelector(".chat__header--name").innerHTML = toNickname;
 
     loadChatLog(chatModal, `chatLog_${toNickname}`);
-    showChatList();
-    chatListOnclick();
     handleChatRoom(chatModal, toNickname);
+    try {
+        showChatList();
+        chatListOnclick();
+    }
+    catch {
+    }
 }
 
 async function handleChatRoom(chatModal, toNickname) {

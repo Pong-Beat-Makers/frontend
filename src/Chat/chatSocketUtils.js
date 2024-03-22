@@ -41,12 +41,15 @@ function chatAlert() {
     const modal = document.querySelector('.modal');
     const modalContainer = document.createElement('div');
 
-    modalContainer.classList.add('modal__container', `modal-name__${modalName}`);
+    modalContainer.classList.add('modal__container', `modal-name__chat-alert`);
     modalContainer.innerHTML = routes["/chat"].alertTemplate(data.from, data.message, data.time);
 
     modal.appendChild(modalContainer);
 
-    return modalContainer;
+    const closeBtn = modalContainer.querySelector(".chat__alert--close");
+    closeBtn.onclick = () => {
+
+    }
 }
 
 export function initChatSocket() {
@@ -78,6 +81,17 @@ export function initChatSocket() {
         } else {
             chatSide = "you";
             chatId = fromNickname;
+            Notification.requestPermission( function (result) {
+                if (result === "denied")
+                    alert('알림이 차단된 상태입니다. 브라우저 설정에서 알림을 허용해주세요!');
+            });
+
+            // TODO: 알림 띄우기
+            const noti = new Notification(fromNickname, {
+                body: data.message,
+                // icon: `/lib/img/novalogo_copy.png`,
+            });
+            setTimeout( function() { noti.close(); }, 3000);
             // modalRender('chatAlert', routes["/chat"].alertTemplate(data.from, data.message, data.time));
         }
 
@@ -90,9 +104,6 @@ export function initChatSocket() {
         updateChatLog(newMsgObj);
         saveNewMsg(`chatLog_${chatId}`, newMsgObj);
         updateChatList();
-        // TODO: 알림 띄우기
-        // 알림 템플릿 만들고, obj 토대로 구성하기
-        // 백그라운드는 x, 엑스버튼 만들기
     };
 
     chatSocket.onclose = function(e) {
