@@ -2,7 +2,7 @@ import { BACKEND, USER_SERVER_DOMAIN, GAME_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN
 import LoginSuccess from "./loginSuccessTemplate.js";
 import Login from "./loginTemplate.js";
 import ProfileModal from "../Profile/profileModalTemplate.js";
-import {USER_STATUS} from "./player.js";
+import player, {USER_STATUS} from "./player.js";
 import changeUrl from "../route.js";
 import {initChatSocket} from "../Chat/chatSocketUtils.js";
 import {handleLoginBtn, handleNaviClick} from "../Public/clickUtils.js";
@@ -182,8 +182,16 @@ async function handleProfileBtns (modal, obj) {
     }
 }
 
+async function setProfileByNickname(divNode, nickname) {
+    const res = await player._getServer(
+        `${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/profile/?friend=${nickname}`);
+    const data = await res.json();
+    const playerProfile = data.profile;
+    await setAvatar(playerProfile, divNode);
+}
+
 async function setMatchHistory(modal, nickname) {
-    const res = await fetch(`${GAME_SERVER_DOMAIN}/${GAME_API_DOMAIN}/history/?nickname=${nickname}`, {
+    const res = await fetch(`${GAME_SERVER_DOMAIN}/${GAME_API_DOMAIN}/game-data/history/?nickname=${nickname}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${Player._token}`,
@@ -218,10 +226,9 @@ async function setMatchHistory(modal, nickname) {
     const stat = modal.querySelectorAll(".history-item__status");
     for (let i = 0; i < data.length; i++) {
         const create_at =  new Date(data[i].created_at);
-        console.log(create_at);
-        date[i].innerHTML = `${create_at.getFullYear()}/${create_at.getMonth()}/${create_at.getDate()}` // TODO: 파싱 필요할지도
-        myPic[i].innerHTML = "";
-        partnerPic[i].innerHTML = ""; // TODO: 다시 fetch 해야 하는 거 아님 ? ㅠㅠ ..
+        date[i].innerHTML = `${create_at.getFullYear()}/${create_at.getMonth()}/${create_at.getDate()}`
+        setProfileByNickname(myPic[i], data[i].user1_nickname);
+        setProfileByNickname(partnerPic[i], data[i].user2_nickname);
         score[i].innerHTML = `Score ${data[i].user1_score} : ${data[i].user2_score}`;
         if (data[i].user1_score > data[i].user2_score)
             stat[i].innerHTML = "Win";
