@@ -145,21 +145,12 @@
     color: #2FBB2C;
 }
 
-.profile-section__friends--status.playing {
-    color: #FF8730;
-;
-}
-
 .profile-section__friends--status.offline {
     color: #787878;
 }
 
 .profile-section__friends--status.online div:last-child {
     background-color: #2FBB2C;
-}
-
-.profile-section__friends--status.playing div:last-child {
-    background-color: #FF8730;
 }
 
 .profile-section__friends--status.offline div:last-child {
