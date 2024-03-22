@@ -106,13 +106,12 @@ class ProfileModal {
             <div class="friend-modal__wrapper">
                 <div class="friend-modal__header">Match history</div>
                 <div class="friend-modal__history-list">
-                    ${this.matchHistoryTemplate()}
                 </div>
             </div>
         </div>
         `;
     }
-    
+
     matchHistoryTemplate() {
         return `
         <div class="friend-modal__history-item">
