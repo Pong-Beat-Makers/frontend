@@ -2,6 +2,7 @@ import { routes } from "../route.js";
 import { chatSocket, setFriendStatus } from "../Login/loginUtils.js";
 import { showChatList, chatListOnclick } from "./chatPageUtils.js";
 import Player from "../Login/player.js";
+import { modalRender } from "../Profile/modalUtils.js";
 
 function saveNewMsg(chatId, newMsgObj) {
     let chatLog = localStorage.getItem(chatId);
@@ -19,6 +20,8 @@ function updateChatLog(newMsgObj) {
         const chatFrame = document.querySelector(".chat__body--frame");
         chatFrame.innerHTML += routes["/chat"].chatBoxTemplate(
             `message_${newMsgObj.from}`, newMsgObj.msg, newMsgObj.time);
+        newMsgObj.isRead = true;
+        chatFrame.scrollTop = chatFrame.scrollHeight;
     }
     catch {
     }
@@ -30,13 +33,26 @@ function updateChatList() {
         chatListOnclick();
     }
     catch {
+        // 챗페이지 밖에 있을 경우 여기서 잡힘 => navi bar에 점 추가 후 누르면 점 없애기 ? ㅠㅠ ㅇㅇ
     }
+}
+
+function chatAlert() {
+    const modal = document.querySelector('.modal');
+    const modalContainer = document.createElement('div');
+
+    modalContainer.classList.add('modal__container', `modal-name__${modalName}`);
+    modalContainer.innerHTML = routes["/chat"].alertTemplate(data.from, data.message, data.time);
+
+    modal.appendChild(modalContainer);
+
+    return modalContainer;
 }
 
 export function initChatSocket() {
     chatSocket.onopen = function (e) {
         chatSocket.send(JSON.stringify({
-            'token' : Player._token, // 실제 토큰 처리
+            'token' : Player._token,
         }));
     };
 
@@ -62,16 +78,21 @@ export function initChatSocket() {
         } else {
             chatSide = "you";
             chatId = fromNickname;
+            // modalRender('chatAlert', routes["/chat"].alertTemplate(data.from, data.message, data.time));
         }
 
         const newMsgObj = {
             from: chatSide,
             msg: data.message,
             time: data.time,
+            isRead: false
         };
-        saveNewMsg(`chatLog_${chatId}`, newMsgObj);
         updateChatLog(newMsgObj);
+        saveNewMsg(`chatLog_${chatId}`, newMsgObj);
         updateChatList();
+        // TODO: 알림 띄우기
+        // 알림 템플릿 만들고, obj 토대로 구성하기
+        // 백그라운드는 x, 엑스버튼 만들기
     };
 
     chatSocket.onclose = function(e) {

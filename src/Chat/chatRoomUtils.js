@@ -5,6 +5,7 @@ import {modalRender} from "../Profile/modalUtils.js";
 import Player from "../Login/player.js";
 import ProfileModal from "../Profile/profileModalTemplate.js";
 import {showProfileDetail} from "../Login/loginUtils.js"
+import { showChatList, chatListOnclick } from "./chatPageUtils.js";
 
 function loadChatLog(chatModal, chatId) {
     const chatFrame = chatModal.querySelector(".chat__body--frame");
@@ -15,9 +16,11 @@ function loadChatLog(chatModal, chatId) {
 
     chatLog = JSON.parse(chatLog);
     for (let i = 0; i < chatLog.length; i++) {
-            chatFrame.innerHTML += routes["/chat"].chatBoxTemplate(
-                `message_${chatLog[i].from}`, chatLog[i].msg, chatLog[i].time);
+        chatFrame.innerHTML += routes["/chat"].chatBoxTemplate(
+            `message_${chatLog[i].from}`, chatLog[i].msg, chatLog[i].time);
+        chatLog[i].isRead = true;
     }
+    localStorage.setItem(chatId, JSON.stringify(chatLog));
 }
 
 function handleInvite(chatModal) {
@@ -94,6 +97,8 @@ export async function showChatroom(toNickname) {
     chatModal.querySelector(".chat__header--name").innerHTML = toNickname;
 
     loadChatLog(chatModal, `chatLog_${toNickname}`);
+    showChatList();
+    chatListOnclick();
     handleChatRoom(chatModal, toNickname);
 }
 
@@ -111,6 +116,7 @@ async function handleChatRoom(chatModal, toNickname) {
     const chatRoom = chatModal.querySelector(".chat__body--frame");
     chatRoom.scrollTop = chatRoom.scrollHeight;
 
+    // TODO: 이거 작동 안하는듯 ; 고치기
     chatModal.querySelector('.chat__body--text').onkeydown = function(e) {
         if (e.keyCode === 13) {  // enter, return
             chatModal.querySelector('.chat__controller--btn').click();

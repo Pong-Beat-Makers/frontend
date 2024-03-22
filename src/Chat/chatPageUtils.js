@@ -17,9 +17,10 @@ export function chatListOnclick() {
 }
 
 function sortChatList() {
+    const chatRoomAll = document.querySelectorAll(".chat__room");
     const chatListTime = document.querySelectorAll(".chat__room--time");
     for (let i = 0; i < chatListTime.length; i++) {
-
+        chatRoomAll[i]
     }
 }
 
@@ -32,6 +33,8 @@ export function showChatList() {
             chatRoomList.innerHTML += routes["/chat"].chatRoomTemplate(
                 key.slice(8),  // name : key에서 chatLog_ 뒤부터 끝까지
                 getLastObj(key).msg, getLastObj(key).time);
+            if (getLastObj(key).isRead === false)
+                document.querySelector(".chat__room--no-alert").classList.replace("chat__room--no-alert", "chat__room--alert");
         }
     }
     if (chatRoomList.innerHTML === "")
