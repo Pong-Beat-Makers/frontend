@@ -2,7 +2,6 @@ import { routes } from "../route.js";
 import { chatSocket, setFriendStatus } from "../Login/loginUtils.js";
 import { showChatList, chatListOnclick } from "./chatPageUtils.js";
 import Player from "../Login/player.js";
-import { modalRender } from "../Profile/modalUtils.js";
 
 function saveNewMsg(chatId, newMsgObj) {
     let chatLog = localStorage.getItem(chatId);
@@ -15,8 +14,12 @@ function saveNewMsg(chatId, newMsgObj) {
     localStorage.setItem(chatId, JSON.stringify(chatLog));
 }
 
-function updateChatLog(newMsgObj) {
+async function updateChatLog(newMsgObj, fromNickname) {
     try {
+        const chatNickname = document.querySelector(".chat__header--name");
+        if (fromNickname !== Player._nickName && fromNickname !== chatNickname.innerText)
+            throw new Error(`Not right room`);
+
         const chatFrame = document.querySelector(".chat__body--frame");
         chatFrame.innerHTML += routes["/chat"].chatBoxTemplate(
             `message_${newMsgObj.from}`, newMsgObj.msg, newMsgObj.time);
@@ -24,6 +27,21 @@ function updateChatLog(newMsgObj) {
         chatFrame.scrollTop = chatFrame.scrollHeight;
     }
     catch {
+        // 채팅방 밖에 있는 경우 or 다른 채팅방에 있는 경우 알림띄움 !
+        if (fromNickname === Player._nickName)
+            return ;
+
+        await Notification.requestPermission(function (result) {
+            if (result === "denied")
+                alert('알림이 차단된 상태입니다. 브라우저 설정에서 알림을 허용해주세요!');
+        });
+
+        // TODO: 알림 기능 체크, 아이콘 등록
+        const noti = new Notification(fromNickname, {
+            body: newMsgObj.msg,
+            // icon: `/lib/img/novalogo_copy.png`,
+        });
+        setTimeout( function() { noti.close(); }, 3000);
     }
 }
 
@@ -48,18 +66,17 @@ function chatAlert() {
 
     const closeBtn = modalContainer.querySelector(".chat__alert--close");
     closeBtn.onclick = () => {
-
     }
 }
 
-export function initChatSocket() {
+export async function initChatSocket() {
     chatSocket.onopen = function (e) {
         chatSocket.send(JSON.stringify({
             'token' : Player._token,
         }));
     };
 
-    chatSocket.onmessage = function(e) {
+    chatSocket.onmessage = async function(e) {
         const data = JSON.parse(e.data);
 
         // 첫 로그인 성공 시
@@ -81,18 +98,6 @@ export function initChatSocket() {
         } else {
             chatSide = "you";
             chatId = fromNickname;
-            Notification.requestPermission( function (result) {
-                if (result === "denied")
-                    alert('알림이 차단된 상태입니다. 브라우저 설정에서 알림을 허용해주세요!');
-            });
-
-            // TODO: 알림 띄우기
-            const noti = new Notification(fromNickname, {
-                body: data.message,
-                // icon: `/lib/img/novalogo_copy.png`,
-            });
-            setTimeout( function() { noti.close(); }, 3000);
-            // modalRender('chatAlert', routes["/chat"].alertTemplate(data.from, data.message, data.time));
         }
 
         const newMsgObj = {
@@ -101,7 +106,7 @@ export function initChatSocket() {
             time: data.time,
             isRead: false
         };
-        updateChatLog(newMsgObj);
+        await updateChatLog(newMsgObj, fromNickname);
         saveNewMsg(`chatLog_${chatId}`, newMsgObj);
         updateChatList();
     };

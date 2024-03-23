@@ -34,7 +34,7 @@ export function showChatList() {
                 key.slice(8),  // name : key에서 chatLog_ 뒤부터 끝까지
                 getLastObj(key).msg, getLastObj(key).time);
             if (getLastObj(key).isRead === false)
-                document.querySelector(".chat__room--no-alert").classList.replace("chat__room--no-alert", "chat__room--alert");
+                document.querySelectorAll(".chat__room--no-alert")[i].classList.replace("chat__room--no-alert", "chat__room--alert");
         }
     }
     if (chatRoomList.innerHTML === "")
