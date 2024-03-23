@@ -1,17 +1,20 @@
 class LoginSuccess {
-    friendBoxTemplate() {
-        return `
-            <div class="profile-section__friends--item">
-                <div class="profile-section__friends--profile">
-                    <div class="profile-section__friends--pic"></div>
-                    <div class="profile-section__friends--name">friend</div>
-                </div>
-                <div class="profile-section__friends--status">
-                    <div class="profile-section__friends--status--text">online</div>
-                    <div></div>
-                </div>
+    friendBoxTemplate(nickname, status = true) {
+        let template = `
+            <div class="profile-section__friends--profile">
+                <div class="profile-section__friends--pic"></div>
+                <div class="profile-section__friends--name">${nickname}</div>
             </div>
         `;
+        if (status) {
+            template += `
+            <div class="profile-section__friends--status">
+                <div class="profile-section__friends--status--text">offline</div>
+                <div></div>
+            </div>
+            `;
+        }
+        return template;
     }
 
 	template() {
@@ -33,7 +36,12 @@ class LoginSuccess {
                     <div class="profile-section__profile--avatar"></div>
                     <div class="profile-section__profile--info">
                         <div>advice_message</div>
-                        <div>nickname</div>
+                        <div>
+                            <div>nickname</div>
+                            <div>
+                                <i class="bi bi-pencil-square"></i>
+                            </div>
+                        </div>
                         <div>status_message here</div>
                     </div>
                 </div>

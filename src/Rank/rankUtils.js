@@ -59,15 +59,17 @@ async function rankerOnclick(app) {
 
     for (let i = 0; i < rankStage.length; i++) {
         rankStage[i].onclick = async () => {
-            const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
-            await showProfileDetail(detailProfileModal, stageName[i].getAttribute('name'));
+            // const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
+            // await showProfileDetail(detailProfileModal, stageName[i].getAttribute('name'));
+            await friendModalClick(stageName[i].getAttribute('name'));
         };
     }
 
     for (let i = 0; i < rankerList.length; i++) {
         rankerList[i].onclick = async () => {
-            const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
-            await showProfileDetail(detailProfileModal, rankerName[i]);            
+            // const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
+            // await showProfileDetail(detailProfileModal, rankerName[i]);
+            await friendModalClick(rankerName[i]);
         };
     }
 }

@@ -2,13 +2,16 @@ import { BACKEND, USER_SERVER_DOMAIN, GAME_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN
 import LoginSuccess from "./loginSuccessTemplate.js";
 import Login from "./loginTemplate.js";
 import ProfileModal from "../Profile/profileModalTemplate.js";
-import {USER_STATUS} from "./player.js";
-import changeUrl from "../route.js";
+import player, {USER_STATUS} from "./player.js";
+import changeUrl, {routes} from "../route.js";
 import {initChatSocket} from "../Chat/chatSocketUtils.js";
 import {handleLoginBtn, handleNaviClick} from "../Public/clickUtils.js";
-import {handleEditUserModalUtils, handleFriendModalUtils, modalRender, setAvatar} from "../Profile/modalUtils.js";
+import {handleEditUserModalUtils, handleFriendItemUtils, modalRender, setAvatar} from "../Profile/modalUtils.js";
 import Player from "./player.js";
 import { showChatroom } from "../Chat/chatRoomUtils.js";
+
+export const loginSuccessTemplate = LoginSuccess;
+export const profileModalTemplate = ProfileModal;
 
 export async function socialLogin(site) {
     const response = await fetch(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/accounts/${site}/login/`, {
@@ -21,44 +24,62 @@ export async function socialLogin(site) {
     window.location.href = data.login_url;
 }
 
+export function setFriendItem(friendListElement, friendData, status = true) {
+    const itemContainer = document.createElement('div');
+    itemContainer.classList.add('profile-section__friends--item');
+    itemContainer.id = friendData.id;
+
+    itemContainer.innerHTML = loginSuccessTemplate.friendBoxTemplate(friendData.nickname, status);
+    const avatarNode = itemContainer.querySelector('.profile-section__friends--pic');
+
+    setAvatar(friendData.profile, avatarNode);
+
+    friendListElement.appendChild(itemContainer);
+
+    itemContainer.addEventListener('click', async () => {
+        await handleFriendItemUtils(friendData.id);
+    });
+}
+
 export async function setFriendList(app) {
     // make friends elements
     const friendList = await Player.getFriendList();
     const friendListElement = app.querySelector(".profile-section__friends--list");
     friendListElement.innerHTML = "";
-    for (let i = 0; i < friendList.length; i++) {
-        friendListElement.innerHTML += LoginSuccess.friendBoxTemplate();
-    }
-    if (friendListElement.innerHTML === "") {
+
+    if (friendList.length > 0) {
+        friendList.forEach(friendData => {
+            setFriendItem(friendListElement, friendData);
+        });
+    } else {
         friendListElement.innerHTML = `<div class="profile-section__friends--msg">
         Let's play the game
         <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         & make new friends 🤝</div>`;
-        return ;
     }
 
-    const friendsAll = app.querySelectorAll(".profile-section__friends--item");
-    const friendsName = app.querySelectorAll(".profile-section__friends--name");
-    const frinedsPic = app.querySelectorAll(".profile-section__friends--pic");
-    const friendsStat = app.querySelectorAll(".profile-section__friends--status");
-    const friendsStatText = app.querySelectorAll(".profile-section__friends--status--text");
-    let isOnline = 1;
-    for (let i = 0; i < friendList.length; i++) {
-        friendsAll[i].id = 'friends-list-' + friendList[i][0]; // user id 기준으로 id 지정
-        friendsName[i].innerHTML = friendList[i][1]; // 닉네임 설정
-        frinedsPic[i].innerHTML = ""; // TODO: update profile pic by friendList[i][1];
-        if (isOnline === "online") {
-            friendsStat[i].classList.add("online");
-            friendsStatText[i].innerHTML = "online";
-        } else {
-            friendsStat[i].classList.add("offline");
-            friendsStatText[i].innerHTML = "offline";
-        }
-        friendsAll[i].onclick = async () => {
-            const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
-            await showProfileDetail(detailProfileModal, friendList[i][1]);
-        }
-    }
+    // const friendsAll = app.querySelectorAll(".profile-section__friends--item");
+    // const friendsName = app.querySelectorAll(".profile-section__friends--name");
+    // const frinedsPic = app.querySelectorAll(".profile-section__friends--pic");
+    // const friendsStat = app.querySelectorAll(".profile-section__friends--status");
+    // const friendsStatText = app.querySelectorAll(".profile-section__friends--status--text");
+    // let isOnline = 1;
+    // for (let i = 0; i < friendList.length; i++) {
+    //     friendsAll[i].id = 'friends-list-' + friendList[i][0]; // user id 기준으로 id 지정
+    //     friendsName[i].innerHTML = friendList[i][1]; // 닉네임 설정
+    //     frinedsPic[i].innerHTML = ""; // TODO: update profile pic by friendList[i][1];
+    //     if (isOnline === "online") {
+    //         friendsStat[i].classList.add("online");
+    //         friendsStatText[i].innerHTML = "online";
+    //     } else {
+    //         friendsStat[i].classList.add("offline");
+    //         friendsStatText[i].innerHTML = "offline";
+    //     }
+    //     friendsAll[i].onclick = async () => {
+    //         const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
+    //         await showProfileDetail(detailProfileModal, friendList[i][1]);
+    //     }
+    // }
 }
 
 export async function setFriendStatus(friend, status) {
@@ -83,29 +104,16 @@ export async function setFriendStatus(friend, status) {
 async function handleProfileSearch(modal, input) {
     const profileSearchResult = modal.querySelector(".profile__result--list");
     profileSearchResult.innerHTML = "";
-    if (input == "")
+    if (input === "")
         return ;
-    const res = await fetch(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/profile/search/?keyword=${input}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${Player._token}`,
-        },
-    });
-    if (!res.ok)
-        throw new Error(`Error : ${res.status}`);
+    const data = await player.searchUser(input);
 
-    const data = await res.json();
-    for (let i = 0; i < data.length; i++) {
-        //TODO: avatar 추가하기
-        profileSearchResult.innerHTML += ProfileModal.profileSearchResultTemplate(data[i].nickname);
-    }
-
-    const profileItems = modal.querySelectorAll(".profile-section__friends--item");
-    for (let i = 0; i < profileItems.length; i++) {
-        profileItems[i].onclick = async () => {
-            const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
-            await showProfileDetail(detailProfileModal, data[i].nickname);
-        }
+    if (data.error === undefined) {
+        data.forEach(user => {
+            setFriendItem(profileSearchResult, user, false);
+        });
+    } else {
+        // TODO: error modal
     }
 }
 
@@ -182,8 +190,14 @@ async function handleProfileBtns (modal, obj) {
     }
 }
 
+async function setProfileByNickname(divNode, nickname) {
+    const data = await player.getUserDetail(nickname);
+    console.log(data);
+    // setAvatar(playerProfile, divNode);
+}
+
 async function setMatchHistory(modal, nickname) {
-    const res = await fetch(`${GAME_SERVER_DOMAIN}/${GAME_API_DOMAIN}/history/?nickname=${nickname}`, {
+    const res = await fetch(`${GAME_SERVER_DOMAIN}/${GAME_API_DOMAIN}/game-data/history/?nickname=${nickname}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${Player._token}`,
@@ -192,9 +206,8 @@ async function setMatchHistory(modal, nickname) {
     if (!res.ok)
         throw new Error(`Error : ${res.status}`);
 
-    const data = await res.json();
-    const obj = JSON.parse(data);
-    console.dir(obj);
+    const data = await res.json()
+
 /*
 {
     "id": "< 게임 데이터 id>",
@@ -208,7 +221,7 @@ async function setMatchHistory(modal, nickname) {
 }
 */
     const matchHistoryList = modal.querySelector(".friend-modal__history-list");
-    for (let i = 0; i < obj.length; i++) {
+    for (let i = 0; i < data.length; i++) {
         matchHistoryList.innerHTML += ProfileModal.matchHistoryTemplate();
     }
 
@@ -217,26 +230,27 @@ async function setMatchHistory(modal, nickname) {
     const partnerPic = modal.querySelectorAll(".match-your-avatar");
     const score = modal.querySelectorAll(".history-item__score");
     const stat = modal.querySelectorAll(".history-item__status");
-    for (let i = 0; i < obj.length; i++) {
-        date[i].innerHTML = obj[i].created_at; // TODO: 파싱 필요할지도
-        myPic[i].innerHTML = "";
-        partnerPic[i].innerHTML = ""; // TODO: 다시 fetch 해야 하는 거 아님 ? ㅠㅠ ..
-        score[i].innerHTML = `Score ${obj[i].user1_score} : ${obj[i].user2_score}`;
-        if (obj[i].user1_score > obj[i].user2_score)
+    for (let i = 0; i < data.length; i++) {
+        const create_at =  new Date(data[i].created_at);
+        date[i].innerHTML = `${create_at.getFullYear()}/${create_at.getMonth()}/${create_at.getDate()}`
+        setProfileByNickname(myPic[i], data[i].user1_nickname);
+        setProfileByNickname(partnerPic[i], data[i].user2_nickname);
+        score[i].innerHTML = `Score ${data[i].user1_score} : ${data[i].user2_score}`;
+        if (data[i].user1_score > data[i].user2_score)
             stat[i].innerHTML = "Win";
-        else if (obj[i].user1_score == obj[i].user2_score)
+        else if (data[i].user1_score == data[i].user2_score)
             stat[i].innerHTML = "Draw";
         else
             stat[i].innerHTML = "Lose";
     }
 }
 
-export function handleAddFriendBtn() {
-    const addFriendModal = modalRender('add-friend', ProfileModal.profileSearchTemplate())
+export async function handleAddFriendBtn() {
+    const addFriendModal = modalRender('add-friend', profileModalTemplate.profileSearchTemplate())
 
     const profileSearchInput = addFriendModal.querySelector(".profile__search input");
-    handleProfileSearch(addFriendModal, profileSearchInput.value);
-    profileSearchInput.oninput = () => { handleProfileSearch(addFriendModal, profileSearchInput.value); };
+    await handleProfileSearch(addFriendModal, profileSearchInput.value);
+    profileSearchInput.oninput = async () => { await handleProfileSearch(addFriendModal, profileSearchInput.value); };
 }
 
 export function changeTo2FAPage(loginUser) {
@@ -323,9 +337,8 @@ export function setProfileSection(app, player) {
     } else {
         infoNode[0].innerHTML = "";
     }
-    infoNode[1].innerHTML = player.getNickName();
+    infoNode[1].children[0].innerHTML = player.getNickName();
     infoNode[2].innerHTML = player.getStatusMessage();
 
     handleEditUserModalUtils(app);
-    handleFriendModalUtils(app);
 }

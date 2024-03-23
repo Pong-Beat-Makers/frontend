@@ -4,7 +4,13 @@ import {
     openBoardModal,
     openErrorModal,
     setupConnectPeopleAtMatchingModal,
-    changeGiveUpToEnd, renderEndStatus, setupActiveReadyBtn, setInfoMessageAtModal
+    changeGiveUpToEnd,
+    renderEndStatus,
+    setupActiveReadyBtn,
+    setInfoMessageAtModal,
+    getInfoPlayerList,
+    generateGuest,
+    orderPlayers
 } from "./gameUtils.js";
 import GameApp from "./gameApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
@@ -51,18 +57,18 @@ class SocketApp {
 
         const waitSocket = new WebSocket(`${GAME_WEBSOCKET}/ws/game/waitingroom/${gameTypeUrl}/`);
 
-        waitSocket.addEventListener('message', e => {
+        waitSocket.addEventListener('message', async e => {
             const data = JSON.parse(e.data);
 
             if (data.room_id !== undefined) {
-                openBoardModal(this, gameType, data.user_nicknames);
+                let userList= await getInfoPlayerList(data.user_nicknames);
+                userList = orderPlayers(data.player, userList);
+
+                openBoardModal(this, gameType, userList);
                 if (gameType !== GAME_TYPE.TWO_PLAYER) {
                     this._boardContainer.querySelector('.modal__ready-btn').remove();
                 }
-                if (data.player === 2) {
-                    data.user_nicknames = data.user_nicknames.reverse();
-                }
-                this._enterGameRoom(data.room_id, gameType, data.user_nicknames);
+                this._enterGameRoom(data.room_id, gameType, userList, data.player);
             } else if (data.type === "send_waiting_number") {
                 setupConnectPeopleAtMatchingModal(this._matchingContainer, data.waiting_number);
             }
@@ -88,17 +94,17 @@ class SocketApp {
     }
 
     localPlay() {
-        const userNickname = [player.getNickName(), 'GUEST'];
+        const userList = [player.getInfo(), generateGuest()];
 
-        openBoardModal(this, GAME_TYPE.TWO_PLAYER, userNickname);
-        this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.TWO_PLAYER, userNickname);
+        openBoardModal(this, GAME_TYPE.TWO_PLAYER, userList);
+        this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.TWO_PLAYER, userList);
     }
 
-    _enterGameRoom(room_id, gameType, playerNames) {
+    _enterGameRoom(room_id, gameType, userList, tournamentPlayerNumber) {
         const gameSocket = new WebSocket(`${GAME_WEBSOCKET}/ws/game/${room_id}/`);
         console.log(`enter the room id: ${room_id}`);
 
-        gameSocket.addEventListener('message', e => {
+        gameSocket.addEventListener('message', async e => {
             const data = JSON.parse(e.data);
 
             if (data.type === 'send_system_message') {
@@ -106,7 +112,7 @@ class SocketApp {
                     if (5 < data.counter) {
                         setInfoMessageAtModal(this._boardContainer, data.counter - 5);
                     } else if (data.counter === 5) {
-                        openPlayGameModal(this, gameType, playerNames);
+                        openPlayGameModal(this, gameType, userList);
                         this._gameApp = new GameApp(this._gameCanvas, gameType);
                         this._gameApp.setPlayer(data.player);
 
@@ -119,7 +125,7 @@ class SocketApp {
                     }
                 } else if (data.message === 'Game Start') {
                     if (gameType === GAME_TYPE.TWO_PLAYER) {
-                        openPlayGameModal(this, gameType, [player.getNickName(), 'GUEST']);
+                        openPlayGameModal(this, gameType, userList);
                         changeGiveUpToEnd(this._gameContiner);
                         this._gameApp = new GameApp(this._gameCanvas, gameType);
                         this._gameApp.setPlayer(2);

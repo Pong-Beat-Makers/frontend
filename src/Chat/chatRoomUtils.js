@@ -1,10 +1,9 @@
 import { FRONTEND, CHAT_API_DOMAIN, CHAT_SERVER_DOMAIN } from "../Public/global.js";
 import { routes } from "../route.js";
 import { chatSocket } from "../Login/loginUtils.js";
-import {modalRender} from "../Profile/modalUtils.js";
+import {friendModalClick, modalRender} from "../Profile/modalUtils.js";
 import Player from "../Login/player.js";
 import ProfileModal from "../Profile/profileModalTemplate.js";
-import {showProfileDetail} from "../Login/loginUtils.js"
 import { showChatList, chatListOnclick } from "./chatPageUtils.js";
 
 function loadChatLog(chatModal, chatId) {
@@ -109,8 +108,9 @@ export async function showChatroom(toNickname) {
 async function handleChatRoom(chatModal, toNickname) {
     const targetProfile = chatModal.querySelector(".chat__header--profile");
     targetProfile.onclick = async () => {
-        const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
-        await showProfileDetail(detailProfileModal, toNickname);
+        // const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
+        // await showProfileDetail(detailProfileModal, toNickname);
+        await friendModalClick(toNickname);
     }
 
     const chatHeaderBtns = chatModal.querySelectorAll(".chat__header--btn");

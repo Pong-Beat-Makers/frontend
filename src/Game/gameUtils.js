@@ -1,17 +1,49 @@
 import { routes } from "../route.js";
-import {modalRender} from "../Profile/modalUtils.js";
+import {modalRender, setAvatar} from "../Profile/modalUtils.js";
 import SocketApp from "./SocketApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
 import {player} from "../app.js";
+import {PROFILE_DEFAULT_IMAGE} from "../Login/player.js";
 
-export function openPlayGameModal(socketApp, gameType, playerNames) {
+export function generateGuest() {
+    let profileIdx = Math.floor(Math.random() * PROFILE_DEFAULT_IMAGE.length);
+    if (PROFILE_DEFAULT_IMAGE[profileIdx] === player.getProfile()) {
+        profileIdx = (profileIdx + 1) % PROFILE_DEFAULT_IMAGE.length;
+    }
+    return {
+        'profile': PROFILE_DEFAULT_IMAGE[profileIdx],
+        'nickname': 'GUEST'
+    };
+}
+
+export async function getInfoPlayerList(playerNames) {
+    let players = [];
+    for (const playerName of playerNames) {
+        const data = await player.getUserDetail(playerName);
+        players.push(data);
+    }
+    return players;
+}
+
+export function orderPlayers(playerNumber, players) {
+    if (playerNumber === 2) {
+        [players[0], players[1]] = [players[1], players[0]];
+    } else if (playerNumber === 3) {
+        [players[0], players[1], players[2], players[3]] = [players[2], players[3], players[0], players[1]];
+    } else if (playerNumber === 4) {
+        [players[0], players[1], players[2], players[3]] = [players[3], players[2], players[0], players[1]];
+    }
+    return players;
+}
+
+export function openPlayGameModal(socketApp, gameType, players) {
     const modalContainer = modalRender('play-game', routes['/game'].playGameTemplate(), false);
 
     modalContainer.querySelector('.playgame__btn').addEventListener('click', () => {
         socketApp.gameClose();
         modalContainer.remove();
     });
-    setupNameAtModal(modalContainer, gameType, playerNames);
+    setupInfoAtModal(modalContainer, gameType, players);
 
     socketApp.setGameContainer(modalContainer);
     socketApp.setGameCanvas(modalContainer.querySelector('#game_playground'));
@@ -30,7 +62,7 @@ export function openMatchingModal(gameType) {
     socketApp.setMatchingContainer(modalContainer);
 }
 
-export function openBoardModal(socketApp, gameType, playerNames) {
+export function openBoardModal(socketApp, gameType, players) {
     let modalName;
     let modalHtml;
 
@@ -56,8 +88,8 @@ export function openBoardModal(socketApp, gameType, playerNames) {
         });
     }
 
-    setupNameAtModal(modalContainer, gameType, playerNames);
     socketApp.setBoardContainer(modalContainer);
+    setupInfoAtModal(modalContainer, gameType, players, gameType !== GAME_TYPE.TOURNAMENT);
 }
 
 export function closeMatchingModal(matchingContainer, socketApp) {
@@ -65,19 +97,20 @@ export function closeMatchingModal(matchingContainer, socketApp) {
     matchingContainer.remove();
 }
 
-export function setupNameAtModal(container, gameType, playerNames) {
-    if (Array.isArray(playerNames)) {
-        const insertNameContainer = container.querySelectorAll('.insert-playerName');
+export function setupInfoAtModal(container, gameType, players, setName = true) {
+    const avatarNodes = container.querySelectorAll('.insert-playerAvatar');
+    const nameNodes = container.querySelectorAll('.insert-playerName');
 
-        if (insertNameContainer.length > 0) {
-            if (playerNames[0] !== undefined) {
-                insertNameContainer[0].innerHTML = playerNames[0];
-            }
-            if (playerNames[1] !== undefined) {
-                insertNameContainer[1].innerHTML = playerNames[1];
+    players.forEach((playerData, i) => {
+        const {profile, nickname} = playerData;
+
+        if (avatarNodes[i] !== undefined) {
+            setAvatar(profile, avatarNodes[i]);
+            if (setName) {
+                nameNodes[i].innerHTML = nickname;
             }
         }
-    }
+    });
 }
 
 export function setupConnectPeopleAtMatchingModal(container, playerNumber) {
@@ -150,6 +183,7 @@ export function renderEndStatus(gameContainer, gamePlayer, score, gameType) {
             status = 'YOU <span class="game-modal__lose">LOSE..</span>';
         } else if (gamePlayer === 2 && score[0] > score[1]) {
             status = 'YOU <span class="game-modal__lose">LOSE..</span>';
+            [score[0], score[1]] = [score[1], score[0]];
         }
     }
 

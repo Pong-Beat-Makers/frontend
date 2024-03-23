@@ -2,11 +2,18 @@ import {changeTo2FAPage, getInfoJWT} from "./loginUtils.js";
 import { BACKEND, USER_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN } from "../Public/global.js";
 
 export const PROFILE_DEFAULT_IMAGE = ['cat', 'bird', 'crocodile', 'deer', 'whale'];
+const USER_MANAGEMENT = `${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}`;
 
 export const USER_STATUS = {
     "DOSE_NOT_EXIST": 0,
     "NOT_AUTHORIZED": 1,
     "AUTHORIZED": 2
+}
+
+export const DOING = {
+    "ADD": 0,
+    "UPDATE": 1,
+    "DELETE": 2,
 }
 
 class Player {
@@ -21,7 +28,7 @@ class Player {
         this._id = user_id;
         this._nickName = nickname;
 
-        const res = await this._getServer(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/profile/?friend=${nickname}`);
+        const res = await this._getServer(`${USER_MANAGEMENT}/profile/?id=${user_id}`);
         if (res.status === 200) {
             this._status = USER_STATUS.AUTHORIZED;
 
@@ -46,7 +53,7 @@ class Player {
     }
 
     async send2FACode(code) {
-        const { status } = await this._getServer(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/accounts/email_verification/?verification_code=${code}`);
+        const { status } = await this._getServer(`${USER_MANAGEMENT}/accounts/email_verification/?verification_code=${code}`);
         if (status === 200) {
             this._status = USER_STATUS.AUTHORIZED;
         }
@@ -55,19 +62,17 @@ class Player {
 
     async getFriendList() {
         this._friendList = [];
-        const res = await this._getServer(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/friends/`);
+        const res = await this._getServer(`${USER_MANAGEMENT}/friends/`);
         if (res.status === 200) {
             const data = await res.json();
-            for (let i = 0; i < data.length; i++) {
-                // TODO: data 형식 확인 필요 !!
-                this._friendList.push([data[i].pk, data[i].nickname, data[i].profile]);
-            }
+            data.forEach(friend => this._friendList.push(friend));
         }
+        // friendList 형식 : [{id: <int>, nickname: <string>, profile: <string>,]
         return this._friendList;
     }
 
     async setProfile(data) {
-        const { status } = await this._getServer(`${BACKEND}/${USER_MANAGEMENT_DOMAIN}/profile/`, 'PATCH', data);
+        const { status } = await this._getServer(`${USER_MANAGEMENT}/profile/`, 'PATCH', data);
 
         if (status === 200) {
             this._profile = data.profile_to;
@@ -76,6 +81,47 @@ class Player {
             return true;
         }
         return false;
+    }
+
+    async getUserDetail(id) {
+        const res = await this._getServer(`${USER_MANAGEMENT}/profile/?id=${id}`);
+
+        /* DetailData: {
+            nickname: <string>,
+            profile: <string>,
+            status_message: <string>,
+            win: <int>,
+            lose: <int>,
+            rank: <int>,
+            is_friend: <boolean>
+        } */
+        if (res.status === 200) {
+            return await res.json();
+        } else {
+            return {'error': res.status};
+        }
+    }
+
+    async friend(id, doing = DOING.ADD) {
+        const data = JSON.stringify({'id': id});
+        const method = doing === DOING.ADD? 'POST' : 'DELETE';
+
+        const { status } = await this._getServer(`${USER_MANAGEMENT}/friends/`, method, data);
+
+        return status === 200;
+    }
+
+    async searchUser(keyword) {
+        const data = await this._getServer(`${USER_MANAGEMENT}/profile/search/?keyword=${keyword}`);
+
+        if (data.status === 200) {
+            /*
+            * [{id: <int>, nickname: <string>, profile: <string>}]
+            */
+            return await data.json();
+        } else {
+            return {error: data.status};
+        }
     }
 
     async _getServer(url, method = 'GET', bodyData) {
@@ -87,7 +133,7 @@ class Player {
         }
         if (bodyData) {
             sendData.body = JSON.stringify(bodyData);
-            sendData.headers['content-type'] = 'application/json';
+            sendData.headers['Content-Type'] = 'application/json';
         }
         return await fetch(url, sendData);
     }
@@ -119,6 +165,19 @@ class Player {
     }
     getStatus() {
         return this._status;
+    }
+    getInfo() {
+        return {
+            id: this._id,
+            nickname: this._nickName,
+            profile: this._profile,
+            status_message: this._status_message,
+            win: this._win,
+            lose: this._lose,
+            rank: this._rank,
+            set_2fa: this._set_2fa,
+            status: this._status
+        };
     }
 }
 
