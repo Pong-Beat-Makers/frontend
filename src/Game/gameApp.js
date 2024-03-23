@@ -260,7 +260,11 @@ class PlayGameApp {
 
     render() {
         this._renderer.render(this._scene, this._camera);
-        requestAnimationFrame(this.render.bind(this));
+        this._animationFrame = requestAnimationFrame(this.render.bind(this));
+    }
+
+    cancelRender() {
+        cancelAnimationFrame(this._animationFrame);
     }
 
     renderBall(x, y, z) {

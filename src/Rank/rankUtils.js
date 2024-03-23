@@ -2,9 +2,6 @@ import { routes } from "../route.js";
 import { friendModalClick } from "../Profile/modalUtils.js";
 import { USER_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN } from "../Public/global.js";
 import Player from "../Login/player.js";
-import { showProfileDetail } from "../Login/loginUtils.js";
-import {modalRender} from "../Profile/modalUtils.js";
-import ProfileModal from "../Profile/profileModalTemplate.js";
 
 export async function setRankPage(app) {
     const res = await fetch(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/profile/ranker/`, {
@@ -30,7 +27,8 @@ export async function setRankPage(app) {
 "profile": ""
 }}
 */
-    // TODO: rankerStage profile 등록 -> background image ! 
+    // TODO: rankerStage profile 등록 -> background image !
+    // TODO: USER SERVER 에서 nickname -> id 변경 필수
     if (rankerNumber >= 2)
         rankerStage.innerHTML += routes["/rank"].rankerStageTemplate("silver", data[1].nickname);
     if (rankerNumber >= 1)

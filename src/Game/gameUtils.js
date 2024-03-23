@@ -5,21 +5,35 @@ import { GAME_TYPE } from "./gameTemplate.js";
 import {player} from "../app.js";
 import {PROFILE_DEFAULT_IMAGE} from "../Login/player.js";
 
-export function generateGuest() {
+export function generateGuest(guestName = 'GUEST', avoidList = []) {
     let profileIdx = Math.floor(Math.random() * PROFILE_DEFAULT_IMAGE.length);
-    if (PROFILE_DEFAULT_IMAGE[profileIdx] === player.getProfile()) {
-        profileIdx = (profileIdx + 1) % PROFILE_DEFAULT_IMAGE.length;
+    const avoidIdx = avoidList.map(item => PROFILE_DEFAULT_IMAGE.indexOf(item));
+
+    for (let i = 0; i < PROFILE_DEFAULT_IMAGE.length; ++i) {
+        if (avoidIdx.includes(profileIdx)) {
+            profileIdx = (profileIdx + 1) % PROFILE_DEFAULT_IMAGE.length;
+        }
     }
+
     return {
         'profile': PROFILE_DEFAULT_IMAGE[profileIdx],
-        'nickname': 'GUEST'
+        'nickname': guestName
     };
 }
 
-export async function getInfoPlayerList(playerNames) {
+export async function getInfoPlayerList(playerIds) {
     let players = [];
-    for (const playerName of playerNames) {
-        const data = await player.getUserDetail(playerName);
+    for (const playerId of playerIds) {
+        let data;
+        try {
+            data = await player.getUserDetail(playerId);
+        } catch (e) {
+            // TODO: alert user server status
+            let avoidAvatar = [];
+            data = generateGuest('player', avoidAvatar);
+            avoidAvatar.push(data.profile);
+        }
+
         players.push(data);
     }
     return players;
@@ -42,6 +56,7 @@ export function openPlayGameModal(socketApp, gameType, players) {
     modalContainer.querySelector('.playgame__btn').addEventListener('click', () => {
         socketApp.gameClose();
         modalContainer.remove();
+        socketApp.cancelRenderGameApp();
     });
     setupInfoAtModal(modalContainer, gameType, players);
 

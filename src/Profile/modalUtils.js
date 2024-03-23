@@ -9,30 +9,15 @@ export function toggleAddAndDeleteBtn(btnNode, id, doing) {
     const buttonMsg = ['<i class="bi bi-person-plus"></i> add', '<i class="bi bi-person-plus"></i> delete'];
 
     btnNode.innerHTML = doing === DOING.ADD? buttonMsg[0]:buttonMsg[1];
-    if (doing === DOING.ADD) {
+    try {
         btnNode.onclick = async () => {
-            const result = await player.friend(id, doing);
+            await player.friend(id, doing);
 
-            if (result) {
-                btnNode.innerHTML = buttonMsg[1];
-                toggleAddAndDeleteBtn(btnNode, id, DOING.DELETE);
-            } else {
-                btnNode.innerHTML = buttonMsg[0];
-                toggleAddAndDeleteBtn(btnNode, id, DOING.ADD);
-            }
+            btnNode.innerHTML = buttonMsg[1];
+            toggleAddAndDeleteBtn(btnNode, id, doing === DOING.ADD? DOING.DELETE : DOING.ADD);
         }
-    } else {
-        btnNode.onclick = async () => {
-            const result = await player.friend(id, doing);
-
-            if (result) {
-                btnNode.innerHTML = buttonMsg[1];
-                toggleAddAndDeleteBtn(btnNode, id, DOING.ADD);
-            } else {
-                btnNode.innerHTML = buttonMsg[0];
-                toggleAddAndDeleteBtn(btnNode, id, DOING.DELETE);
-            }
-        }
+    } catch (e) {
+        // TODO: error modal
     }
 }
 
@@ -53,12 +38,12 @@ export function  modalRender(modalName, htmlCode, backgroundClick = true) {
     return modalContainer;
 }
 
-export async function friendModalClick(id) {
-    const data = await player.getUserDetail(id);
-    const modalContainer = modalRender("friend-profile", profileModalTemplate.friendModalTemplate());
-    modalContainer.querySelector('.friend-modal__container').id = id;
+export async function friendModalClick(id, chatApp) {
+    try {
+        const data = await player.getUserDetail(id);
+        const modalContainer = modalRender("friend-profile", profileModalTemplate.friendModalTemplate());
+        modalContainer.querySelector('.friend-modal__container').id = id;
 
-    if (data.error === undefined) {
         const {
             nickname: name,
             profile,
@@ -87,11 +72,11 @@ export async function friendModalClick(id) {
             profileBtns.forEach(btn => btn.remove());
         } else {
             profileBtns[0].onclick = () => {
-                showChatroom(id);
+                showChatroom(chatApp, data);
             }
             toggleAddAndDeleteBtn(profileBtns[1], id, is_friend ? DOING.DELETE : DOING.ADD);
         }
-    } else {
+    } catch (e) {
         // TODO: error modal
     }
 }
@@ -142,7 +127,7 @@ export function handleEditUserModalUtils(app) {
     const editBtn = profileBtn.querySelector('.profile-section__profile--info > div:nth-child(2) div:last-child');
 
     avatar.addEventListener('click', async () => {
-        await friendModalClick(player.getId(), true);
+        await friendModalClick(player.getId());
     });
 
     editBtn.addEventListener('click', () => {
@@ -211,7 +196,7 @@ export function handleEditUserModalUtils(app) {
             });
         });
 
-        modalContainer.querySelector('.profile-modal__save-btn').addEventListener('click', e =>  {
+        modalContainer.querySelector('.profile-modal__save-btn').addEventListener('click', async () =>  {
             const data = {
                 'profile_to': getAvatarData(avatars),
                 'nickname_to': nickname.value,
@@ -219,19 +204,19 @@ export function handleEditUserModalUtils(app) {
                 'set_2fa_to': get2FAData(toggleItems)
             };
 
+            console.log(data)
             if ((player.getNickName() !== nickname.value && /User\d+$/.test(nickname.value)) || nickname.value.includes('\n')) {
                 openErrorModal(`${nickname.value} is not vaild.`);
             } else {
-                if (player.setProfile(data)) {
+                try {
+                    await player.setProfile(data);
                     location.reload();
+                } catch (e) {
+                    openErrorModal(`Something was wrong .. Error code: ${e.error}`);
                 }
             }
         });
     });
-}
-
-export async function handleFriendItemUtils(id) {
-    await friendModalClick(id);
 }
 
 export function setAvatar(playerProfile, divNode) {
@@ -240,4 +225,38 @@ export function setAvatar(playerProfile, divNode) {
     } else {
         divNode.setAttribute('data-image', playerProfile);
     }
+}
+
+export function setFriendStatus(friendItemNode, isOnline = true) {
+    const friendStatus = friendItemNode.querySelector('.profile-section__friends--status');
+    const statusText = friendStatus.children[0];
+
+    if (isOnline) {
+        statusText.innerHTML = 'online';
+        friendStatus.classList.add('online');
+    } else {
+        statusText.innerHTML = 'offline';
+        friendStatus.classList.remove('online');
+    }
+}
+
+export function findItemFromFriendList(friendListNode, friendId) {
+    const friendItems = friendListNode.querySelectorAll('.profile-section__friends--item');
+
+    for (const friendItem of friendItems) {
+        if (friendItem.id === friendId) {
+            return friendItem;
+        }
+    }
+    return undefined;
+}
+
+export function setupFriendListStatus(friendListNode, friendListData = []) {
+    const friendItems = friendListNode.querySelectorAll('.profile-section__friends--item');
+
+    friendItems.forEach(item => {
+        if (friendListData.includes(Number(item.id))) {
+            setFriendStatus(item, true);
+        }
+    });
 }
