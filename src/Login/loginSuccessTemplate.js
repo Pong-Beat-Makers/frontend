@@ -1,15 +1,20 @@
 class LoginSuccess {
-    friendBoxTemplate(nickname) {
-        return `
+    friendBoxTemplate(nickname, status = true) {
+        let template = `
             <div class="profile-section__friends--profile">
                 <div class="profile-section__friends--pic"></div>
                 <div class="profile-section__friends--name">${nickname}</div>
             </div>
+        `;
+        if (status) {
+            template += `
             <div class="profile-section__friends--status">
                 <div class="profile-section__friends--status--text">offline</div>
                 <div></div>
             </div>
-        `;
+            `;
+        }
+        return template;
     }
 
 	template() {

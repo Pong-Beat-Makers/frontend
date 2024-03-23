@@ -1,15 +1,4 @@
 class ProfileModal {
-    profileSearchResultTemplate(nickname) {
-		return `
-            <div class="profile-section__friends--item">
-                <div class="profile-section__friends--profile">
-                    <div class="profile-section__friends--pic"></div>
-                    <div class="profile-section__friends--name">${nickname}</div>
-                </div>
-            </div>
-        `;
-    }
-
     profileSearchTemplate() {
         return `
         <div class="modal__container modal-name__friend-profile">
