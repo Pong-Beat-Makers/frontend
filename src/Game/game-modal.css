@@ -49,6 +49,7 @@
     height: 81px;
     background-color: #D9D9D9;
     border-radius: 50%;
+    background-size: cover;
 }
 
 .playgame__header--name {
@@ -153,6 +154,7 @@ canvas {
     width: 290px;
     height: 290px;
     border-radius: 50%;
+    background-size: cover;
 }
 
 .versus-modal__name {
@@ -255,6 +257,7 @@ canvas {
     display: flex;
     justify-content: center;
     align-items: center;
+    background-size: cover;
 }
 
 .tournament__avatar.tournament__champion {
