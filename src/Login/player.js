@@ -2,6 +2,7 @@ import {changeTo2FAPage, getInfoJWT} from "./loginUtils.js";
 import { BACKEND, USER_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN } from "../Public/global.js";
 
 export const PROFILE_DEFAULT_IMAGE = ['cat', 'bird', 'crocodile', 'deer', 'whale'];
+const USER_MANAGEMENT = `${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}`;
 
 export const USER_STATUS = {
     "DOSE_NOT_EXIST": 0,
@@ -27,7 +28,7 @@ class Player {
         this._id = user_id;
         this._nickName = nickname;
 
-        const res = await this._getServer(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/profile/?friend=${nickname}`);
+        const res = await this._getServer(`${USER_MANAGEMENT}/profile/?id=${user_id}`);
         if (res.status === 200) {
             this._status = USER_STATUS.AUTHORIZED;
 
@@ -52,7 +53,7 @@ class Player {
     }
 
     async send2FACode(code) {
-        const { status } = await this._getServer(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/accounts/email_verification/?verification_code=${code}`);
+        const { status } = await this._getServer(`${USER_MANAGEMENT}/accounts/email_verification/?verification_code=${code}`);
         if (status === 200) {
             this._status = USER_STATUS.AUTHORIZED;
         }
@@ -61,17 +62,17 @@ class Player {
 
     async getFriendList() {
         this._friendList = [];
-        const res = await this._getServer(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/friends/`);
+        const res = await this._getServer(`${USER_MANAGEMENT}/friends/`);
         if (res.status === 200) {
             const data = await res.json();
             data.forEach(friend => this._friendList.push(friend));
         }
-        // friendList 형식 : [{pk: <int>, nickname: <string>, profile: <string>,]
+        // friendList 형식 : [{id: <int>, nickname: <string>, profile: <string>,]
         return this._friendList;
     }
 
     async setProfile(data) {
-        const { status } = await this._getServer(`${BACKEND}/${USER_MANAGEMENT_DOMAIN}/profile/`, 'PATCH', data);
+        const { status } = await this._getServer(`${USER_MANAGEMENT}/profile/`, 'PATCH', data);
 
         if (status === 200) {
             this._profile = data.profile_to;
@@ -82,8 +83,8 @@ class Player {
         return false;
     }
 
-    async getUserDetail(nickname) {
-        const res = await this._getServer(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/profile/?friend=${nickname}`);
+    async getUserDetail(id) {
+        const res = await this._getServer(`${USER_MANAGEMENT}/profile/?id=${id}`);
 
         /* DetailData: {
             nickname: <string>,
@@ -101,13 +102,26 @@ class Player {
         }
     }
 
-    async friend(nickname, doing = DOING.ADD) {
-        const data = JSON.stringify({'friend': nickname});
+    async friend(id, doing = DOING.ADD) {
+        const data = JSON.stringify({'id': id});
         const method = doing === DOING.ADD? 'POST' : 'DELETE';
 
-        const { status } = await this._getServer(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/friends/`, method, data);
+        const { status } = await this._getServer(`${USER_MANAGEMENT}/friends/`, method, data);
 
         return status === 200;
+    }
+
+    async searchUser(keyword) {
+        const data = await this._getServer(`${USER_MANAGEMENT}/profile/search/?keyword=${keyword}`);
+
+        if (data.status === 200) {
+            /*
+            * [{id: <int>, nickname: <string>, profile: <string>}]
+            */
+            return await data.json();
+        } else {
+            return {error: data.status};
+        }
     }
 
     async _getServer(url, method = 'GET', bodyData) {
