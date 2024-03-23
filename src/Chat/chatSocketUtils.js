@@ -15,10 +15,10 @@ function saveNewMsg(chatId, newMsgObj) {
     localStorage.setItem(chatId, JSON.stringify(chatLog));
 }
 
-function updateChatLog(newMsgObj) {
+function updateChatLog(newMsgObj, fromNickname) {
     try {
         const chatNickname = document.querySelector(".chat__header--name");
-        if (newMsgObj.nick !== Player._nickName && newMsgObj.nick !== chatNickname.innerText)
+        if (fromNickname !== Player._nickName && fromNickname !== chatNickname.innerText)
             throw new Error(`Not right room`);
 
         const chatFrame = document.querySelector(".chat__body--frame");
@@ -29,7 +29,7 @@ function updateChatLog(newMsgObj) {
     }
     catch {
         // 채팅방 밖에 있는 경우 or 다른 채팅방에 있는 경우 알림띄움 !
-        if (newMsgObj.nick === Player._nickName)
+        if (fromNickname === Player._nickName)
             return ;
 
             // TODO: 작동안됨
@@ -39,7 +39,7 @@ function updateChatLog(newMsgObj) {
         });
 
         // TODO: 알림 기능 체크, 아이콘 등록
-        const noti = new Notification(newMsgObj.nick, {
+        const noti = new Notification(fromNickname, {
             body: newMsgObj.msg,
             // icon: `/lib/img/novalogo_copy.png`,
         });
@@ -104,13 +104,12 @@ export function initChatSocket() {
         }
 
         const newMsgObj = {
-            nick: fromNickname,
             from: chatSide,
             msg: data.message,
             time: data.time,
             isRead: false
         };
-        updateChatLog(newMsgObj);
+        updateChatLog(newMsgObj, fromNickname);
         saveNewMsg(`chatLog_${chatId}`, newMsgObj);
         updateChatList();
     };
