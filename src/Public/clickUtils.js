@@ -20,26 +20,22 @@ function handleLogoutBtn(event) {
 
 export function handleNaviClick(app) {
     const headerElements = app.querySelectorAll(".main-section__list--item");
-    const logoutBtn = app.querySelector(".header__logout--btn");
     headerElements[0].onclick = () => {
         changeUrl("/home");
         // handleHomeModal();
-        headerElements[0].classList.add("active");
     }
     headerElements[1].onclick = () => {
         changeUrl("/chat");
         setChatPage();
-        headerElements[1].classList.add("active");
     }
     headerElements[2].onclick = () => {
         changeUrl("/game");
-        headerElements[2].classList.add("active");
         handleGameModal();
     }
     headerElements[3].onclick = () => {
         changeUrl("/rank");
-        headerElements[3].classList.add("active");
         setRankPage(app);
     }
+    const logoutBtn = app.querySelector(".header__logout--btn");
     logoutBtn.onclick = handleLogoutBtn;
 }

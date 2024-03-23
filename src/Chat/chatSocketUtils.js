@@ -2,7 +2,6 @@ import { routes } from "../route.js";
 import { chatSocket, setFriendStatus } from "../Login/loginUtils.js";
 import { showChatList, chatListOnclick } from "./chatPageUtils.js";
 import Player from "../Login/player.js";
-import { modalRender } from "../Profile/modalUtils.js";
 
 function saveNewMsg(chatId, newMsgObj) {
     let chatLog = localStorage.getItem(chatId);
@@ -15,7 +14,7 @@ function saveNewMsg(chatId, newMsgObj) {
     localStorage.setItem(chatId, JSON.stringify(chatLog));
 }
 
-function updateChatLog(newMsgObj, fromNickname) {
+async function updateChatLog(newMsgObj, fromNickname) {
     try {
         const chatNickname = document.querySelector(".chat__header--name");
         if (fromNickname !== Player._nickName && fromNickname !== chatNickname.innerText)
@@ -32,8 +31,7 @@ function updateChatLog(newMsgObj, fromNickname) {
         if (fromNickname === Player._nickName)
             return ;
 
-            // TODO: 작동안됨
-        Notification.requestPermission( function (result) {
+        await Notification.requestPermission(function (result) {
             if (result === "denied")
                 alert('알림이 차단된 상태입니다. 브라우저 설정에서 알림을 허용해주세요!');
         });
@@ -44,7 +42,6 @@ function updateChatLog(newMsgObj, fromNickname) {
             // icon: `/lib/img/novalogo_copy.png`,
         });
         setTimeout( function() { noti.close(); }, 3000);
-        // modalRender('chatAlert', routes["/chat"].alertTemplate(data.from, data.message, data.time));
     }
 }
 
@@ -72,14 +69,14 @@ function chatAlert() {
     }
 }
 
-export function initChatSocket() {
+export async function initChatSocket() {
     chatSocket.onopen = function (e) {
         chatSocket.send(JSON.stringify({
             'token' : Player._token,
         }));
     };
 
-    chatSocket.onmessage = function(e) {
+    chatSocket.onmessage = async function(e) {
         const data = JSON.parse(e.data);
 
         // 첫 로그인 성공 시
@@ -109,7 +106,7 @@ export function initChatSocket() {
             time: data.time,
             isRead: false
         };
-        updateChatLog(newMsgObj, fromNickname);
+        await updateChatLog(newMsgObj, fromNickname);
         saveNewMsg(`chatLog_${chatId}`, newMsgObj);
         updateChatList();
     };
