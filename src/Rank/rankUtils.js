@@ -16,17 +16,13 @@ export async function setRankPage(app) {
     if (!res.ok)
         throw new Error(`Error : ${res.status}`);
 
-    const obj = await res.json();
-    const data = obj.results;
+    const data = await res.json();
     const rankerNumber = data.length;
     const rankerStage = app.querySelector(".rank__stage");
     const rankerList = app.querySelector(".rank__list--friends");
 
 /*
 {{
-"nickname": "User2",
-"profile": ""
-}, {
 "nickname": "User2",
 "profile": ""
 }, {

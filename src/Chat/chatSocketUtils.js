@@ -17,6 +17,10 @@ function saveNewMsg(chatId, newMsgObj) {
 
 function updateChatLog(newMsgObj) {
     try {
+        const chatNickname = document.querySelector(".chat__header--name");
+        if (newMsgObj.nick !== Player._nickName && newMsgObj.nick !== chatNickname.innerText)
+            throw new Error(`Not right room`);
+
         const chatFrame = document.querySelector(".chat__body--frame");
         chatFrame.innerHTML += routes["/chat"].chatBoxTemplate(
             `message_${newMsgObj.from}`, newMsgObj.msg, newMsgObj.time);
@@ -24,6 +28,23 @@ function updateChatLog(newMsgObj) {
         chatFrame.scrollTop = chatFrame.scrollHeight;
     }
     catch {
+        // 채팅방 밖에 있는 경우 or 다른 채팅방에 있는 경우 알림띄움 !
+        if (newMsgObj.nick === Player._nickName)
+            return ;
+
+            // TODO: 작동안됨
+        Notification.requestPermission( function (result) {
+            if (result === "denied")
+                alert('알림이 차단된 상태입니다. 브라우저 설정에서 알림을 허용해주세요!');
+        });
+
+        // TODO: 알림 기능 체크, 아이콘 등록
+        const noti = new Notification(newMsgObj.nick, {
+            body: newMsgObj.msg,
+            // icon: `/lib/img/novalogo_copy.png`,
+        });
+        setTimeout( function() { noti.close(); }, 3000);
+        // modalRender('chatAlert', routes["/chat"].alertTemplate(data.from, data.message, data.time));
     }
 }
 
@@ -48,7 +69,6 @@ function chatAlert() {
 
     const closeBtn = modalContainer.querySelector(".chat__alert--close");
     closeBtn.onclick = () => {
-
     }
 }
 
@@ -81,21 +101,10 @@ export function initChatSocket() {
         } else {
             chatSide = "you";
             chatId = fromNickname;
-            Notification.requestPermission( function (result) {
-                if (result === "denied")
-                    alert('알림이 차단된 상태입니다. 브라우저 설정에서 알림을 허용해주세요!');
-            });
-
-            // TODO: 알림 띄우기
-            const noti = new Notification(fromNickname, {
-                body: data.message,
-                // icon: `/lib/img/novalogo_copy.png`,
-            });
-            setTimeout( function() { noti.close(); }, 3000);
-            // modalRender('chatAlert', routes["/chat"].alertTemplate(data.from, data.message, data.time));
         }
 
         const newMsgObj = {
+            nick: fromNickname,
             from: chatSide,
             msg: data.message,
             time: data.time,
