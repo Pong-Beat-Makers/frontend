@@ -1,7 +1,7 @@
 import { FRONTEND, CHAT_API_DOMAIN, CHAT_SERVER_DOMAIN } from "../Public/global.js";
 import { routes } from "../route.js";
 import { chatSocket } from "../Login/loginUtils.js";
-import {friendModalClick, modalRender} from "../Profile/modalUtils.js";
+import {friendModalClick, modalRender, setAvatar} from "../Profile/modalUtils.js";
 import Player from "../Login/player.js";
 import ProfileModal from "../Profile/profileModalTemplate.js";
 import { showChatList, chatListOnclick } from "./chatPageUtils.js";
@@ -27,7 +27,7 @@ function handleInvite(chatModal) {
     const roomAddress = `${FRONTEND}/game/${crypto.randomUUID()}`;
 
     chatSocket.send(JSON.stringify({
-        'target_nickname' : targetNickname,
+        'target_id' : targetNickname,
         'message': `${Player._nickName} invited you to a game!\n
         ${roomAddress}`
     }));
@@ -39,7 +39,7 @@ async function handleBlockToggle(chatModal) {
     const targetNickname = chatModal.querySelector(".chat__header--name").innerHTML;
     const blockToggleBtn = chatModal.querySelectorAll(".chat__header--btn")[1];
     const blockIcon = `<i class="bi bi-person-slash"></i>`;
-    
+
     let methodSelected;
 
     if (blockToggleBtn.classList.contains("block")) {
@@ -47,7 +47,7 @@ async function handleBlockToggle(chatModal) {
         blockToggleBtn.innerHTML = `${blockIcon} Unblock`;
         methodSelected = 'POST';
         chatSocket.send(JSON.stringify({
-            'target_nickname' : targetNickname,
+            'target_id' : targetNickname,
             'message': `${targetNickname} is now blocked by ${Player._nickName} ❤️`
         }));
     }
@@ -63,21 +63,20 @@ async function handleBlockToggle(chatModal) {
                 'Authorization': `Bearer ${Player._token}`,
             },
             body: JSON.stringify({
-                'target_nickname' : targetNickname,
+                'target_id' : targetNickname,
         })
     };
-    
+
     const res = await fetch(`${CHAT_SERVER_DOMAIN}/${CHAT_API_DOMAIN}/blockedusers/`, data);
     if (!res.ok)
         throw new Error(`Error : ${res.status}`);
 }
 
-export async function showChatroom(toNickname) {
+export async function showChatroom(toID) {
     const chatModal = modalRender("chat", routes["/chat"].modalTemplate());
 
     const blockIcon = `<i class="bi bi-person-slash"></i>`;
-
-    const response = await fetch(`${CHAT_SERVER_DOMAIN}/${CHAT_API_DOMAIN}/blockedusers/?target_nickname=${toNickname}`, {
+    const response = await fetch(`${CHAT_SERVER_DOMAIN}/${CHAT_API_DOMAIN}/blockedusers/?target_id=${toID}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${Player._token}`,
@@ -85,7 +84,7 @@ export async function showChatroom(toNickname) {
     });
     if (!response.ok)
         throw new Error(`Error : ${response.status}`);
-    
+
     const data = await response.json();
     if (data.is_blocked === true) {
         const blockToggleBtn = chatModal.querySelectorAll(".chat__header--btn")[1];
@@ -93,10 +92,14 @@ export async function showChatroom(toNickname) {
         blockToggleBtn.classList.replace("block", "unblock");
     };
 
-    chatModal.querySelector(".chat__header--name").innerHTML = toNickname;
+    const data2 = await Player.getUserDetail(toID);
+    const toNickname = data2.nickname;
 
-    loadChatLog(chatModal, `chatLog_${toNickname}`);
-    handleChatRoom(chatModal, toNickname);
+    chatModal.querySelector(".chat__header--name").innerHTML = toNickname;
+    setAvatar(data2.profile, chatModal.querySelector(".chat__header--avatar"));
+
+    loadChatLog(chatModal, `chatLog_${toID}`);
+    handleChatRoom(chatModal, toID);
     try {
         showChatList();
         chatListOnclick();
@@ -105,12 +108,12 @@ export async function showChatroom(toNickname) {
     }
 }
 
-async function handleChatRoom(chatModal, toNickname) {
+async function handleChatRoom(chatModal, toId) {
     const targetProfile = chatModal.querySelector(".chat__header--profile");
     targetProfile.onclick = async () => {
         // const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
         // await showProfileDetail(detailProfileModal, toNickname);
-        await friendModalClick(toNickname);
+        await friendModalClick(toId);
     }
 
     const chatHeaderBtns = chatModal.querySelectorAll(".chat__header--btn");
@@ -129,10 +132,10 @@ async function handleChatRoom(chatModal, toNickname) {
 
     chatModal.querySelector('.chat__send--btn').onclick = function(e) {
         const messageInputDom = chatModal.querySelector('.chat__body--text');
-        const targetNickname = chatModal.querySelector('.chat__header--name').innerHTML;
+        const targetId = toId;
         const message = messageInputDom.value;
         const obj = {
-            'target_nickname' : targetNickname,
+            'target_id' : targetId,
             'message': message
         };
         chatSocket.send(JSON.stringify(obj));
