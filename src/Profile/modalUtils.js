@@ -244,7 +244,7 @@ export function findItemFromFriendList(friendListNode, friendId) {
     const friendItems = friendListNode.querySelectorAll('.profile-section__friends--item');
 
     for (const friendItem of friendItems) {
-        if (friendItem.id === friendId) {
+        if (Number(friendItem.id) === friendId) {
             return friendItem;
         }
     }

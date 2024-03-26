@@ -31,13 +31,17 @@ class ChatApp {
             const data = JSON.parse(e.data);
 
             if (data.message === 'You have successfully logged') {
-                const onlineFriendIds = data.online_friends.map(info => info[0]);
+                const onlineFriendIds = data.online_friends;
 
                 setupFriendListStatus(this._friendListNode, onlineFriendIds);
             } else if (data.type === 'send_status') {
                 const friendItem = findItemFromFriendList(this._friendListNode, data.from_id);
                 if (friendItem !== undefined) {
-                    setFriendStatus(friendItem, true);
+                    if (data.status === 'online'){
+                        setFriendStatus(friendItem, true);
+                    } else if (data.status === 'offline') {
+                        setFriendStatus(friendItem, false);
+                    }
                 }
             } else if (data.type === 'chat_message'){
                 // TODO: chatting data from말고 to도 받아야 할 듯 ..
