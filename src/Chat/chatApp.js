@@ -5,6 +5,7 @@ import {
     setFriendStatus,
     setupFriendListStatus
 } from "../Profile/modalUtils.js";
+import {renderSystemChatBox} from "./chatPageUtils.js";
 import {processMessage} from "./chatSocketUtils.js";
 import {SOCKET_STATE} from "../Game/SocketApp.js";
 
@@ -14,6 +15,7 @@ class ChatApp {
     constructor(app) {
         this._app = app;
         this._friendListNode = app.querySelector('.profile-section__friends--list');
+        this._friendsOnline = [];
 
         const chatSocket = new WebSocket(`${CHAT_WEBSOCKET}/ws/chatting/`);
         this._chatSocket = chatSocket;
@@ -31,9 +33,9 @@ class ChatApp {
             const data = JSON.parse(e.data);
 
             if (data.message === 'You have successfully logged') {
-                const onlineFriendIds = data.online_friends;
+                this._friendsOnline = data.online_friends;
 
-                setupFriendListStatus(this._friendListNode, onlineFriendIds);
+                setupFriendListStatus(this._friendListNode, this._friendsOnline);
             } else if (data.type === 'send_status') {
                 const friendItem = findItemFromFriendList(this._friendListNode, data.from_id);
                 if (friendItem !== undefined) {
@@ -43,24 +45,30 @@ class ChatApp {
                         setFriendStatus(friendItem, false);
                     }
                 }
-            } else if (data.type === 'chat_message'){
-                // TODO: chatting data from말고 to도 받아야 할 듯 ..
+            } else if (data.type === 'chat_message') {
                 /*
                 * {
                 *   type: "chat_message",
                 *   from: <string>,
                 *   from_id: <int>,
+                *   to_id: <int>,
                 *   message: <string>,
                 *   time: <string>
                 * }
                 * */
+                await processMessage(this, app, data);
+            } else if (data.type === 'system_message') {
                 if (data.error === 'No User or Offline') {
                     // TODO: offline message
+                    renderSystemChatBox(this._app, 'Offline User', data.from_id);
                 }
-                await processMessage(this, app, data);
             }
         }
 
+    }
+
+    setFriendsOnline(friendListNode = this._friendListNode) {
+        setupFriendListStatus(friendListNode, this._friendsOnline);
     }
 
     async userBlock(id, isBlocked) {

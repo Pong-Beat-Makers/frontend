@@ -3,9 +3,9 @@ import {DOING, PROFILE_DEFAULT_IMAGE} from '../Login/player.js';
 import {player} from "../app.js";
 import {openErrorModal} from "../Game/gameUtils.js";
 import {showChatroom} from "../Chat/chatRoomUtils.js";
-import {profileModalTemplate} from "../Login/loginUtils.js";
+import {profileModalTemplate, setFriendList} from "../Login/loginUtils.js";
 
-export function toggleAddAndDeleteBtn(btnNode, id, doing) {
+export function toggleAddAndDeleteBtn(chatApp, btnNode, id, doing) {
     const buttonMsg = ['<i class="bi bi-person-plus"></i> add', '<i class="bi bi-person-plus"></i> delete'];
 
     btnNode.innerHTML = doing === DOING.ADD? buttonMsg[0]:buttonMsg[1];
@@ -14,7 +14,9 @@ export function toggleAddAndDeleteBtn(btnNode, id, doing) {
             await player.friend(id, doing);
 
             btnNode.innerHTML = buttonMsg[1];
-            toggleAddAndDeleteBtn(btnNode, id, doing === DOING.ADD? DOING.DELETE : DOING.ADD);
+            toggleAddAndDeleteBtn(chatApp, btnNode, id, doing === DOING.ADD? DOING.DELETE : DOING.ADD);
+            await setFriendList(chatApp);
+            chatApp.setFriendsOnline();
         }
     } catch (e) {
         // TODO: error modal
@@ -74,7 +76,7 @@ export async function friendModalClick(id, chatApp) {
             profileBtns[0].onclick = () => {
                 showChatroom(chatApp, data);
             }
-            toggleAddAndDeleteBtn(profileBtns[1], id, is_friend ? DOING.DELETE : DOING.ADD);
+            toggleAddAndDeleteBtn(chatApp, profileBtns[1], id, is_friend ? DOING.DELETE : DOING.ADD);
         }
     } catch (e) {
         // TODO: error modal

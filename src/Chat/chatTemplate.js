@@ -1,9 +1,15 @@
 class Chat {
-    chatBoxTemplate(type, message, time) {
+    chatBoxTemplate(message, time) {
         return `
-            <div class="chatbox ${type}">
-                <div class="chatbox__message">${message}</div>
-                <div class="chatbox__info">${time}</div>
+            <div class="chatbox__message">${message}</div>
+            <div class="chatbox__info">${time}</div>
+        `;
+    }
+
+    systemChatBoxTemplate(message) {
+        return `
+            <div class="chatbox__system">
+                ${ message }            
             </div>
         `;
     }

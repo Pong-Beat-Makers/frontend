@@ -29,6 +29,13 @@ export async function socialLogin(site) {
 }
 
 export function setFriendItem(chatApp, friendListElement, friendData, status = true) {
+    /*
+    * friendData : {
+    *   id: <int>,
+    *   nickname: <string>,
+    *   profile: <string>
+    * }
+    * */
     const itemContainer = document.createElement('div');
     itemContainer.classList.add('profile-section__friends--item');
     itemContainer.id = friendData.id;
@@ -68,25 +75,6 @@ export async function setFriendList(chatApp) {
         friendListElement.innerHTML = `<div class="profile-section__friends--msg">
         User Server is wrong 🥲 ..</div>`;
     }
-}
-
-export async function setFriendStatus(friend, status) {
-    // const app = document.querySelector(".profile-section__friends--list");
-    let id = friend[0]
-    let nickname = friend[1]
-    const targetFriendItem = document.getElementById('friends-list-' + id);
-    // TODO: check error
-    const targetFriendStatus = targetFriendItem.querySelector(".profile-section__friends--status");
-    const targetFriendText = targetFriendItem.querySelector(".profile-section__friends--status--text");
-    if (status === 'online') {
-        targetFriendStatus.classList.replace("offline", status);
-    } else if (status === 'offline') {
-        targetFriendStatus.classList.replace("online", status);
-    }
-    let friendName = document.querySelector(`#friends-list-${id} .profile-section__friends--name`);
-    friendName.innerHTML = nickname;
-
-    targetFriendText.innerHTML = status;
 }
 
 async function handleProfileSearch(modal, input, chatApp) {

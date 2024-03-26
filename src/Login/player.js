@@ -107,7 +107,7 @@ class Player {
 
         const { status } = await this._getServer(`${USER_MANAGEMENT}/friends/`, method, {id: id});
 
-        if (status !== 200) {
+        if (status < 200 || 300 <= status) {
             throw {error: status};
         }
     }
