@@ -215,7 +215,6 @@ export async function renderMainPage(player) {
 
         changeUrl("/home"); // TODO: location url check (window.location.pathname)
         app.querySelectorAll(".main-section__list--item")[0].classList.add("active");
-        // handleHomeModal();
 
         const chatApp = new ChatApp(app);
 

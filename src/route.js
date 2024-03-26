@@ -4,7 +4,6 @@ import Game from "./Game/gameTemplate.js";
 import Rank from "./Rank/rankTemplate.js";
 import Login from "./Login/loginTemplate.js";
 import { setChatPage } from "./Chat/chatPageUtils.js";
-import { handleHomeModal } from "./Home/homeUtils.js";
 import { handleGameModal } from "./Game/gameUtils.js";
 import { setRankPage } from "./Rank/rankUtils.js";
 
@@ -40,7 +39,6 @@ window.addEventListener("popstate", () => {
     changeUrl(previousUrl, false);
 
     if (previousUrl === "/home")
-        // handleHomeModal();
         ;
     else if (previousUrl === "/chat")
         setChatPage();

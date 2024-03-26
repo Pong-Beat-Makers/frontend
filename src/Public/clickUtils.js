@@ -1,7 +1,6 @@
 import changeUrl from "../route.js";
 import { socialLogin } from "../Login/loginUtils.js";
 import { setChatPage } from "../Chat/chatPageUtils.js";
-import { handleHomeModal } from "../Home/homeUtils.js";
 import { handleGameModal } from "../Game/gameUtils.js";
 import { setRankPage } from "../Rank/rankUtils.js";
 import { deleteCookie } from "./cookieUtils.js";
@@ -22,7 +21,6 @@ export function handleNaviClick(chatApp) {
     const headerElements = chatApp.getApp().querySelectorAll(".main-section__list--item");
     headerElements[0].onclick = () => {
         changeUrl("/home");
-        // handleHomeModal();
     }
     headerElements[1].onclick = async () => {
         changeUrl("/chat");
