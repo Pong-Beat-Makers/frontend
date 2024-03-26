@@ -1,6 +1,6 @@
 import {renderMainPage} from "./Login/loginUtils.js";
-import Player, {USER_STATUS} from "./Login/player.js";
-import {getCookie} from '../src/Public/cookieUtils.js';
+import Player from "./Login/player.js";
+import {getCookie} from './Public/cookieUtils.js';
 
 export const player = Player;
 
@@ -9,11 +9,9 @@ const app = async () => {
 
     if (token) {
         await player.whoAmI(token);
-        await player.getFriendList();
-
-        renderMainPage(player);
+        await renderMainPage(player);
     } else {
-        renderMainPage();
+        await renderMainPage();
     }
 }
 

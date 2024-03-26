@@ -1,17 +1,38 @@
 import { routes } from "../route.js";
-import { chatSocket, setFriendStatus } from "../Login/loginUtils.js";
-import { showChatList, chatListOnclick } from "./chatPageUtils.js";
+import { setFriendStatus } from "../Login/loginUtils.js";
+import {showChatList, chatListOnclick, renderChatBox, CHATLOG_PREFIX} from "./chatPageUtils.js";
 import Player from "../Login/player.js";
+import {player} from "../app.js";
 
-function saveNewMsg(chatId, newMsgObj) {
-    let chatLog = localStorage.getItem(chatId);
-    if (chatLog) {
-        chatLog = JSON.parse(chatLog);
-    } else {
-        chatLog = [];
+export function saveNewMsg(newMsgObj) {
+    /*
+    * newMsgObj: {
+    *   from: <string>,
+    *   from_id: <int>,
+    *   message: <string>,
+    *   time: <string>,
+    *   isRead: <boolean>
+    * }
+    * */
+    if (newMsgObj !== undefined && player.getId() !== newMsgObj.from_id) {
+        const localStorageLog = localStorage.getItem(CHATLOG_PREFIX + newMsgObj.from_id);
+        let chatLog = localStorageLog ? JSON.parse(localStorageLog) : [];
+
+        if (chatLog.length > 0) {
+            // TODO: 저장 기준 다시 생각해봐야함 ..
+            chatLog.forEach(log => log.isRead = true);
+            const lastDate = new Date('2000-01-01T' + chatLog[chatLog.length - 1].time + ':00');
+            const currDate = new Date('2000-01-01T' + newMsgObj.time + ':00');
+
+            if (lastDate < currDate) {
+                chatLog.push(newMsgObj);
+            }
+        } else {
+            chatLog.push(newMsgObj);
+        }
+
+        localStorage.setItem(CHATLOG_PREFIX + newMsgObj.from_id, JSON.stringify(chatLog));
     }
-    chatLog.push(newMsgObj);
-    localStorage.setItem(chatId, JSON.stringify(chatLog));
 }
 
 async function updateChatLog(newMsgObj, fromNickname) {
@@ -48,7 +69,6 @@ async function updateChatLog(newMsgObj, fromNickname) {
 function updateChatList() {
     try {
         showChatList();
-        chatListOnclick();
     }
     catch {
         // 챗페이지 밖에 있을 경우 여기서 잡힘 => navi bar에 점 추가 후 누르면 점 없애기 ? ㅠㅠ ㅇㅇ
@@ -124,4 +144,44 @@ function initFriendsStatus(onlineFriendsList) {
 
 function updateFriendStatus(updatedFriend, status) {
     setFriendStatus(updatedFriend, status);
+}
+
+export async function processMessage(chatApp, app, messageData) {
+    /*
+    * messageData: {
+    *   type: "chat_message",
+    *   from: <string>,
+    *   from_id: <int>,
+    *   message: <string>,
+    *   time: <string>
+    * }
+    * */
+    const chatContainers = app.querySelectorAll('.chat__container');
+    let isRender = false;
+
+    chatContainers.forEach(container => {
+        if (player.getId() === messageData.from_id || Number(container.id) === messageData.from_id) {
+            // TODO: message render
+            renderChatBox(container, messageData);
+            isRender = true;
+        }
+    });
+    if (!isRender) {
+        // TODO: message alert
+        await Notification.requestPermission(function (result) {
+            if (result === "denied")
+                alert('알림이 차단된 상태입니다. 브라우저 설정에서 알림을 허용해주세요!');
+        });
+
+        messageData.isRead = false;
+        saveNewMsg(messageData);
+        await showChatList(chatApp);
+
+        // TODO: 알림 기능 체크, 아이콘 등록
+        const noti = new Notification(messageData.from, {
+            body: messageData.message,
+            // icon: `/lib/img/novalogo_copy.png`,
+        });
+        setTimeout( function() { noti.close(); }, 3000);
+    }
 }

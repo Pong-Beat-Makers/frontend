@@ -1,5 +1,5 @@
-import {changeTo2FAPage, getInfoJWT} from "./loginUtils.js";
-import { BACKEND, USER_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN } from "../Public/global.js";
+import {getInfoJWT} from "./loginUtils.js";
+import { USER_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN } from "../Public/global.js";
 
 export const PROFILE_DEFAULT_IMAGE = ['cat', 'bird', 'crocodile', 'deer', 'whale'];
 const USER_MANAGEMENT = `${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}`;
@@ -24,15 +24,15 @@ class Player {
     async whoAmI(token) {
         this._token = token;
 
-        const { user_id, nickname } = getInfoJWT(this._token);
+        const { user_id } = getInfoJWT(this._token);
         this._id = user_id;
-        this._nickName = nickname;
 
         const res = await this._getServer(`${USER_MANAGEMENT}/profile/?id=${user_id}`);
         if (res.status === 200) {
             this._status = USER_STATUS.AUTHORIZED;
 
             const {
+                nickname,
                 profile,
                 status_message,
                 win,
@@ -41,6 +41,7 @@ class Player {
                 set_2fa
             } = await res.json();
 
+            this._nickName = nickname;
             this._profile = profile;
             this._status_message = status_message;
             this._win = win;
@@ -54,33 +55,33 @@ class Player {
 
     async send2FACode(code) {
         const { status } = await this._getServer(`${USER_MANAGEMENT}/accounts/email_verification/?verification_code=${code}`);
-        if (status === 200) {
-            this._status = USER_STATUS.AUTHORIZED;
+        if (status !== 200) {
+            throw {error: status};
         }
-        return status;
+        this._status = USER_STATUS.AUTHORIZED;
     }
 
     async getFriendList() {
         this._friendList = [];
         const res = await this._getServer(`${USER_MANAGEMENT}/friends/`);
-        if (res.status === 200) {
-            const data = await res.json();
-            data.forEach(friend => this._friendList.push(friend));
+        if (res.status !== 200) {
+            throw {error: res.status};
         }
-        // friendList 형식 : [{id: <int>, nickname: <string>, profile: <string>,]
+        const data = await res.json();
+        data.forEach(friend => this._friendList.push(friend));
+        // friendList 형식 : [{id: <int>, nickname: <string>, profile: <string>},]
         return this._friendList;
     }
 
     async setProfile(data) {
         const { status } = await this._getServer(`${USER_MANAGEMENT}/profile/`, 'PATCH', data);
 
-        if (status === 200) {
-            this._profile = data.profile_to;
-            this._nickName = data.nickname_to;
-            this._status_message = data.status_message_to;
-            return true;
+        if (status !== 200) {
+            throw {error: status};
         }
-        return false;
+        this._profile = data.profile_to;
+        this._nickName = data.nickname_to;
+        this._status_message = data.status_message_to;
     }
 
     async getUserDetail(id) {
@@ -95,33 +96,41 @@ class Player {
             rank: <int>,
             is_friend: <boolean>
         } */
-        if (res.status === 200) {
-            return await res.json();
-        } else {
-            return {'error': res.status};
+        if (res.status !== 200) {
+            throw {'error': res.status};
         }
+        return await res.json();
     }
 
     async friend(id, doing = DOING.ADD) {
-        const data = JSON.stringify({'id': id});
         const method = doing === DOING.ADD? 'POST' : 'DELETE';
 
-        const { status } = await this._getServer(`${USER_MANAGEMENT}/friends/`, method, data);
+        const { status } = await this._getServer(`${USER_MANAGEMENT}/friends/`, method, {id: id});
 
-        return status === 200;
+        if (status !== 200) {
+            throw {error: status};
+        }
     }
 
     async searchUser(keyword) {
         const data = await this._getServer(`${USER_MANAGEMENT}/profile/search/?keyword=${keyword}`);
 
-        if (data.status === 200) {
+        if (data.status !== 200) {
             /*
             * [{id: <int>, nickname: <string>, profile: <string>}]
             */
-            return await data.json();
-        } else {
-            return {error: data.status};
+            throw {error: data.status};
         }
+        return await data.json();
+    }
+
+    async getRankerList() {
+        const data = await this._getServer(``);
+
+        if (data.status !== 200) {
+            throw {error: data.status};
+        }
+        return await data.json();
     }
 
     async _getServer(url, method = 'GET', bodyData) {

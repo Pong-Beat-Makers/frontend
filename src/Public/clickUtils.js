@@ -18,24 +18,24 @@ function handleLogoutBtn(event) {
     location.reload();
 }
 
-export function handleNaviClick(app) {
-    const headerElements = app.querySelectorAll(".main-section__list--item");
+export function handleNaviClick(chatApp) {
+    const headerElements = chatApp.getApp().querySelectorAll(".main-section__list--item");
     headerElements[0].onclick = () => {
         changeUrl("/home");
         // handleHomeModal();
     }
-    headerElements[1].onclick = () => {
+    headerElements[1].onclick = async () => {
         changeUrl("/chat");
-        setChatPage();
+        await setChatPage(chatApp);
     }
     headerElements[2].onclick = () => {
         changeUrl("/game");
         handleGameModal();
     }
-    headerElements[3].onclick = () => {
+    headerElements[3].onclick = async () => {
         changeUrl("/rank");
-        setRankPage(app);
+        await setRankPage(chatApp.getApp());
     }
-    const logoutBtn = app.querySelector(".header__logout--btn");
+    const logoutBtn = chatApp.getApp().querySelector(".header__logout--btn");
     logoutBtn.onclick = handleLogoutBtn;
 }

@@ -1,119 +1,128 @@
-import { FRONTEND, CHAT_API_DOMAIN, CHAT_SERVER_DOMAIN } from "../Public/global.js";
+import {FRONTEND, GAME_WEBSOCKET} from "../Public/global.js";
 import { routes } from "../route.js";
-import { chatSocket } from "../Login/loginUtils.js";
 import {friendModalClick, modalRender, setAvatar} from "../Profile/modalUtils.js";
 import Player from "../Login/player.js";
-import ProfileModal from "../Profile/profileModalTemplate.js";
-import { showChatList, chatListOnclick } from "./chatPageUtils.js";
+import {CHATLOG_PREFIX, renderChatBox, showChatList} from "./chatPageUtils.js";
 
-function loadChatLog(chatModal, chatId) {
-    const chatFrame = chatModal.querySelector(".chat__body--frame");
+export function getChatLogList() {
+    let data = [];
 
-    let chatLog = localStorage.getItem(chatId);
-    if (!chatLog)
-        return ;
-
-    chatLog = JSON.parse(chatLog);
-    for (let i = 0; i < chatLog.length; i++) {
-        chatFrame.innerHTML += routes["/chat"].chatBoxTemplate(
-            `message_${chatLog[i].from}`, chatLog[i].msg, chatLog[i].time);
-        chatLog[i].isRead = true;
+    for (let key in localStorage) {
+        if (key.startsWith(CHATLOG_PREFIX)) {
+            let log = {
+                id: key.substring(CHATLOG_PREFIX.length),
+                log: JSON.parse(localStorage.getItem(key))
+            };
+            data.push(log);
+        }
     }
-    localStorage.setItem(chatId, JSON.stringify(chatLog));
+    return data;
 }
 
-function handleInvite(chatModal) {
-    const targetNickname = chatModal.querySelector(".chat__header--name").innerHTML;
-    const roomAddress = `${FRONTEND}/game/${crypto.randomUUID()}`;
+function getChatLog(userId) {
+    /*
+    * return: [{
+    *   from: <string>,
+    *   from_id: <int>,
+    *   message: <string>,
+    *   time: <string>,
+    *   isRead: <boolean>
+    * }]
+    * */
+    const chatLog = localStorage.getItem(CHATLOG_PREFIX + userId);
 
-    chatSocket.send(JSON.stringify({
-        'target_id' : targetNickname,
-        'message': `${Player._nickName} invited you to a game!\n
-        ${roomAddress}`
-    }));
-    // 추후 식별 가능 문자열로 바꿔서 이 메시지 받으면 게임 참여하기 버튼으로 바뀌게 하기 !
-    window.location.href(roomAddress);
+    return chatLog ? JSON.parse(chatLog) : [];
 }
-
-async function handleBlockToggle(chatModal) {
-    const targetNickname = chatModal.querySelector(".chat__header--name").innerHTML;
-    const blockToggleBtn = chatModal.querySelectorAll(".chat__header--btn")[1];
-    const blockIcon = `<i class="bi bi-person-slash"></i>`;
-
-    let methodSelected;
-
-    if (blockToggleBtn.classList.contains("block")) {
-        blockToggleBtn.classList.replace("block", "unblock");
-        blockToggleBtn.innerHTML = `${blockIcon} Unblock`;
-        methodSelected = 'POST';
-        chatSocket.send(JSON.stringify({
-            'target_id' : targetNickname,
-            'message': `${targetNickname} is now blocked by ${Player._nickName} ❤️`
-        }));
-    }
-    else {
-        blockToggleBtn.innerHTML = `${blockIcon} Block`;
-        methodSelected = 'DELETE';
-    }
-
-    const data = {
-            method: methodSelected,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${Player._token}`,
-            },
-            body: JSON.stringify({
-                'target_id' : targetNickname,
-        })
-    };
-
-    const res = await fetch(`${CHAT_SERVER_DOMAIN}/${CHAT_API_DOMAIN}/blockedusers/`, data);
-    if (!res.ok)
-        throw new Error(`Error : ${res.status}`);
-}
-
-export async function showChatroom(toID) {
-    const chatModal = modalRender("chat", routes["/chat"].modalTemplate());
-
-    const blockIcon = `<i class="bi bi-person-slash"></i>`;
-    const response = await fetch(`${CHAT_SERVER_DOMAIN}/${CHAT_API_DOMAIN}/blockedusers/?target_id=${toID}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${Player._token}`,
-        },
+function loadChatLog(chatContainer, userId, chatApp) {
+    const chatLog = getChatLog(userId);
+    chatLog.forEach(log => {
+        renderChatBox(chatContainer, log, chatApp);
     });
-    if (!response.ok)
-        throw new Error(`Error : ${response.status}`);
+    // localStorage.setItem(chatId, JSON.stringify(chatLog));
+}
 
-    const data = await response.json();
-    if (data.is_blocked === true) {
-        const blockToggleBtn = chatModal.querySelectorAll(".chat__header--btn")[1];
-        blockToggleBtn.innerHTML = `${blockIcon} Unblock`;
-        blockToggleBtn.classList.replace("block", "unblock");
-    };
+function handleInvite(chatApp, userData) {
+    /*
+    * userData: {id: <string>, nickname: <string>, profile: <string>}
+    * */
+    const roomAddress = `${GAME_WEBSOCKET}/ws/game/${crypto.randomUUID()}`;
 
-    const data2 = await Player.getUserDetail(toID);
-    const toNickname = data2.nickname;
+    chatApp.sendMessage(userData.id, `<button class="chatbox__invite-btn" id="${crypto.randomUUID()}">invite</button>`);
+    // 추후 식별 가능 문자열로 바꿔서 이 메시지 받으면 게임 참여하기 버튼으로 바뀌게 하기 !
+    // window.location.href(roomAddress);
+}
 
-    chatModal.querySelector(".chat__header--name").innerHTML = toNickname;
-    setAvatar(data2.profile, chatModal.querySelector(".chat__header--avatar"));
-
-    loadChatLog(chatModal, `chatLog_${toID}`);
-    handleChatRoom(chatModal, toID);
+async function handleBlockToggle(chatApp, userData, blockToggleBtn, isBlocked) {
+    const blockIcon = `<i class="bi bi-person-slash"></i>`;
     try {
-        showChatList();
-        chatListOnclick();
-    }
-    catch {
+        await chatApp.userBlock(userData.id, isBlocked);
+
+        if (isBlocked) {
+            blockToggleBtn.innerHTML = `${blockIcon} Block`;
+        } else {
+            blockToggleBtn.innerHTML = `${blockIcon} Unblock`;
+        }
+        blockToggleBtn.onclick = () => {
+            handleBlockToggle(chatApp, userData, blockToggleBtn, !isBlocked);
+        };
+    } catch (e) {
+        // TODO: error modal
     }
 }
 
-async function handleChatRoom(chatModal, toId) {
+export async function showChatroom(chatApp, userData) {
+    /*
+    * userData: {id: <string>, nickname: <string>, profile: <string>}
+    * */
+    const chatModal = modalRender("chat", routes["/chat"].modalTemplate());
+    const chatContainer = chatModal.querySelector('.chat__container');
+    const avatar = chatContainer.querySelector('.chat__header--avatar');
+    const chatHeaderBtns = chatContainer.querySelectorAll(".chat__header--btn");
+    const sendBtn = chatContainer.querySelector('.chat__send--btn');
+    const msgInput = chatContainer.querySelector('.chat__body--text');
+
+    chatContainer.id = userData.id;
+    setAvatar(userData.profile, avatar);
+
+    const data = await chatApp.isBlocked(userData.id);
+    try {
+        const blockIcon = `<i class="bi bi-person-slash"></i>`;
+
+        if (data.is_blocked === true) {
+            chatHeaderBtns[1].innerHTML = `${blockIcon} Unblock`;
+            chatHeaderBtns[1].classList.replace("block", "unblock");
+        }
+
+        chatHeaderBtns[0].onclick = () => { handleInvite(chatApp, userData) };
+        chatHeaderBtns[1].onclick = async e => { await handleBlockToggle(chatApp, userData, e.target, data.is_blocked) };
+
+        chatModal.querySelector(".chat__header--name").innerHTML = userData.nickname;
+
+        loadChatLog(chatContainer, userData.id, chatApp);
+
+        sendBtn.addEventListener('click', e => {
+            chatApp.sendMessage(userData.id, msgInput.value);
+            msgInput.value = "";
+        });
+
+        msgInput.addEventListener('keydown', e => {
+            if (e.keyCode === 13) {
+                e.preventDefault();
+                sendBtn.click();
+            }
+        });
+        await showChatList(chatApp);
+    } catch(e) {
+        // TODO: error modal
+    }
+}
+
+async function handleChatRoom(chatModal, toNickname) {
     const targetProfile = chatModal.querySelector(".chat__header--profile");
     targetProfile.onclick = async () => {
         // const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
         // await showProfileDetail(detailProfileModal, toNickname);
-        await friendModalClick(toId);
+        await friendModalClick(toNickname);
     }
 
     const chatHeaderBtns = chatModal.querySelectorAll(".chat__header--btn");
@@ -132,10 +141,10 @@ async function handleChatRoom(chatModal, toId) {
 
     chatModal.querySelector('.chat__send--btn').onclick = function(e) {
         const messageInputDom = chatModal.querySelector('.chat__body--text');
-        const targetId = toId;
+        const targetNickname = chatModal.querySelector('.chat__header--name').innerHTML;
         const message = messageInputDom.value;
         const obj = {
-            'target_id' : targetId,
+            'target_nickname' : targetNickname,
             'message': message
         };
         chatSocket.send(JSON.stringify(obj));

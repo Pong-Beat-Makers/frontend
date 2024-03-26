@@ -88,6 +88,15 @@
     margin-bottom: 10px;
 }
 
+.chatbox__invite-btn {
+    background-color: rgb(var(--font-color));
+    padding: 15px 70px;
+    border-radius: 10px;
+    font-size: 18px;
+    color: rgb(var(--sub-color));
+    filter: drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.25));
+}
+
 .chatbox__message {
     position: relative;
     display: flex;

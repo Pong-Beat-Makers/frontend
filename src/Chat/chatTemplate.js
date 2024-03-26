@@ -10,7 +10,6 @@ class Chat {
 
     chatRoomTemplate(name, msg, time) {
         return `
-        <div class="chat__room" role="button">
             <div class="chat__empty"></div>
             <div class="chat__room--profile"></div>
             <div class="chat__room--contents">
@@ -18,10 +17,9 @@ class Chat {
                 <div class="chat__room--msg">${msg}</div>
             </div>
             <div class="chat__room--info">
-                <div class="chat__room--no-alert"></div>
+                <div class="chat__room--alert"></div>
                 <div class="chat__room--time">${time}</div>
             </div>
-        </div>
         `;
     }
 

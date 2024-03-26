@@ -14,9 +14,8 @@ import {
 } from "./gameUtils.js";
 import GameApp from "./gameApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
-import { getCookie } from '../Public/cookieUtils.js';
 import {player} from "../app.js";
-import { GAME_SERVER_DOMAIN, GAME_WEBSOCKET } from '../Public/global.js';
+import { GAME_WEBSOCKET } from '../Public/global.js';
 
 export const SOCKET_STATE = {
     CONNECTING: 0,
@@ -60,17 +59,25 @@ class SocketApp {
         waitSocket.addEventListener('message', async e => {
             const data = JSON.parse(e.data);
 
-            if (data.room_id !== undefined) {
-                let userList= await getInfoPlayerList(data.user_nicknames);
-                userList = orderPlayers(data.player, userList);
+            const {
+                type,
+                room_id,
+                player: playerNumber,
+                user_ids,
+                waiting_number
+            } = data;
+
+            if (room_id !== undefined) {
+                let userList= await getInfoPlayerList(user_ids);
+                userList = orderPlayers(playerNumber, userList);
 
                 openBoardModal(this, gameType, userList);
                 if (gameType !== GAME_TYPE.TWO_PLAYER) {
                     this._boardContainer.querySelector('.modal__ready-btn').remove();
                 }
-                this._enterGameRoom(data.room_id, gameType, userList, data.player);
-            } else if (data.type === "send_waiting_number") {
-                setupConnectPeopleAtMatchingModal(this._matchingContainer, data.waiting_number);
+                this._enterGameRoom(room_id, gameType, userList, playerNumber);
+            } else if (type === "send_waiting_number") {
+                setupConnectPeopleAtMatchingModal(this._matchingContainer, waiting_number);
             }
         });
 
@@ -94,7 +101,7 @@ class SocketApp {
     }
 
     localPlay() {
-        const userList = [player.getInfo(), generateGuest()];
+        const userList = [player.getInfo(), generateGuest('GUEST', [player.getProfile()])];
 
         openBoardModal(this, GAME_TYPE.TWO_PLAYER, userList);
         this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.TWO_PLAYER, userList);
@@ -215,6 +222,10 @@ class SocketApp {
         if (this.isGameState() === SOCKET_STATE.OPEN || this.isGameState() === SOCKET_STATE.CONNECTING) {
             this._gameSocket.close();
         }
+    }
+
+    cancelRenderGameApp() {
+        this._gameApp.cancelRender();
     }
 
     setGameContainer(gameContainer) {

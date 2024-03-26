@@ -1,14 +1,18 @@
-import { BACKEND, USER_SERVER_DOMAIN, GAME_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN, GAME_API_DOMAIN, CHAT_WEBSOCKET } from "../Public/global.js"
+import { USER_SERVER_DOMAIN, GAME_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN, GAME_API_DOMAIN, CHAT_WEBSOCKET } from "../Public/global.js"
 import LoginSuccess from "./loginSuccessTemplate.js";
 import Login from "./loginTemplate.js";
 import ProfileModal from "../Profile/profileModalTemplate.js";
 import player, {USER_STATUS} from "./player.js";
 import changeUrl, {routes} from "../route.js";
-import {initChatSocket} from "../Chat/chatSocketUtils.js";
 import {handleLoginBtn, handleNaviClick} from "../Public/clickUtils.js";
-import {handleEditUserModalUtils, handleFriendItemUtils, modalRender, setAvatar} from "../Profile/modalUtils.js";
+import {
+    friendModalClick,
+    handleEditUserModalUtils,
+    modalRender,
+    setAvatar
+} from "../Profile/modalUtils.js";
 import Player from "./player.js";
-import { showChatroom } from "../Chat/chatRoomUtils.js";
+import ChatApp from "../Chat/chatApp.js";
 
 export const loginSuccessTemplate = LoginSuccess;
 export const profileModalTemplate = ProfileModal;
@@ -24,7 +28,7 @@ export async function socialLogin(site) {
     window.location.href = data.login_url;
 }
 
-export function setFriendItem(friendListElement, friendData, status = true) {
+export function setFriendItem(chatApp, friendListElement, friendData, status = true) {
     const itemContainer = document.createElement('div');
     itemContainer.classList.add('profile-section__friends--item');
     itemContainer.id = friendData.id;
@@ -37,49 +41,33 @@ export function setFriendItem(friendListElement, friendData, status = true) {
     friendListElement.appendChild(itemContainer);
 
     itemContainer.addEventListener('click', async () => {
-        await handleFriendItemUtils(friendData.id);
+        await friendModalClick(friendData.id, chatApp);
     });
 }
 
-export async function setFriendList(app) {
+export async function setFriendList(chatApp) {
     // make friends elements
-    const friendList = await Player.getFriendList();
-    const friendListElement = app.querySelector(".profile-section__friends--list");
-    friendListElement.innerHTML = "";
+    const friendListElement = chatApp.getApp().querySelector(".profile-section__friends--list");
+    try {
+        const friendList = await Player.getFriendList();
 
-    if (friendList.length > 0) {
-        friendList.forEach(friendData => {
-            setFriendItem(friendListElement, friendData);
-        });
-    } else {
-        friendListElement.innerHTML = `<div class="profile-section__friends--msg">
+        friendListElement.innerHTML = "";
+
+        if (friendList.length > 0) {
+            friendList.forEach(friendData => {
+                setFriendItem(chatApp, friendListElement, friendData);
+            });
+        } else {
+            friendListElement.innerHTML = `<div class="profile-section__friends--msg">
         Let's play the game
         <br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         & make new friends 🤝</div>`;
+        }
+    } catch (e) {
+        console.error(e.error);
+        friendListElement.innerHTML = `<div class="profile-section__friends--msg">
+        User Server is wrong 🥲 ..</div>`;
     }
-
-    // const friendsAll = app.querySelectorAll(".profile-section__friends--item");
-    // const friendsName = app.querySelectorAll(".profile-section__friends--name");
-    // const frinedsPic = app.querySelectorAll(".profile-section__friends--pic");
-    // const friendsStat = app.querySelectorAll(".profile-section__friends--status");
-    // const friendsStatText = app.querySelectorAll(".profile-section__friends--status--text");
-    // let isOnline = 1;
-    // for (let i = 0; i < friendList.length; i++) {
-    //     friendsAll[i].id = 'friends-list-' + friendList[i][0]; // user id 기준으로 id 지정
-    //     friendsName[i].innerHTML = friendList[i][1]; // 닉네임 설정
-    //     frinedsPic[i].innerHTML = ""; // TODO: update profile pic by friendList[i][1];
-    //     if (isOnline === "online") {
-    //         friendsStat[i].classList.add("online");
-    //         friendsStatText[i].innerHTML = "online";
-    //     } else {
-    //         friendsStat[i].classList.add("offline");
-    //         friendsStatText[i].innerHTML = "offline";
-    //     }
-    //     friendsAll[i].onclick = async () => {
-    //         const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
-    //         await showProfileDetail(detailProfileModal, friendList[i][1]);
-    //     }
-    // }
 }
 
 export async function setFriendStatus(friend, status) {
@@ -101,92 +89,19 @@ export async function setFriendStatus(friend, status) {
     targetFriendText.innerHTML = status;
 }
 
-async function handleProfileSearch(modal, input) {
+async function handleProfileSearch(modal, input, chatApp) {
     const profileSearchResult = modal.querySelector(".profile__result--list");
     profileSearchResult.innerHTML = "";
     if (input === "")
         return ;
-    const data = await player.searchUser(input);
+    try {
+        const data = await player.searchUser(input);
 
-    if (data.error === undefined) {
         data.forEach(user => {
-            setFriendItem(profileSearchResult, user, false);
+            setFriendItem(chatApp, profileSearchResult, user, false);
         });
-    } else {
+    } catch (e) {
         // TODO: error modal
-    }
-}
-
-export async function showProfileDetail(modal, input) {
-    const res = await fetch(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/profile/?friend=${input}`, {
-        method: 'GET',
-        headers: {
-            // TODO: getCookie로 토큰 불러온 부분 모두 수정 ;; => player에 함수 넣기 !
-            'Authorization': `Bearer ${Player._token}`,
-        },
-    });
-    if (!res.ok)
-        throw new Error(`Error : ${res.status}`);
-
-    const data = await res.json();
-
-    // TODO: avatar 사용하는 부분 수정 필요 !
-    const nickname = modal.querySelector(".friend-modal__info--nickname");
-    // const avatar = modal.querySelector(".friend-modal__avatar");
-    const status = modal.querySelector(".friend-modal__info--status");
-    const rate = modal.querySelector(".friend-modal__game-info--rate span");
-    const rank = modal.querySelector(".friend-modal__game-info--rank span");
-
-    nickname.innerHTML = data.nickname;
-    // avatar.classList.add(data.profile);
-    status.innerHTML = data.status_message;
-    let winRate = 0;
-    if ((data.win + data.lose) !== 0)
-        winRate = data.win / (data.win + data.lose);
-    rate.innerHTML = `${winRate.toPrecision(5) * 100}%`
-    rank.innerHTML = data.rank;
-
-    await handleProfileBtns(modal, data);
-    await setMatchHistory(modal, data.nickname);
-}
-
-async function handleProfileBtns (modal, obj) {
-    const profileBtns = modal.querySelectorAll(".friend-modal__btn");
-    // profileBtns[0] = chat, [1] = add
-
-    profileBtns[0].onclick = () => {
-        // TODO: move to chat page
-        showChatroom(modal.querySelector(".friend-modal__info--nickname").innerText);
-    }
-
-    let methodSelected;
-    if (obj.is_friend == false) {
-        profileBtns[1].innerHTML = `<i class="bi bi-person-plus"></i> add`;
-        methodSelected = 'POST';
-    } else {
-        profileBtns[1].innerHTML = `<i class="bi bi-person-plus"></i> delete`;
-        methodSelected = 'DELETE';
-    }
-
-    profileBtns[1].onclick = async () => {
-        const data = {
-                method: methodSelected,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${Player._token}`,
-                },
-                body: JSON.stringify({
-                    'friend' : obj.nickname,
-                })
-        };
-        const res = await fetch(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/friends/`, data);
-        if (!res.ok)
-            throw new Error(`Error : ${res.status}`);
-        else if (methodSelected == 'POST')
-            profileBtns[1].innerHTML = `<i class="bi bi-person-plus"></i> delete`;
-        else if (methodSelected == 'DELETE')
-            profileBtns[1].innerHTML = `<i class="bi bi-person-plus"></i> add`;
-        await setFriendList(document.querySelector(".profile-section"));
     }
 }
 
@@ -245,12 +160,12 @@ async function setMatchHistory(modal, nickname) {
     }
 }
 
-export async function handleAddFriendBtn() {
+export async function handleAddFriendBtn(chatApp) {
     const addFriendModal = modalRender('add-friend', profileModalTemplate.profileSearchTemplate())
 
     const profileSearchInput = addFriendModal.querySelector(".profile__search input");
     await handleProfileSearch(addFriendModal, profileSearchInput.value);
-    profileSearchInput.oninput = async () => { await handleProfileSearch(addFriendModal, profileSearchInput.value); };
+    profileSearchInput.oninput = async () => { await handleProfileSearch(addFriendModal, profileSearchInput.value, chatApp); };
 }
 
 export function changeTo2FAPage(loginUser) {
@@ -274,9 +189,9 @@ export function changeTo2FAPage(loginUser) {
         const infoContainer = loginBody.querySelector('.login__body--info');
 
         infoContainer.innerHTML = "";
-        if (status === 200) {
+        try {
             location.reload();
-        } else if (400 <= status < 500) {
+        } catch (e) {
             infoContainer.innerHTML = "Wrong code!";
         }
   });
@@ -292,28 +207,26 @@ export function getInfoJWT(token) {
     return JSON.parse(jsonPayload);
 }
 
-export let chatSocket;
-
-export function renderMainPage(player) {
+export async function renderMainPage(player) {
     const app = document.getElementById('app');
 
     if (player !== undefined && player.getStatus() === USER_STATUS.AUTHORIZED) {
         app.innerHTML = LoginSuccess.template();
 
-        changeUrl("/home");
+        changeUrl("/home"); // TODO: location url check (window.location.pathname)
         app.querySelectorAll(".main-section__list--item")[0].classList.add("active");
         // handleHomeModal();
-        handleNaviClick(app);
+
+        const chatApp = new ChatApp(app);
+
         setProfileSection(app, player);
-        setFriendList(app);
+        handleNaviClick(chatApp);
+        await setFriendList(chatApp);
 
         const friendAddButton = app.querySelector(".profile-section__friends--button");
-        friendAddButton.onclick = handleAddFriendBtn;
-
-        chatSocket = new WebSocket(
-            `${CHAT_WEBSOCKET}/ws/chatting/`
-        );
-        initChatSocket();
+        friendAddButton.onclick = () => {
+            handleAddFriendBtn(chatApp);
+        };
     } else {
         app.innerHTML = Login.template();
         handleLoginBtn();
