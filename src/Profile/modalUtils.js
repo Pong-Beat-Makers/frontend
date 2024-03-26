@@ -5,6 +5,13 @@ import {openErrorModal} from "../Game/gameUtils.js";
 import {showChatroom} from "../Chat/chatRoomUtils.js";
 import {profileModalTemplate, setFriendList} from "../Login/loginUtils.js";
 
+
+export function decodeHtml(html) {
+    const txt = document.createElement("textarea");
+    txt.innerHTML = html;
+    return txt.value;
+}
+
 export function toggleAddAndDeleteBtn(chatApp, btnNode, id, doing) {
     const buttonMsg = ['<i class="bi bi-person-plus"></i> add', '<i class="bi bi-person-dash-fill"></i> delete'];
 
@@ -138,8 +145,11 @@ export function handleEditUserModalUtils(app) {
         const nickname = modalContainer.querySelector('.profile-modal__nickname');
         const status_message = modalContainer.querySelector('.profile-modal__status-message');
 
-        nickname.value = player.getNickName();
-        status_message.value = player.getStatusMessage();
+        nickname.value = decodeHtml(player.getNickName());
+        status_message.value = decodeHtml(player.getStatusMessage());
+
+        nickname.nextElementSibling.firstElementChild.innerHTML = nickname.value.length;
+        status_message.nextElementSibling.firstElementChild.innerHTML = status_message.value.length;
 
         modalContainer.querySelectorAll('textarea').forEach(element => {
             element.addEventListener('keyup', e => {
@@ -206,7 +216,6 @@ export function handleEditUserModalUtils(app) {
                 'set_2fa_to': get2FAData(toggleItems)
             };
 
-            console.log(data)
             if ((player.getNickName() !== nickname.value && /User\d+$/.test(nickname.value)) || nickname.value.includes('\n')) {
                 openErrorModal(`${nickname.value} is not vaild.`);
             } else {
