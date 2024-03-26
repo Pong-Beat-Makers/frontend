@@ -77,16 +77,25 @@ export async function setFriendList(chatApp) {
     }
 }
 
-async function handleProfileSearch(modal, input, chatApp) {
-    const profileSearchResult = modal.querySelector(".profile__result--list");
-    profileSearchResult.innerHTML = "";
-    if (input === "")
-        return ;
+async function handleProfileSearch(listNode, keyword, chatApp) {
+    listNode.innerHTML = "";
+
+    if (keyword === "") {
+        return;
+    }
+
     try {
-        const data = await player.searchUser(input);
+        const data = await player.searchUser(keyword);
 
         data.forEach(user => {
-            setFriendItem(chatApp, profileSearchResult, user, false);
+            const itemContainer = document.createElement('div');
+            itemContainer.classList.add('friend-item__container');
+            itemContainer.style.width = '300px';
+            itemContainer.style.marginBottom = '10px';
+
+            setFriendItem(chatApp, itemContainer, user, false);
+
+            listNode.appendChild(itemContainer);
         });
     } catch (e) {
         // TODO: error modal
@@ -151,9 +160,9 @@ async function setMatchHistory(modal, nickname) {
 export async function handleAddFriendBtn(chatApp) {
     const addFriendModal = modalRender('add-friend', profileModalTemplate.profileSearchTemplate())
 
-    const profileSearchInput = addFriendModal.querySelector(".profile__search input");
-    await handleProfileSearch(addFriendModal, profileSearchInput.value);
-    profileSearchInput.oninput = async () => { await handleProfileSearch(addFriendModal, profileSearchInput.value, chatApp); };
+    const profileSearchInput = addFriendModal.querySelector(".search-friend__body--input");
+    const profileSearchList = addFriendModal.querySelector('.search-friend__body--list');
+    profileSearchInput.onkeyup = async () => { await handleProfileSearch(profileSearchList, profileSearchInput.value, chatApp); };
 }
 
 export function changeTo2FAPage(loginUser) {

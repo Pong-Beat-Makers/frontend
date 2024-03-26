@@ -1,15 +1,12 @@
 class ProfileModal {
     profileSearchTemplate() {
         return `
-        <div class="modal__container modal-name__friend-profile">
-            <div class="modal__background"></div>
-            <div class="profile__search__modal__container">
-                <form class="profile__search">
-                    <input id="profile__search--input" type="text" placeholder="Profile Search"/>
-                    <button class="profile__search--btn">🔍</button>
-                </form>
-                <div class="profile__result--list">
-                </div>
+        <div class="modal__background"></div>
+        <div class="search-friend__container">
+            <div class="search-friend__header">Add friend</div>
+            <div class="search-friend__body">
+                <input class="search-friend__body--input" type="text" placeholder="type nickname here..."/>
+                <div class="search-friend__body--list"></div>
             </div>
         </div>
         `;

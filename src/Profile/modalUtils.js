@@ -6,7 +6,7 @@ import {showChatroom} from "../Chat/chatRoomUtils.js";
 import {profileModalTemplate, setFriendList} from "../Login/loginUtils.js";
 
 export function toggleAddAndDeleteBtn(chatApp, btnNode, id, doing) {
-    const buttonMsg = ['<i class="bi bi-person-plus"></i> add', '<i class="bi bi-person-plus"></i> delete'];
+    const buttonMsg = ['<i class="bi bi-person-plus"></i> add', '<i class="bi bi-person-dash-fill"></i> delete'];
 
     btnNode.innerHTML = doing === DOING.ADD? buttonMsg[0]:buttonMsg[1];
     try {
