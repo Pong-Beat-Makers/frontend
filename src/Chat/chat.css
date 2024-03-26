@@ -65,6 +65,7 @@ input#chat__search--input::placeholder {
     border-radius: 50%;
     background-color: #D9D9D9D9;
     margin-right: 15px;
+    background-size: cover;
 }
 
 .chat__room--contents {
@@ -97,7 +98,7 @@ input#chat__search--input::placeholder {
     margin-left: auto;
 }
 
-.chat__room--alert {
+.chat__room.chat__room--no-read .chat__room--alert {
     width: 15px;
     height: 15px;
     border-radius: 50%;
@@ -124,4 +125,13 @@ input#chat__search--input::placeholder {
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.4);
     display: none;
+}
+
+.chat__search--error {
+    width: 100%;
+    padding: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+    text-wrap: nowrap;
 }
