@@ -170,7 +170,6 @@ class Player {
     getId() {
         return this._id;
     }
-
     getNickName() {
         return this._nickName;
     }
@@ -194,6 +193,9 @@ class Player {
     }
     getStatus() {
         return this._status;
+    }
+    getChatApp() {
+        return this._chatApp;
     }
     getInfo() {
         return {
