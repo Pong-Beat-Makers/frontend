@@ -1,8 +1,9 @@
 import {getInfoJWT} from "./loginUtils.js";
-import { USER_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN } from "../Public/global.js";
+import { USER_MANAGEMENT_DOMAIN, USER_SERVER_DOMAIN, GAME_SERVER_DOMAIN, GAME_API_DOMAIN } from "../Public/global.js";
 
 export const PROFILE_DEFAULT_IMAGE = ['cat', 'bird', 'crocodile', 'deer', 'whale'];
 const USER_MANAGEMENT = `${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}`;
+const GAME_API = `${GAME_SERVER_DOMAIN}/${GAME_API_DOMAIN}`;
 
 export const USER_STATUS = {
     "DOSE_NOT_EXIST": 0,
@@ -105,10 +106,10 @@ class Player {
     async friend(id, doing = DOING.ADD) {
         const method = doing === DOING.ADD? 'POST' : 'DELETE';
 
-        const { status } = await this._getServer(`${USER_MANAGEMENT}/friends/`, method, {id: id});
+        const data = await this._getServer(`${USER_MANAGEMENT}/friends/`, method, {id: id});
 
-        if (status < 200 || 300 <= status) {
-            throw {error: status};
+        if (!data.ok) {
+            throw {error: data.status};
         }
     }
 
@@ -124,10 +125,29 @@ class Player {
         return await data.json();
     }
 
-    async getRankerList() {
-        const data = await this._getServer(``);
+    async getMatchHistoryById(userId) {
+        const data = await this._getServer(`${GAME_API}/game-data/history/?id=${userId}`);
+        /*
+        * gameHistory : {
+        *   id: <int>,
+        *   match_type: <string>,
+        *   user1_id: <int>,
+        *   user2_id: <int>,
+        *   user1_score: <int>,
+        *   user2_score: <int>,
+        *   created_at: <date>
+        * }
+        * */
+        if (!data.ok) {
+            throw {error: data.status};
+        }
+        return await data.json();
+    }
 
-        if (data.status !== 200) {
+    async getRankerList() {
+        const data = await this._getServer(`${USER_MANAGEMENT}/profile/ranker/`);
+
+        if (!data.ok) {
             throw {error: data.status};
         }
         return await data.json();

@@ -1,73 +1,69 @@
-import { routes } from "../route.js";
-import { friendModalClick } from "../Profile/modalUtils.js";
-import { USER_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN } from "../Public/global.js";
-import Player from "../Login/player.js";
+import {friendModalClick, setAvatar} from "../Profile/modalUtils.js";
+import {player} from "../app.js";
+import {setFriendItem} from "../Login/loginUtils.js";
 
-export async function setRankPage(app) {
-    const res = await fetch(`${USER_SERVER_DOMAIN}/${USER_MANAGEMENT_DOMAIN}/profile/ranker/`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${Player._token}`,
-        },
+function getStageProfile(tier, data, chatApp) {
+    const tableNode = document.createElement('div');
+    const profileNode = document.createElement('div');
+
+    tableNode.classList.add('rank__stage--table');
+    profileNode.classList.add('rank__stage--avatar', `rank__profile--${tier}`);
+
+    setAvatar(data.profile, profileNode);
+
+    profileNode.addEventListener('click', async () => {
+        await friendModalClick(data.id, chatApp);
     });
-    if (!res.ok)
-        throw new Error(`Error : ${res.status}`);
 
-    const data = await res.json();
-    const rankerNumber = data.length;
-    const rankerStage = app.querySelector(".rank__stage");
-    const rankerList = app.querySelector(".rank__list--friends");
-
-/*
-{{
-"nickname": "User2",
-"profile": ""
-}, {
-"nickname": "User2",
-"profile": ""
-}}
-*/
-    // TODO: rankerStage profile 등록 -> background image !
-    // TODO: USER SERVER 에서 nickname -> id 변경 필수
-    if (rankerNumber >= 2)
-        rankerStage.innerHTML += routes["/rank"].rankerStageTemplate("silver", data[1].nickname);
-    if (rankerNumber >= 1)
-        rankerStage.innerHTML += routes["/rank"].rankerStageTemplate("gold", data[0].nickname);
-    if (rankerNumber >= 3) {
-        rankerStage.innerHTML += routes["/rank"].rankerStageTemplate("bronze", data[2].nickname);
-
-        for (let i = 4; i <= rankerNumber; i++) {
-            rankerList.innerHTML += routes["/rank"].rankerTemplate(i, data[i].nickname);
-        }
-    }
-
-    if (rankerStage.innerHTML === "")
-        rankerStage.innerHTML = `<div class="chat__search--error">
-        No ranker presents yet. Be the first ranker!
-        </div>`
-    await rankerOnclick(app.querySelector(".main-section__main"));
+    tableNode.appendChild(profileNode);
+    return tableNode;
 }
 
-async function rankerOnclick(app) {
-    const rankStage = app.querySelectorAll(".rank__stage--table");
-    const stageName = app.querySelectorAll(".rank__stage--avatar");
+function getRankerItem(rank, data, app) {
+    const item = document.createElement('div');
+    const rankNode = document.createElement('div');
 
-    const rankerList = app.querySelectorAll(".profile-section__friends--item");
-    const rankerName = app.querySelectorAll(".profile-section__friends--name");
+    item.classList.add('rank__list--item');
+    rankNode.classList.add('rank__list--number');
 
-    for (let i = 0; i < rankStage.length; i++) {
-        rankStage[i].onclick = async () => {
-            // const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
-            // await showProfileDetail(detailProfileModal, stageName[i].getAttribute('name'));
-            await friendModalClick(stageName[i].getAttribute('name'));
-        };
-    }
+    rankNode.innerHTML = rank;
 
-    for (let i = 0; i < rankerList.length; i++) {
-        rankerList[i].onclick = async () => {
-            // const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
-            // await showProfileDetail(detailProfileModal, rankerName[i]);
-            await friendModalClick(rankerName[i]);
-        };
+    item.appendChild(rankNode);
+    setFriendItem(app, item, data, false);
+    return item;
+}
+
+export async function setRankPage(app) {
+    try {
+        const data = await player.getRankerList();
+        /*
+        * rankerList: [{
+        *   id: <int>,
+        *   nickname: <string>,
+        *   profile: <string>
+        * }]
+        * */
+        const rankerNumber = data.length;
+        const rankerStage = app.querySelector(".rank__stage");
+        const rankerList = app.querySelector(".rank__list--friends");
+
+        if (rankerNumber >= 2)
+            rankerStage.appendChild(getStageProfile('silver', data[1], app));
+        if (rankerNumber >= 1)
+            rankerStage.appendChild(getStageProfile('gold', data[0], app));
+        if (rankerNumber >= 3) {
+            rankerStage.appendChild(getStageProfile('bronze', data[2], app));
+
+            for (let i = 3; i < rankerNumber; ++i) {
+                rankerList.appendChild(getRankerItem(i, data[i], app));
+            }
+        }
+
+        if (rankerStage.innerHTML === "")
+            rankerStage.innerHTML = `<div class="chat__search--error">
+        No ranker presents yet. Be the first ranker!
+        </div>`
+    } catch (e) {
+        // TODO: error modal
     }
 }

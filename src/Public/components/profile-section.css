@@ -57,6 +57,9 @@
 }
 
 .profile-section__profile--info > div:nth-child(2) div:last-child {
+    width: 30px;
+    background-image: url("../../assets/editProfile.svg");
+    background-size: cover;
     cursor: pointer;
 }
 
@@ -98,6 +101,13 @@
     color: white;
     font-size: 25px;
     border-radius: 50%;
+}
+
+.profile-section__friends--header button div {
+    width: 26px;
+    height: 25px;
+    background-image: url("../../assets/addFriend.svg");
+    background-size: cover;
 }
 
 .profile-section__friends--list {

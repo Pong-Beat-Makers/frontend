@@ -12,6 +12,35 @@ export function decodeHtml(html) {
     return txt.value;
 }
 
+export function orderPlayer(userId, data) {
+    /*
+    * data : {
+    *   id: <int>,
+    *   match_type: <string>,
+    *   user1_id: <int>,
+    *   user2_id: <int>,
+    *   user1_score: <int>,
+    *   user2_score: <int>,
+    *   user1_profile: <string>,
+    *   user2_profile: <string>
+    * }
+    * */
+    if (userId !== data.user1_id) {
+        let tmp = data.user1_id;
+        data.user1_id = data.user2_id;
+        data.user2_id = tmp;
+
+        tmp = data.user1_score;
+        data.user1_score = data.user2_score;
+        data.user2_score = tmp;
+
+        tmp = data.user1_profile;
+        data.user2_profile = data.user1_profile;
+        data.user1_profile = tmp;
+    }
+    return data;
+}
+
 export function toggleAddAndDeleteBtn(chatApp, btnNode, id, doing) {
     const buttonMsg = ['<i class="bi bi-person-plus"></i> add', '<i class="bi bi-person-dash-fill"></i> delete'];
 
@@ -28,6 +57,60 @@ export function toggleAddAndDeleteBtn(chatApp, btnNode, id, doing) {
     } catch (e) {
         // TODO: error modal
     }
+}
+
+export function getGameHistoryItem(userId, data) {
+    /*
+    * data : {
+    *   id: <int>,
+    *   match_type: <string>,
+    *   user1_id: <int>,
+    *   user2_id: <int>,
+    *   user1_score: <int>,
+    *   user2_score: <int>,
+    *   created_at: <date>,
+    *   user1_profile: <string>,
+    *   user2_profile: <string>
+    * }
+    * */
+    const orderedData = orderPlayer(userId, data);
+
+    const itemNode = document.createElement('div');
+    itemNode.classList.add('friend-modal__history-item');
+
+    itemNode.innerHTML = profileModalTemplate.matchHistoryTemplate();
+
+    const dateNode = itemNode.querySelector('.history-item__day');
+    const myAvatar = itemNode.querySelector('.match-my-avatar');
+    const youAvatar = itemNode.querySelector('.match-your-avatar');
+    const scoreNode = itemNode.querySelector('.history-item__score');
+    const status = itemNode.querySelector('.history-item__status');
+
+    const historyDate = new Date(orderedData.created_at);
+
+    setAvatar(orderedData.user1_profile, myAvatar);
+    setAvatar(orderedData.user2_profile, youAvatar);
+
+    dateNode.innerHTML = `${historyDate.getFullYear() % 100}/${historyDate.getMonth() + 1}/${historyDate.getDate()}`;
+    scoreNode.innerHTML = `Score ${orderedData.user1_score} : ${orderedData.user2_score}`;
+    status.innerHTML = orderedData.user1_score > orderedData.user2_score? 'Win': 'Lose';
+
+    return itemNode;
+}
+
+export async function renderGameHistoryList(userId, historyListNode, gameHistoryData = []) {
+    for (let data of gameHistoryData) {
+        const user1Detail = await player.getUserDetail(data.user1_id);
+        const user2Detail = await player.getUserDetail(data.user2_id);
+
+        data.user1_profile = user1Detail.profile;
+        data.user2_profile = user2Detail.profile;
+    }
+
+    gameHistoryData.forEach(data => {
+        const item = getGameHistoryItem(userId, data);
+        historyListNode.appendChild(item);
+    })
 }
 
 export function  modalRender(modalName, htmlCode, backgroundClick = true) {
@@ -76,6 +159,10 @@ export async function friendModalClick(id, chatApp) {
 
         winRate.innerHTML = (win + lose) ? `${(win / (win + lose)).toPrecision(5) * 100}%` : '0%';
         rankPoint.innerHTML = rank;
+
+        const gameHistoryListNode = modalContainer.querySelector('.friend-modal__history-list');
+        const gameHistory = await player.getMatchHistoryById(id);
+        await renderGameHistoryList(id, gameHistoryListNode, gameHistory);
 
         if (player.getId() === id) {
             profileBtns.forEach(btn => btn.remove());

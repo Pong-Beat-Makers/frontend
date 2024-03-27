@@ -102,61 +102,6 @@ async function handleProfileSearch(listNode, keyword, chatApp) {
     }
 }
 
-async function setProfileByNickname(divNode, nickname) {
-    const data = await player.getUserDetail(nickname);
-    console.log(data);
-    // setAvatar(playerProfile, divNode);
-}
-
-async function setMatchHistory(modal, nickname) {
-    const res = await fetch(`${GAME_SERVER_DOMAIN}/${GAME_API_DOMAIN}/game-data/history/?nickname=${nickname}`, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${Player._token}`,
-        },
-    });
-    if (!res.ok)
-        throw new Error(`Error : ${res.status}`);
-
-    const data = await res.json()
-
-/*
-{
-    "id": "< 게임 데이터 id>",
-    // 유저 1이 자기 자신
-    "user1_nickname": "<유저1 닉네임(게임 상 왼쪽에 있는 유저)>",
-    "user2_nickname": "<유저2 닉네임(게임 상 오른쪽에 있는 유저)>",
-    "user1_score": "<유저1 점수>",
-    "user2_score": "<유저2 점수>",
-    "match_type": "<랜덤인지 토너먼트인지 type>",
-    "created_at": "<게임이 끝난 날짜와 시간>",
-}
-*/
-    const matchHistoryList = modal.querySelector(".friend-modal__history-list");
-    for (let i = 0; i < data.length; i++) {
-        matchHistoryList.innerHTML += ProfileModal.matchHistoryTemplate();
-    }
-
-    const date = modal.querySelectorAll(".history-item__day");
-    const myPic = modal.querySelectorAll(".match-my-avatar");
-    const partnerPic = modal.querySelectorAll(".match-your-avatar");
-    const score = modal.querySelectorAll(".history-item__score");
-    const stat = modal.querySelectorAll(".history-item__status");
-    for (let i = 0; i < data.length; i++) {
-        const create_at =  new Date(data[i].created_at);
-        date[i].innerHTML = `${create_at.getFullYear()}/${create_at.getMonth()}/${create_at.getDate()}`
-        setProfileByNickname(myPic[i], data[i].user1_nickname);
-        setProfileByNickname(partnerPic[i], data[i].user2_nickname);
-        score[i].innerHTML = `Score ${data[i].user1_score} : ${data[i].user2_score}`;
-        if (data[i].user1_score > data[i].user2_score)
-            stat[i].innerHTML = "Win";
-        else if (data[i].user1_score == data[i].user2_score)
-            stat[i].innerHTML = "Draw";
-        else
-            stat[i].innerHTML = "Lose";
-    }
-}
-
 export async function handleAddFriendBtn(chatApp) {
     const addFriendModal = modalRender('add-friend', profileModalTemplate.profileSearchTemplate())
 
