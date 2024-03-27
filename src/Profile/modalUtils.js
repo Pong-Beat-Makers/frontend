@@ -167,8 +167,8 @@ export async function friendModalClick(id, chatApp) {
         if (player.getId() === id) {
             profileBtns.forEach(btn => btn.remove());
         } else {
-            profileBtns[0].onclick = () => {
-                showChatroom(chatApp, data);
+            profileBtns[0].onclick = async () => {
+                await showChatroom(chatApp, data);
             }
             toggleAddAndDeleteBtn(chatApp, profileBtns[1], id, is_friend ? DOING.DELETE : DOING.ADD);
         }
