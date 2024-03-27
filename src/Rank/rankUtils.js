@@ -43,7 +43,6 @@ export async function setRankPage(app) {
         *   profile: <string>
         * }]
         * */
-        console.log(data)
         const rankerNumber = data.length;
         const rankerStage = app.querySelector(".rank__stage");
         const rankerList = app.querySelector(".rank__list--friends");
@@ -66,29 +65,5 @@ export async function setRankPage(app) {
         </div>`
     } catch (e) {
         // TODO: error modal
-    }
-}
-
-async function rankerOnclick(app) {
-    const rankStage = app.querySelectorAll(".rank__stage--table");
-    const stageName = app.querySelectorAll(".rank__stage--avatar");
-
-    const rankerList = app.querySelectorAll(".profile-section__friends--item");
-    const rankerName = app.querySelectorAll(".profile-section__friends--name");
-
-    for (let i = 0; i < rankStage.length; i++) {
-        rankStage[i].onclick = async () => {
-            // const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
-            // await showProfileDetail(detailProfileModal, stageName[i].getAttribute('name'));
-            await friendModalClick(stageName[i].getAttribute('name'));
-        };
-    }
-
-    for (let i = 0; i < rankerList.length; i++) {
-        rankerList[i].onclick = async () => {
-            // const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
-            // await showProfileDetail(detailProfileModal, rankerName[i]);
-            await friendModalClick(rankerName[i]);
-        };
     }
 }
