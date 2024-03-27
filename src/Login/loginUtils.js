@@ -3,7 +3,7 @@ import LoginSuccess from "./loginSuccessTemplate.js";
 import Login from "./loginTemplate.js";
 import ProfileModal from "../Profile/profileModalTemplate.js";
 import player, {USER_STATUS} from "./player.js";
-import changeUrl, {routes} from "../route.js";
+import { setPages } from "../route.js";
 import {handleLoginBtn, handleNaviClick} from "../Public/clickUtils.js";
 import {
     friendModalClick,
@@ -154,19 +154,19 @@ export async function renderMainPage(player) {
 
     if (player !== undefined && player.getStatus() === USER_STATUS.AUTHORIZED) {
         app.innerHTML = LoginSuccess.template();
+        player._chatApp = new ChatApp(app);
 
-        changeUrl("/home"); // TODO: location url check (window.location.pathname)
-        app.querySelectorAll(".main-section__list--item")[0].classList.add("active");
-
-        const chatApp = new ChatApp(app);
+        const requestedUrl = (window.location.pathname === '/' ? "/home" : window.location.pathname);
+        history.replaceState(requestedUrl, null, requestedUrl);
+        await setPages(player.getChatApp());
 
         setProfileSection(app, player);
-        handleNaviClick(chatApp);
-        await setFriendList(chatApp);
+        handleNaviClick(player.getChatApp());
+        await setFriendList(player.getChatApp());
 
         const friendAddButton = app.querySelector(".profile-section__friends--button");
         friendAddButton.onclick = () => {
-            handleAddFriendBtn(chatApp);
+            handleAddFriendBtn(player.getChatApp());
         };
     } else {
         app.innerHTML = Login.template();
