@@ -38,9 +38,7 @@ class LoginSuccess {
                         <div>advice_message</div>
                         <div>
                             <div>nickname</div>
-                            <div>
-                                <i class="bi bi-pencil-square"></i>
-                            </div>
+                            <div></div>
                         </div>
                         <div>status_message here</div>
                     </div>
@@ -50,7 +48,7 @@ class LoginSuccess {
                         <div class="profile-section__friends--header">
                             <div>friends</div>
                             <button class="profile-section__friends--button">
-                                <i class="bi bi-person-plus"></i>
+                                <div></div>
                             </button>
                         </div>
                         <div class="profile-section__friends--list"></div>
