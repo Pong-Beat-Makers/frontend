@@ -114,6 +114,7 @@
     height: 42px;
     border-radius: 50%;
     background-color: #D9D9D9;
+    background-size: cover;
 }
 
 .history-item__profiles {

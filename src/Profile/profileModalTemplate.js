@@ -100,16 +100,14 @@ class ProfileModal {
 
     matchHistoryTemplate() {
         return `
-        <div class="friend-modal__history-item">
-            <div class="history-item__day">24/01/26</div>
-            <div class="history-item__profiles">
-                <div class="history-item__profiles--avatar match-my-avatar"></div>
-                <div>vs</div>
-                <div class="history-item__profiles--avatar match-your-avatar"></div>
-            </div>
-            <div class="history-item__score">Score 7 : 3</div>
-            <div class="history-item__status">Win</div>
+        <div class="history-item__day">24/01/26</div>
+        <div class="history-item__profiles">
+            <div class="history-item__profiles--avatar match-my-avatar"></div>
+            <div>vs</div>
+            <div class="history-item__profiles--avatar match-your-avatar"></div>
         </div>
+        <div class="history-item__score">Score 7 : 3</div>
+        <div class="history-item__status">Win</div>
         `;
     }
 }
