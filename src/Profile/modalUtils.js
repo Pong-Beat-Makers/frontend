@@ -3,10 +3,17 @@ import {DOING, PROFILE_DEFAULT_IMAGE} from '../Login/player.js';
 import {player} from "../app.js";
 import {openErrorModal} from "../Game/gameUtils.js";
 import {showChatroom} from "../Chat/chatRoomUtils.js";
-import {profileModalTemplate} from "../Login/loginUtils.js";
+import {profileModalTemplate, setFriendList} from "../Login/loginUtils.js";
 
-export function toggleAddAndDeleteBtn(btnNode, id, doing) {
-    const buttonMsg = ['<i class="bi bi-person-plus"></i> add', '<i class="bi bi-person-plus"></i> delete'];
+
+export function decodeHtml(html) {
+    const txt = document.createElement("textarea");
+    txt.innerHTML = html;
+    return txt.value;
+}
+
+export function toggleAddAndDeleteBtn(chatApp, btnNode, id, doing) {
+    const buttonMsg = ['<i class="bi bi-person-plus"></i> add', '<i class="bi bi-person-dash-fill"></i> delete'];
 
     btnNode.innerHTML = doing === DOING.ADD? buttonMsg[0]:buttonMsg[1];
     try {
@@ -14,7 +21,9 @@ export function toggleAddAndDeleteBtn(btnNode, id, doing) {
             await player.friend(id, doing);
 
             btnNode.innerHTML = buttonMsg[1];
-            toggleAddAndDeleteBtn(btnNode, id, doing === DOING.ADD? DOING.DELETE : DOING.ADD);
+            toggleAddAndDeleteBtn(chatApp, btnNode, id, doing === DOING.ADD? DOING.DELETE : DOING.ADD);
+            await setFriendList(chatApp);
+            chatApp.setFriendsOnline();
         }
     } catch (e) {
         // TODO: error modal
@@ -74,7 +83,7 @@ export async function friendModalClick(id, chatApp) {
             profileBtns[0].onclick = () => {
                 showChatroom(chatApp, data);
             }
-            toggleAddAndDeleteBtn(profileBtns[1], id, is_friend ? DOING.DELETE : DOING.ADD);
+            toggleAddAndDeleteBtn(chatApp, profileBtns[1], id, is_friend ? DOING.DELETE : DOING.ADD);
         }
     } catch (e) {
         // TODO: error modal
@@ -136,8 +145,11 @@ export function handleEditUserModalUtils(app) {
         const nickname = modalContainer.querySelector('.profile-modal__nickname');
         const status_message = modalContainer.querySelector('.profile-modal__status-message');
 
-        nickname.value = player.getNickName();
-        status_message.value = player.getStatusMessage();
+        nickname.value = decodeHtml(player.getNickName());
+        status_message.value = decodeHtml(player.getStatusMessage());
+
+        nickname.nextElementSibling.firstElementChild.innerHTML = nickname.value.length;
+        status_message.nextElementSibling.firstElementChild.innerHTML = status_message.value.length;
 
         modalContainer.querySelectorAll('textarea').forEach(element => {
             element.addEventListener('keyup', e => {
@@ -204,7 +216,6 @@ export function handleEditUserModalUtils(app) {
                 'set_2fa_to': get2FAData(toggleItems)
             };
 
-            console.log(data)
             if ((player.getNickName() !== nickname.value && /User\d+$/.test(nickname.value)) || nickname.value.includes('\n')) {
                 openErrorModal(`${nickname.value} is not vaild.`);
             } else {

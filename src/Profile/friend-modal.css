@@ -138,3 +138,71 @@
         transform: none;
     }
 }
+
+/*
+* search friend
+*/
+
+.search-friend__container {
+    position: absolute;
+    background-color: rgb(var(--sub-color));
+    width: 770px;
+    height: 570px;
+    box-shadow: 0px 0px 50px 0px rgba(0, 0, 0, 0.5);
+    padding: 45px 60px;
+    display: flex;
+    animation: bottomPadeInModal .8s ease-in-out forwards;
+    flex-direction: column;
+}
+
+.search-friend__header {
+    color: white;
+    font-size: 25px;
+    margin-bottom: 15px;
+}
+
+.search-friend__body {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.search-friend__body--input {
+    height: 50px;
+    border-radius: 10px;
+    background-color: #FFFFFF80;
+    padding: 10px 20px;
+    font-size: 18px;
+}
+
+.search-friend__body--input::placeholder {
+    color: #0000004D;
+}
+
+.search-friend__body--list {
+    min-height: 0;
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.profile__search--btn {
+    all: unset;
+    cursor: pointer;
+    padding: 5px 5px;
+    width: 30px;
+    height: 30px;
+    font-size: 30px;
+    margin-bottom: 10px;
+    &:hover {
+        transform: scale(2);
+    }
+}
+
+.profile__result--list {
+    margin-top: 15px;
+}

@@ -3,21 +3,7 @@ import { routes } from "../route.js";
 import {friendModalClick, modalRender, setAvatar} from "../Profile/modalUtils.js";
 import Player from "../Login/player.js";
 import {CHATLOG_PREFIX, renderChatBox, showChatList} from "./chatPageUtils.js";
-
-export function getChatLogList() {
-    let data = [];
-
-    for (let key in localStorage) {
-        if (key.startsWith(CHATLOG_PREFIX)) {
-            let log = {
-                id: key.substring(CHATLOG_PREFIX.length),
-                log: JSON.parse(localStorage.getItem(key))
-            };
-            data.push(log);
-        }
-    }
-    return data;
-}
+import {readChatLog} from "./chatSocketUtils.js";
 
 function getChatLog(userId) {
     /*
@@ -33,10 +19,10 @@ function getChatLog(userId) {
 
     return chatLog ? JSON.parse(chatLog) : [];
 }
-function loadChatLog(chatContainer, userId, chatApp) {
+function loadChatLog(chatContainer, userId) {
     const chatLog = getChatLog(userId);
     chatLog.forEach(log => {
-        renderChatBox(chatContainer, log, chatApp);
+        renderChatBox(chatContainer, log);
     });
     // localStorage.setItem(chatId, JSON.stringify(chatLog));
 }
@@ -72,7 +58,16 @@ async function handleBlockToggle(chatApp, userData, blockToggleBtn, isBlocked) {
 
 export async function showChatroom(chatApp, userData) {
     /*
-    * userData: {id: <string>, nickname: <string>, profile: <string>}
+    * userData: {
+    *   id: <int>,
+    *   nickname: <string>,
+    *   profile: <string>,
+    *   status_message: <string>,
+    *   win: <int>,
+    *   lose: <int>,
+    *   rank: <int>,
+    *   is_friend: <boolean>,
+    * }
     * */
     const chatModal = modalRender("chat", routes["/chat"].modalTemplate());
     const chatContainer = chatModal.querySelector('.chat__container');
@@ -98,7 +93,7 @@ export async function showChatroom(chatApp, userData) {
 
         chatModal.querySelector(".chat__header--name").innerHTML = userData.nickname;
 
-        loadChatLog(chatContainer, userData.id, chatApp);
+        loadChatLog(chatContainer, userData.id);
 
         sendBtn.addEventListener('click', e => {
             chatApp.sendMessage(userData.id, msgInput.value);
@@ -111,43 +106,9 @@ export async function showChatroom(chatApp, userData) {
                 sendBtn.click();
             }
         });
+        readChatLog(userData.id);
         await showChatList(chatApp);
     } catch(e) {
         // TODO: error modal
     }
-}
-
-async function handleChatRoom(chatModal, toNickname) {
-    const targetProfile = chatModal.querySelector(".chat__header--profile");
-    targetProfile.onclick = async () => {
-        // const detailProfileModal = modalRender('detailed-profile', ProfileModal.friendModalTemplate());
-        // await showProfileDetail(detailProfileModal, toNickname);
-        await friendModalClick(toNickname);
-    }
-
-    const chatHeaderBtns = chatModal.querySelectorAll(".chat__header--btn");
-    chatHeaderBtns[0].onclick = () => { handleInvite(chatModal) };
-    chatHeaderBtns[1].onclick = async () => { await handleBlockToggle(chatModal) };
-
-    const chatRoom = chatModal.querySelector(".chat__body--frame");
-    chatRoom.scrollTop = chatRoom.scrollHeight;
-
-    // TODO: 이거 작동 안하는듯 ; 고치기
-    chatModal.querySelector('.chat__body--text').onkeydown = function(e) {
-        if (e.keyCode === 13) {  // enter, return
-            chatModal.querySelector('.chat__controller--btn').click();
-        }
-    };
-
-    chatModal.querySelector('.chat__send--btn').onclick = function(e) {
-        const messageInputDom = chatModal.querySelector('.chat__body--text');
-        const targetNickname = chatModal.querySelector('.chat__header--name').innerHTML;
-        const message = messageInputDom.value;
-        const obj = {
-            'target_nickname' : targetNickname,
-            'message': message
-        };
-        chatSocket.send(JSON.stringify(obj));
-        messageInputDom.value = '';
-    };
 }

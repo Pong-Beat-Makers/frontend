@@ -2,7 +2,7 @@ import { routes } from "../route.js";
 import { showChatroom } from "./chatRoomUtils.js";
 import {player} from "../app.js";
 import {setAvatar} from "../Profile/modalUtils.js";
-import {saveNewMsg} from "./chatSocketUtils.js";
+import {getOpponent, saveNewMsg} from "./chatSocketUtils.js";
 
 export const CHATLOG_PREFIX = 'chatLog_';
 
@@ -12,28 +12,11 @@ function getLastObj(chatId) {
     return lastObj;
 }
 
-export function chatListOnclick() {
-    const openModalBtn = document.querySelectorAll(".chat__room");
-    for (let i = 0; i < openModalBtn.length; i++) {
-        openModalBtn[i].onclick = function() {
-            showChatroom(openModalBtn[i].querySelector(".chat__room--name").innerText);
-        }
-    }
-}
-
-function sortChatList() {
-    const chatRoomAll = document.querySelectorAll(".chat__room");
-    const chatListTime = document.querySelectorAll(".chat__room--time");
-    for (let i = 0; i < chatListTime.length; i++) {
-        chatRoomAll[i]
-    }
-}
-
-export function renderChatBox(chatContainer, newMsgObj, chatApp) {
+export function renderChatBox(chatContainer, newMsgObj, isNew = false) {
     /*
     * newMsgObj: {
-    *   from: <string>,
     *   from_id: <int>,
+    *   to_id: <int>,
     *   message: <string>,
     *   time: <string>,
     *   isRead: <boolean>
@@ -41,26 +24,57 @@ export function renderChatBox(chatContainer, newMsgObj, chatApp) {
     * */
     const frameNode = chatContainer.querySelector('.chat__body--frame');
 
-    frameNode.innerHTML += routes["/chat"].chatBoxTemplate(
-        `message_${player.getId() === newMsgObj.from_id? 'me':'you'}`, newMsgObj.message, newMsgObj.time);
-    newMsgObj.isRead = true;
+    const msgTime = new Date(newMsgObj.time);
+    const chatBoxNode = document.createElement('div');
+    chatBoxNode.classList.add('chatbox', `message_${player.getId() === newMsgObj.from_id? 'me':'you'}`);
+
+    chatBoxNode.innerHTML += routes["/chat"].chatBoxTemplate(newMsgObj.message, `${msgTime.getHours()}:${msgTime.getMinutes()}`);
+    frameNode.appendChild(chatBoxNode);
+
     frameNode.scrollTop = frameNode.scrollHeight;
-    saveNewMsg(newMsgObj);
+    if (isNew) {
+        saveNewMsg(newMsgObj);
+    }
+}
+
+export function renderSystemChatBox(app, message, userId) {
+    const chatContainers = app.querySelectorAll('.chat__container');
+
+    chatContainers.forEach(container => {
+        if (Number(container.id) === userId) {
+            // TODO: system message render
+            const frameNode = container.querySelector('.chat__body--frame');
+
+            frameNode.innerHTML += routes['/chat'].systemChatBoxTemplate(message);
+            frameNode.scrollTop = frameNode.scrollHeight;
+        }
+    });
 }
 
 export async function renderChatRoom(chatRoomList, lastObj, chatApp) {
-
-    if (lastObj.from === undefined) {
+    /*
+    * lastObj : {
+    *   type: <string>,
+    *   from_id: <int>,
+    *   to_id: <int>,
+    *   message: <string>,
+    *   time: <string>,
+    *   isRead: <boolean>
+    * }
+    * */
+    if (lastObj === undefined) {
         return ;
     }
 
     try {
-        const userDetail = await player.getUserDetail(lastObj.from_id);
+        const userDetail = await player.getUserDetail(getOpponent(lastObj));
 
         const chatRoomItem = document.createElement('div');
         chatRoomItem.classList.add('chat__room');
 
-        chatRoomItem.innerHTML = routes['/chat'].chatRoomTemplate(userDetail.nickname, lastObj.message, lastObj.time);
+        const msgTime = new Date(lastObj.time);
+
+        chatRoomItem.innerHTML = routes['/chat'].chatRoomTemplate(userDetail.nickname, lastObj.message, `${msgTime.getHours()}:${msgTime.getMinutes()}`);
 
         const avatar = chatRoomItem.querySelector('.chat__room--profile');
 
@@ -87,8 +101,8 @@ export async function showChatList(chatApp) {
     if (chatRoomList !== null) {
         chatRoomList.innerHTML = "";
         for (let i = 0; i < localStorage.length; i++) {
-            let key = localStorage.key(i);
-            if (key.startsWith("chatLog_")) {
+            const key = localStorage.key(i);
+            if (key.startsWith(CHATLOG_PREFIX)) {
                 await renderChatRoom(chatRoomList, getLastObj(key), chatApp);
             }
         }
