@@ -145,7 +145,7 @@ class Player {
     }
 
     async getRankerList() {
-        const data = await this._getServer(``);
+        const data = await this._getServer(`${USER_MANAGEMENT}/profile/ranker/`);
 
         if (!data.ok) {
             throw {error: data.status};

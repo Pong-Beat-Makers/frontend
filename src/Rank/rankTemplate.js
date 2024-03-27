@@ -1,12 +1,4 @@
 class Rank {
-	rankerStageTemplate(tier, nickname) {
-		return `
-			<div class="rank__stage--table">
-				<div class="rank__stage--avatar rank__profile--${tier}" name=${nickname}></div>
-		</div>
-		`
-	}
-
 	rankerTemplate(num, nickname) {
 		return `
 			<div class="rank__list--item">
