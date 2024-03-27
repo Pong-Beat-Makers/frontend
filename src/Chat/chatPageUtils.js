@@ -2,7 +2,7 @@ import { routes } from "../route.js";
 import { showChatroom } from "./chatRoomUtils.js";
 import {player} from "../app.js";
 import {setAvatar} from "../Profile/modalUtils.js";
-import {getChatLog, getOpponent, saveNewMsg} from "./chatSocketUtils.js";
+import {closedChatLog, getChatLog, getOpponent, saveNewMsg} from "./chatSocketUtils.js";
 import SocketApp from "../Game/SocketApp.js";
 
 export const CHATLOG_PREFIX = 'chatLog_';
@@ -31,7 +31,7 @@ export function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) 
     const chatBoxNode = document.createElement('div');
     chatBoxNode.classList.add('chatbox', `message_${player.getId() === newMsgObj.from_id? 'me':'you'}`);
 
-    chatBoxNode.innerHTML += routes["/chat"].chatBoxTemplate(newMsgObj.message?newMsgObj.message:'', `${msgTime.getHours()}:${msgTime.getMinutes()}`);
+    chatBoxNode.innerHTML += routes["/chat"].chatBoxTemplate(newMsgObj.message?newMsgObj.message:'', `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
 
     if (newMsgObj.type === 'invite_game') {
         const inviteBtn = document.createElement('button');
@@ -51,6 +51,7 @@ export function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) 
             const socketApp = SocketApp;
 
             socketApp.inviteGameRoom(newMsgObj.room_id, [player.getInfo(), userDetail], chatApp);
+            closedChatLog(userDetail.id, chatApp);
         }
     }
 
@@ -103,7 +104,7 @@ export async function renderChatRoom(chatRoomList, lastObj, chatApp) {
             lastObj.message = `${userDetail.nickname} invite you!`;
         }
 
-        chatRoomItem.innerHTML = routes['/chat'].chatRoomTemplate(userDetail.nickname, lastObj.message, `${msgTime.getHours()}:${msgTime.getMinutes()}`);
+        chatRoomItem.innerHTML = routes['/chat'].chatRoomTemplate(userDetail.nickname, lastObj.message, `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
 
         const avatar = chatRoomItem.querySelector('.chat__room--profile');
 

@@ -6,8 +6,9 @@ import {
     setupFriendListStatus
 } from "../Profile/modalUtils.js";
 import {renderSystemChatBox} from "./chatPageUtils.js";
-import {processMessage} from "./chatSocketUtils.js";
+import {closedChatLog, getOpponent, processMessage} from "./chatSocketUtils.js";
 import {SOCKET_STATE} from "../Game/SocketApp.js";
+import SocketApp from "../Game/SocketApp.js";
 
 const CHAT_API = `${CHAT_SERVER_DOMAIN}/${CHAT_API_DOMAIN}`;
 
@@ -70,7 +71,18 @@ class ChatApp {
                 * room_id: <string>,
                 * time: <string>
                 * */
+                // TODO: Blocked User 에게도 보내짐
+                closedChatLog(getOpponent(data), this);
                 await processMessage(this, data);
+
+                if (player.getId() === data.from_id) {
+                    closedChatLog(getOpponent(data), this);
+
+                    const userDetail = await player.getUserDetail(getOpponent(data));
+                    const socketApp = SocketApp;
+
+                    socketApp.inviteGameRoom(data.room_id, [player.getInfo(), userDetail], this);
+                }
             }
         }
 

@@ -53,6 +53,7 @@ export function orderPlayers(playerNumber, players) {
 
 export function openPlayGameModal(socketApp, gameType, players) {
     const modalContainer = modalRender('play-game', routes['/game'].playGameTemplate(), false);
+    const playGround = modalContainer.querySelector('#game_playground');
 
     modalContainer.querySelector('.playgame__btn').addEventListener('click', () => {
         socketApp.gameClose();
@@ -62,7 +63,17 @@ export function openPlayGameModal(socketApp, gameType, players) {
     setupInfoAtModal(modalContainer, gameType, players);
 
     socketApp.setGameContainer(modalContainer);
-    socketApp.setGameCanvas(modalContainer.querySelector('#game_playground'));
+    socketApp.setGameCanvas(playGround);
+
+    playGround.focus();
+
+    const focusOutEvent = playGround.addEventListener('focusout', () => {
+        toggleFocusOut(playGround, true);
+    });
+
+    playGround.addEventListener('focusin', () => {
+        toggleFocusOut(playGround, false);
+    })
 }
 
 export function openMatchingModal(gameType) {
@@ -182,9 +193,34 @@ export function handleGameModal() {
     });
 }
 
+export function removeAllEventListener(node) {
+    const listeners = getEventListeners(node);
+    console.log(listeners);
+}
+
+export function toggleFocusOut(gameContainer, isNotFocus = true) {
+    if (gameContainer.querySelector('.game-modal-name__end') !== null) {
+        return ;
+    }
+
+    if (isNotFocus) {
+        const modalContainer = document.createElement('div');
+        modalContainer.classList.add('game-modal__container', 'game-modal-name__focus');
+
+        modalContainer.innerHTML = routes['/game'].gameInfoModalTemplate('Out of focus');
+
+        gameContainer.appendChild(modalContainer);
+    } else {
+        const modalContainer = gameContainer.querySelector('.game-modal__container.game-modal-name__focus');
+        if (modalContainer !== null) {
+            modalContainer.remove();
+        }
+    }
+}
+
 export function renderEndStatus(gameContainer, gamePlayer, score, gameType) {
     const modalContainer = document.createElement('div');
-    modalContainer.classList.add('game-modal__container');
+    modalContainer.classList.add('game-modal__container', 'game-modal-name__end');
 
     let status = 'YOU <span class="game-modal__win">WIN!</span>';
 
@@ -214,8 +250,8 @@ export function removeExitBtnInfoModal(container) {
 export function exitInviteGame(container, socketApp, chatApp, userDetail) {
     container.querySelector('.matching-game__btn').addEventListener('click', () => {
         socketApp.gameClose();
+        // TODO: invite Game Cancel event
         chatApp.sendMessage(userDetail.id, 'Cancel Invite.');
-        closedChatLog(userDetail.id, chatApp);
     })
 }
 

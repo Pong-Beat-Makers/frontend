@@ -157,7 +157,7 @@ export async function friendModalClick(id, chatApp) {
         friendInfo[0].innerHTML = name;
         friendInfo[1].innerHTML = status_message;
 
-        winRate.innerHTML = (win + lose) ? `${(win / (win + lose)).toPrecision(5) * 100}%` : '0%';
+        winRate.innerHTML = (win + lose) ? `${(win / (win + lose) * 100).toPrecision(5)}%` : '0%';
         rankPoint.innerHTML = rank;
 
         const gameHistoryListNode = modalContainer.querySelector('.friend-modal__history-list');

@@ -168,6 +168,13 @@ class Game {
 		`;
 	}
 
+	gameInfoModalTemplate(message) {
+		return `
+			<div class="game-modal__background light"></div>
+			<div class="game-modal__message">Out of focus.</div>
+		`;
+	}
+
 	infoModalTemplate(comment) {
 		return `
             <div class="modal__background"></div>

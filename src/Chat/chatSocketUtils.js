@@ -109,10 +109,6 @@ export async function processMessage(chatApp, messageData) {
     const chatContainers = chatApp.getApp().querySelectorAll('.chat__container');
     let isRender = false;
 
-    if (messageData.type === 'invite_game') {
-        closedChatLog(getOpponent(messageData), chatApp);
-    }
-
     chatContainers.forEach(container => {
         if (player.getId() === messageData.from_id || Number(container.id) === messageData.from_id) {
             // TODO: message render

@@ -11,7 +11,7 @@ import {
     getInfoPlayerList,
     generateGuest,
     orderPlayers, setCommentInfoModal, removeExitBtnInfoModal,
-    exitInviteGame
+    exitInviteGame, toggleFocusOut, removeAllEventListener
 } from "./gameUtils.js";
 import GameApp from "./gameApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
@@ -122,6 +122,7 @@ class SocketApp {
                 if (data.message === 'Game Ready') {
                     if (data.counter === 10) {
                         removeExitBtnInfoModal(this._matchingContainer);
+                        this._matchingContainer.querySelector('.matching-game__wrapper span').classList.remove('ingAnimation');
                         setCommentInfoModal(this._matchingContainer, `Start for ${data.counter - 5}s`);
                     } else if (5 < data.counter) {
                         setCommentInfoModal(this._matchingContainer, `Start for ${data.counter - 5}s`);
@@ -150,6 +151,7 @@ class SocketApp {
                         if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') this._gameSend({'move': 'stop'});
                     });
                 } else if (data.message === 'Game End') {
+                    toggleFocusOut(this._gameCanvas, false);
                     renderEndStatus(this._gameCanvas, this._gameApp.getPlayer(), data.score, GAME_TYPE.RANDOM);
                     changeGiveUpToEnd(this._gameContiner);
                 }
@@ -229,6 +231,7 @@ class SocketApp {
                         });
                     }
                 } else if (data.message === 'Game End') {
+                    toggleFocusOut(this._gameCanvas, false);
                     renderEndStatus(this._gameCanvas, this._gameApp.getPlayer(), data.score, gameType);
                     changeGiveUpToEnd(this._gameContiner);
                 }

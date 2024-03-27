@@ -34,7 +34,6 @@ function handleInvite(chatApp, userData) {
     /*
     * userData: {id: <string>, nickname: <string>, profile: <string>}
     * */
-    closedChatLog(userData.id, chatApp);
     chatApp.inviteGame(userData.id);
 }
 
