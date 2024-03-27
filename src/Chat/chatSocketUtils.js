@@ -1,6 +1,28 @@
 import {showChatList, renderChatBox, CHATLOG_PREFIX} from "./chatPageUtils.js";
 import {player} from "../app.js";
 
+export function getChatLog(usersData = []) {
+    /*
+    * usersData : [{
+    *   id: <int>,
+    *   nickname: <string>,
+    *   profile: <string>
+    * }]
+    * */
+    const result = [];
+
+    usersData.forEach(userData => {
+        const localStorageLog = localStorage.getItem(CHATLOG_PREFIX + userData.id);
+        let chatLog = localStorageLog ? JSON.parse(localStorageLog) : [];
+
+        if (chatLog.length > 0) {
+            userData.chatLog = chatLog[chatLog.length - 1];
+            result.push(userData);
+        }
+    });
+    return result;
+}
+
 export function getOpponent(newMsgObj) {
     let opponent = undefined;
     if (newMsgObj !== undefined || (player.getId() === newMsgObj.from_id || player.getId() === newMsgObj.to_id)) {

@@ -2,7 +2,7 @@ import { routes } from "../route.js";
 import { showChatroom } from "./chatRoomUtils.js";
 import {player} from "../app.js";
 import {setAvatar} from "../Profile/modalUtils.js";
-import {getOpponent, saveNewMsg} from "./chatSocketUtils.js";
+import {getChatLog, getOpponent, saveNewMsg} from "./chatSocketUtils.js";
 
 export const CHATLOG_PREFIX = 'chatLog_';
 
@@ -113,44 +113,54 @@ export async function showChatList(chatApp) {
     }
 }
 
-function showSearchResult(input) {
-    const chatRoomList = document.querySelector(".chat__room--list");
+async function getChatLogByKeyword(keyword) {
+    if (keyword.length <= 0) {
+        return [];
+    }
+
+    try {
+        const searchUsers = await player.searchUser(keyword);
+        return getChatLog(searchUsers);
+    } catch (e) {
+        // TODO: error modal
+    }
+    return [];
+}
+
+async function showSearchResult(keyword, chatApp) {
+    const chatRoomList = chatApp.getApp().querySelector(".chat__room--list");
+    const keywordRoomData = await getChatLogByKeyword(keyword);
+
     chatRoomList.innerHTML = "";
-    let isFound = false;
-    for (let i = 0; i < localStorage.length; i++) {
-        let key = localStorage.key(i);
-        if (key.includes(input) && key.startsWith("chatLog_")) {
-            isFound = true;
-            chatRoomList.innerHTML += routes["/chat"].chatRoomTemplate(
-                key.slice(8),
-                getLastObj(key).msg, getLastObj(key).time);
-            }
-        }
-        if (isFound === false) {
-            chatRoomList.innerHTML = `<div class="chat__search--error">
-            Nothing found for ${input}
-            </div>`
-        }
+    if (keywordRoomData.length > 0) {
+        keywordRoomData.forEach(roomData => {
+            renderChatRoom(chatRoomList, roomData.chatLog, chatApp);
+        });
+    } else {
+        chatRoomList.innerHTML = `<div class="chat__search--error">
+        Nothing found for ${keyword}
+        </div>`
+    }
 }
 
 // 검색창 내부 input 달라질 때마다 호출되는 함수
 async function checkChatroomSearch(chatApp) {
-    const chatSearchInput = document.querySelector(".chat__search input");
-    if (chatSearchInput.value)
-        showSearchResult(chatSearchInput.value);
+    const chatSearchInput = chatApp.getApp().querySelector("#chat__search--input");
+
+    if (chatSearchInput !== null && chatSearchInput.value.length > 0)
+        await showSearchResult(chatSearchInput.value, chatApp);
     else
         await showChatList(chatApp);
-    // 채팅방 정렬
 }
 
 export async function setChatPage(chatApp) {
     await showChatList(chatApp);
 
-    const chatSearchBtn = document.querySelector(".chat__search");
+    const chatSearchBtn = chatApp.getApp().querySelector(".chat__search");
     chatSearchBtn.onsubmit = function (e) {
         e.preventDefault();
     }
-    chatSearchBtn.oninput = async () => {
+    chatSearchBtn.onkeyup = async () => {
         await checkChatroomSearch(chatApp);
     };
 }
