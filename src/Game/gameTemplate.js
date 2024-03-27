@@ -168,7 +168,7 @@ class Game {
 		`;
 	}
 
-	errorModalTemplate(comment) {
+	infoModalTemplate(comment) {
 		return `
             <div class="modal__background"></div>
             <div class="matching-game__wrapper">

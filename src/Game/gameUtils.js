@@ -4,6 +4,7 @@ import SocketApp from "./SocketApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
 import {player} from "../app.js";
 import {PROFILE_DEFAULT_IMAGE} from "../Login/player.js";
+import {closedChatLog} from "../Chat/chatSocketUtils.js";
 
 export function generateGuest(guestName = 'GUEST', avoidList = []) {
     let profileIdx = Math.floor(Math.random() * PROFILE_DEFAULT_IMAGE.length);
@@ -70,7 +71,7 @@ export function openMatchingModal(gameType) {
 
     socketApp.matching(gameType);
 
-    document.querySelector('.matching-game__btn').addEventListener('click', () => {
+    modalContainer.querySelector('.matching-game__btn').addEventListener('click', () => {
         closeMatchingModal(modalContainer, socketApp);
     });
 
@@ -206,10 +207,29 @@ export function renderEndStatus(gameContainer, gamePlayer, score, gameType) {
     gameContainer.appendChild(modalContainer);
 }
 
-export function openErrorModal(comment) {
-    const modalContainer = modalRender('matching-game', routes['/game'].errorModalTemplate(comment));
+export function removeExitBtnInfoModal(container) {
+    container.querySelector('.matching-game__btn').remove();
+}
+
+export function exitInviteGame(container, socketApp, chatApp, userDetail) {
+    container.querySelector('.matching-game__btn').addEventListener('click', () => {
+        socketApp.gameClose();
+        chatApp.sendMessage(userDetail.id, 'Cancel Invite.');
+        closedChatLog(userDetail.id, chatApp);
+    })
+}
+
+export function setCommentInfoModal(container, comment) {
+    const commentNode = container.querySelector('.matching-game__wrapper span');
+
+    commentNode.innerHTML = comment;
+}
+
+export function openInfoModal(comment, backgroundClick = true) {
+    const modalContainer = modalRender('matching-game', routes['/game'].infoModalTemplate(comment), backgroundClick);
 
     modalContainer.querySelector('.matching-game__btn').addEventListener('click', () => {
         modalContainer.remove();
     });
+    return modalContainer;
 }

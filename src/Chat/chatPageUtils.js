@@ -3,6 +3,7 @@ import { showChatroom } from "./chatRoomUtils.js";
 import {player} from "../app.js";
 import {setAvatar} from "../Profile/modalUtils.js";
 import {getChatLog, getOpponent, saveNewMsg} from "./chatSocketUtils.js";
+import SocketApp from "../Game/SocketApp.js";
 
 export const CHATLOG_PREFIX = 'chatLog_';
 
@@ -12,13 +13,15 @@ function getLastObj(chatId) {
     return lastObj;
 }
 
-export function renderChatBox(chatContainer, newMsgObj, isNew = false) {
+export function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) {
     /*
     * newMsgObj: {
+    *   type: <string>,
     *   from_id: <int>,
     *   to_id: <int>,
     *   message: <string>,
     *   time: <string>,
+    *   isClose: <boolean>,
     *   isRead: <boolean>
     * }
     * */
@@ -28,7 +31,29 @@ export function renderChatBox(chatContainer, newMsgObj, isNew = false) {
     const chatBoxNode = document.createElement('div');
     chatBoxNode.classList.add('chatbox', `message_${player.getId() === newMsgObj.from_id? 'me':'you'}`);
 
-    chatBoxNode.innerHTML += routes["/chat"].chatBoxTemplate(newMsgObj.message, `${msgTime.getHours()}:${msgTime.getMinutes()}`);
+    chatBoxNode.innerHTML += routes["/chat"].chatBoxTemplate(newMsgObj.message?newMsgObj.message:'', `${msgTime.getHours()}:${msgTime.getMinutes()}`);
+
+    if (newMsgObj.type === 'invite_game') {
+        const inviteBtn = document.createElement('button');
+        const messageNode = chatBoxNode.querySelector('.chatbox__message');
+
+        inviteBtn.classList.add('chatbox__invite-btn');
+        inviteBtn.innerText = "Join the Game";
+
+        if (newMsgObj.closed) {
+            inviteBtn.disabled = true;
+        }
+
+        messageNode.appendChild(inviteBtn);
+
+        inviteBtn.onclick = async () => {
+            const userDetail = await player.getUserDetail(getOpponent(newMsgObj));
+            const socketApp = SocketApp;
+
+            socketApp.inviteGameRoom(newMsgObj.room_id, [player.getInfo(), userDetail], chatApp);
+        }
+    }
+
     frameNode.appendChild(chatBoxNode);
 
     frameNode.scrollTop = frameNode.scrollHeight;
@@ -73,6 +98,10 @@ export async function renderChatRoom(chatRoomList, lastObj, chatApp) {
         chatRoomItem.classList.add('chat__room');
 
         const msgTime = new Date(lastObj.time);
+
+        if (lastObj.type === 'invite_game') {
+            lastObj.message = `${userDetail.nickname} invite you!`;
+        }
 
         chatRoomItem.innerHTML = routes['/chat'].chatRoomTemplate(userDetail.nickname, lastObj.message, `${msgTime.getHours()}:${msgTime.getMinutes()}`);
 

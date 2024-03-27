@@ -56,12 +56,21 @@ class ChatApp {
                 *   time: <string>
                 * }
                 * */
-                await processMessage(this, app, data);
+                await processMessage(this, data);
             } else if (data.type === 'system_message') {
                 if (data.error === 'No User or Offline') {
                     // TODO: offline message
                     renderSystemChatBox(this._app, 'Offline User', data.from_id);
                 }
+            } else if (data.type === 'invite_game') {
+                /*
+                * type: <string>,
+                * from_id: <int>,
+                * to_id: <int>,
+                * room_id: <string>,
+                * time: <string>
+                * */
+                await processMessage(this, data);
             }
         }
 
@@ -93,6 +102,14 @@ class ChatApp {
             throw {error: res.status};
         }
         return await res.json();
+    }
+
+    inviteGame(userId) {
+        /*
+        *   "target_id": "<초대하고자 하는 대상 id>",
+        *   "type" : "invite_game"
+        * */
+        this._send({target_id: userId, type: "invite_game"});
     }
 
     sendMessage(userId, message) {

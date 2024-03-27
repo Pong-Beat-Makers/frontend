@@ -1,7 +1,7 @@
 import ProfileModal from "./profileModalTemplate.js";
 import {DOING, PROFILE_DEFAULT_IMAGE} from '../Login/player.js';
 import {player} from "../app.js";
-import {openErrorModal} from "../Game/gameUtils.js";
+import {openInfoModal} from "../Game/gameUtils.js";
 import {showChatroom} from "../Chat/chatRoomUtils.js";
 import {profileModalTemplate, setFriendList} from "../Login/loginUtils.js";
 
@@ -35,8 +35,8 @@ export function orderPlayer(userId, data) {
         data.user2_score = tmp;
 
         tmp = data.user1_profile;
-        data.user2_profile = data.user1_profile;
-        data.user1_profile = tmp;
+        data.user1_profile = data.user2_profile;
+        data.user2_profile = tmp;
     }
     return data;
 }
@@ -304,13 +304,13 @@ export function handleEditUserModalUtils(app) {
             };
 
             if ((player.getNickName() !== nickname.value && /User\d+$/.test(nickname.value)) || nickname.value.includes('\n')) {
-                openErrorModal(`${nickname.value} is not vaild.`);
+                openInfoModal(`${nickname.value} is not vaild.`);
             } else {
                 try {
                     await player.setProfile(data);
                     location.reload();
                 } catch (e) {
-                    openErrorModal(`Something was wrong .. Error code: ${e.error}`);
+                    openInfoModal(`Something was wrong .. Error code: ${e.error}`);
                 }
             }
         });

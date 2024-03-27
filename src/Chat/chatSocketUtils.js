@@ -1,5 +1,6 @@
 import {showChatList, renderChatBox, CHATLOG_PREFIX} from "./chatPageUtils.js";
 import {player} from "../app.js";
+import {loadChatLog} from "./chatRoomUtils.js";
 
 export function getChatLog(usersData = []) {
     /*
@@ -29,6 +30,35 @@ export function getOpponent(newMsgObj) {
         opponent = player.getId() === newMsgObj.from_id? newMsgObj.to_id : newMsgObj.from_id;
     }
     return opponent;
+}
+
+export function foundChatContainer(userId, chatApp) {
+    let foundContainer = undefined;
+    const containers = chatApp.getApp().querySelectorAll('.chat__container');
+    containers.forEach(container => {
+        if (Number(container.id) === userId) {
+            foundContainer = container;
+        }
+    })
+    return foundContainer;
+}
+
+export function closedChatLog(userId, chatApp) {
+    const localStorageLog = localStorage.getItem(CHATLOG_PREFIX + userId);
+    let chatLog = localStorageLog ? JSON.parse(localStorageLog) : [];
+
+    chatLog.forEach(log => {
+        if (log.type === 'invite_game') {
+            log.closed = true;
+        }
+    });
+
+    localStorage.setItem(CHATLOG_PREFIX + userId, JSON.stringify((chatLog)));
+
+    const chatContainer = foundChatContainer(userId, chatApp);
+    if (chatContainer !== undefined) {
+        loadChatLog(chatContainer, userId, chatApp);
+    }
 }
 
 export function readChatLog(userId) {
@@ -65,7 +95,7 @@ export function saveNewMsg(newMsgObj) {
     }
 }
 
-export async function processMessage(chatApp, app, messageData) {
+export async function processMessage(chatApp, messageData) {
     /*
     * messageData: {
     *   type: "chat_message",
@@ -76,13 +106,17 @@ export async function processMessage(chatApp, app, messageData) {
     *   time: <string>
     * }
     * */
-    const chatContainers = app.querySelectorAll('.chat__container');
+    const chatContainers = chatApp.getApp().querySelectorAll('.chat__container');
     let isRender = false;
+
+    if (messageData.type === 'invite_game') {
+        closedChatLog(getOpponent(messageData), chatApp);
+    }
 
     chatContainers.forEach(container => {
         if (player.getId() === messageData.from_id || Number(container.id) === messageData.from_id) {
             // TODO: message render
-            renderChatBox(container, messageData, true);
+            renderChatBox(container, messageData, chatApp, true);
             isRender = true;
         }
     });
