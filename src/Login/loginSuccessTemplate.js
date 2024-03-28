@@ -68,6 +68,7 @@ class LoginSuccess {
             </section>
         </div>
         <div class="modal"></div>
+        <div class="toast"></div>
 	    `;
 	}
 }

@@ -7,6 +7,7 @@ import {
 } from "./chatPageUtils.js";
 import {player} from "../app.js";
 import {loadChatLog} from "./chatRoomUtils.js";
+import {routes} from "../route.js";
 
 export function getChatLog(usersData = []) {
     /*
@@ -126,6 +127,17 @@ export function saveNewMsg(newMsgObj) {
     }
 }
 
+export async function processNextMatch(chatApp) {
+    const data = {
+        type: "system_message",
+        to_id: player.getId(),
+        message: "Start after 5s",
+        time: new Date().toISOString()
+    }
+
+    await processSystemMessage(chatApp, data);
+}
+
 export async function processSystemMessage(chatApp, messageData) {
     /*
     * messageData: {
@@ -186,7 +198,7 @@ export async function processMessage(chatApp, messageData) {
         // TODO : fromNickname 수정
         newToast.innerHTML = routes["/chat"].chatAlertTemplate("New Message", messageData.message, `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
         
-        app.querySelector(".toast").appendChild(newToast);
+        chatApp.getApp().querySelector(".toast").appendChild(newToast);
         newToast.querySelector(".chat__alert--close-btn").onclick = () => {
             newToast.remove();
         }

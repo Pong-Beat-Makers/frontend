@@ -6,7 +6,7 @@ import {
     setupFriendListStatus
 } from "../Profile/modalUtils.js";
 import {renderSystemChatBox} from "./chatPageUtils.js";
-import {closedChatLog, getOpponent, processMessage, processSystemMessage} from "./chatSocketUtils.js";
+import {closedChatLog, getOpponent, processMessage, processNextMatch, processSystemMessage} from "./chatSocketUtils.js";
 import {SOCKET_STATE} from "../Game/SocketApp.js";
 import SocketApp from "../Game/SocketApp.js";
 
@@ -39,6 +39,16 @@ class ChatApp {
                     delete data.online_friends;
 
                     setupFriendListStatus(this._friendListNode, this._friendsOnline);
+                } else if (data.message === 'Next Match') {
+                    const room_id = data.room_id;
+                    delete data.room_id;
+
+                    await processNextMatch(this);
+                    const userDetail = await player.getUserDetail(data.opponent_id);
+                    const socketApp = SocketApp;
+
+                    socketApp.closeGameModal();
+                    socketApp.inviteGameRoom(room_id, [player.getInfo(), userDetail], this);
                 }
                 await processSystemMessage(this, data);
             } else if (data.type === 'send_status') {

@@ -10,7 +10,7 @@ import {
     setInfoMessageAtModal,
     getInfoPlayerList,
     generateGuest,
-    orderPlayers, setCommentInfoModal, removeExitBtnInfoModal,
+    orderPlayers,
     exitInviteGame, toggleFocusOut
 } from "./gameUtils.js";
 import GameApp from "./gameApp.js";
@@ -111,6 +111,7 @@ class SocketApp {
     inviteGameRoom(room_id, userList, chatApp) {
         const gameSocket = new WebSocket(`${GAME_WEBSOCKET}/ws/game/${room_id}/`);
         console.log(`enter the room id: ${room_id}`);
+
         this._matchingContainer = openInfoModal('Waiting for user', false);
         this._matchingContainer.querySelector('.matching-game__wrapper span').classList.add('ingAnimation');
         exitInviteGame(this._matchingContainer, this, chatApp, userList[1]);
@@ -121,18 +122,20 @@ class SocketApp {
             if (data.type === 'send_system_message') {
                 if (data.message === 'Game Ready') {
                     if (data.counter === 10) {
-                        removeExitBtnInfoModal(this._matchingContainer);
-                        this._matchingContainer.querySelector('.matching-game__wrapper span').classList.remove('ingAnimation');
-                        setCommentInfoModal(this._matchingContainer, `Start for ${data.counter - 5}s`);
+                        this._matchingContainer.remove();
+                        this._matchingContainer = undefined;
+
+                        openBoardModal(this, GAME_TYPE.RANDOM, userList);
+                        this._boardContainer.querySelector('.modal__ready-btn').remove();
                     } else if (5 < data.counter) {
-                        setCommentInfoModal(this._matchingContainer, `Start for ${data.counter - 5}s`);
+                        setInfoMessageAtModal(this._boardContainer, data.counter - 5);
                     } else if (data.counter === 5) {
                         openPlayGameModal(this, GAME_TYPE.RANDOM, userList);
                         this._gameApp = new GameApp(this._gameCanvas, GAME_TYPE.RANDOM);
                         this._gameApp.setPlayer(data.player);
 
-                        this._matchingContainer.remove();
-                        this._matchingContainer = undefined;
+                        this._boardContainer.remove();
+                        this._boardContainer = undefined;
 
                         this._gameApp.renderConter(data.counter);
                     } else if (data.counter < 5) {
@@ -277,6 +280,10 @@ class SocketApp {
         if (this.isGameState() === SOCKET_STATE.OPEN) {
             this._gameSocket.send(JSON.stringify(data));
         }
+    }
+
+    closeGameModal() {
+        this._gameContiner.remove();
     }
 
     isGameState() {
