@@ -184,7 +184,7 @@ export async function processMessage(chatApp, messageData) {
         const newToast = document.createElement('div');
         const msgTime = new Date(messageData.time);
         // TODO : fromNickname 수정
-        newToast.innerHTML = routes["/chat"].chatAlertTemplate(messageData.from, messageData.message, `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
+        newToast.innerHTML = routes["/chat"].chatAlertTemplate("New Message", messageData.message, `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
         
         app.querySelector(".toast").appendChild(newToast);
         newToast.querySelector(".chat__alert--close-btn").onclick = () => {
