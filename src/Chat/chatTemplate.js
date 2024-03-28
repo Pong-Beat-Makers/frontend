@@ -95,6 +95,20 @@ class Chat {
             </div>
 		`;
 	}
+
+    chatAlertTemplate(name, msg, time) {
+        return `
+        <div class="chat__alert--container">
+            <div class="chat__alert--icon"></div>
+            <div class="chat__alert--contents">
+                <div class="chat__alert--title">${name}</div>
+                <div class="chat__alert--text">${msg}</div>
+            </div>
+            <div class="chat__alert--time">${time}</div>
+            <button class="chat__alert--close-btn">X</button>
+        </div>
+        `;
+    }
 }
 
 export default new Chat();

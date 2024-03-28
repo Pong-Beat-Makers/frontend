@@ -181,21 +181,19 @@ export async function processMessage(chatApp, messageData) {
         }
     });
     if (!isRender) {
-        // TODO: message alert
-        await Notification.requestPermission(function (result) {
-            if (result === "denied")
-                alert('알림이 차단된 상태입니다. 브라우저 설정에서 알림을 허용해주세요!');
-        });
+        const newToast = document.createElement('div');
+        const msgTime = new Date(messageData.time);
+        // TODO : fromNickname 수정
+        newToast.innerHTML = routes["/chat"].chatAlertTemplate("New Message", messageData.message, `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
+        
+        app.querySelector(".toast").appendChild(newToast);
+        newToast.querySelector(".chat__alert--close-btn").onclick = () => {
+            newToast.remove();
+        }
+        setTimeout( function() { newToast.remove(); }, 3000);
 
         messageData.isRead = false;
         saveNewMsg(messageData);
         await showChatList(chatApp);
-
-        // TODO: 알림 기능 체크, 아이콘 등록
-        const noti = new Notification(messageData.from, {
-            body: messageData.message,
-            // icon: `/lib/img/novalogo_copy.png`,
-        });
-        setTimeout( function() { noti.close(); }, 3000);
     }
 }
