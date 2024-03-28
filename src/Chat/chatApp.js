@@ -75,7 +75,7 @@ class ChatApp {
                 closedChatLog(getOpponent(data), this);
                 await processMessage(this, data);
 
-                if (player.getId() === data.from_id) {
+                if (data.status === 'invite' && player.getId() === data.from_id) {
                     closedChatLog(getOpponent(data), this);
 
                     const userDetail = await player.getUserDetail(getOpponent(data));
@@ -119,9 +119,19 @@ class ChatApp {
     inviteGame(userId) {
         /*
         *   "target_id": "<초대하고자 하는 대상 id>",
-        *   "type" : "invite_game"
+        *   "type" : "invite_game",
+        *   "status: "invite"
         * */
-        this._send({target_id: userId, type: "invite_game"});
+        this._send({target_id: userId, type: "invite_game", status: 'invite'});
+    }
+
+    cancelInviteGame(userId) {
+        /*
+        *   "target_id": "<초대하고자 하는 대상 id>",
+        *   "type" : "invite_game",
+        *   "status: "cancel"
+        * */
+        this._send({target_id: userId, type: "invite_game", status: 'cancel'});
     }
 
     sendMessage(userId, message) {

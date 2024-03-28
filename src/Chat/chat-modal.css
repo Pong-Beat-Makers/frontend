@@ -89,7 +89,7 @@
 }
 
 .chatbox__invite-btn {
-    background-color: rgb(var(--font-color));
+    background-color: #cfa9ff;
     padding: 15px 70px;
     border-radius: 10px;
     font-size: 18px;
@@ -98,7 +98,8 @@
 }
 
 .chatbox__invite-btn:disabled {
-    filter: brightness(.5);
+    color: gray;
+    filter: brightness(.7);
     cursor: default;
 }
 

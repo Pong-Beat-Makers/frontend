@@ -33,30 +33,39 @@ export function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) 
 
     chatBoxNode.innerHTML += routes["/chat"].chatBoxTemplate(newMsgObj.message?newMsgObj.message:'', `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
 
+    frameNode.appendChild(chatBoxNode);
     if (newMsgObj.type === 'invite_game') {
-        const inviteBtn = document.createElement('button');
-        const messageNode = chatBoxNode.querySelector('.chatbox__message');
+        if (newMsgObj.status === 'invite') {
+            const messageNode = chatBoxNode.querySelector('.chatbox__message');
+            const inviteBtn = document.createElement('button');
 
-        inviteBtn.classList.add('chatbox__invite-btn');
-        inviteBtn.innerText = "Join the Game";
+            inviteBtn.classList.add('chatbox__invite-btn');
+            inviteBtn.innerText = "Join the Game";
 
-        if (newMsgObj.closed) {
-            inviteBtn.disabled = true;
-        }
+            if (newMsgObj.closed) {
+                inviteBtn.disabled = true;
+            }
 
-        messageNode.appendChild(inviteBtn);
+            messageNode.appendChild(inviteBtn);
 
-        inviteBtn.onclick = async () => {
-            const userDetail = await player.getUserDetail(getOpponent(newMsgObj));
-            const socketApp = SocketApp;
+            inviteBtn.onclick = async () => {
+                const userDetail = await player.getUserDetail(getOpponent(newMsgObj));
+                const socketApp = SocketApp;
 
-            socketApp.inviteGameRoom(newMsgObj.room_id, [player.getInfo(), userDetail], chatApp);
-            closedChatLog(userDetail.id, chatApp);
+                socketApp.inviteGameRoom(newMsgObj.room_id, [player.getInfo(), userDetail], chatApp);
+                closedChatLog(userDetail.id, chatApp);
+            }
+        } else if (newMsgObj.status === 'cancel') {
+            chatBoxNode.remove();
+
+            const cancelMessageNode = document.createElement('div');
+            cancelMessageNode.classList.add('chatbox__system');
+
+            cancelMessageNode.innerHTML = 'User Canceled The Game';
+
+            frameNode.appendChild(cancelMessageNode);
         }
     }
-
-    frameNode.appendChild(chatBoxNode);
-
     frameNode.scrollTop = frameNode.scrollHeight;
     if (isNew) {
         saveNewMsg(newMsgObj);

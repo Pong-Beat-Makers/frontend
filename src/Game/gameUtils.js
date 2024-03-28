@@ -193,11 +193,6 @@ export function handleGameModal() {
     });
 }
 
-export function removeAllEventListener(node) {
-    const listeners = getEventListeners(node);
-    console.log(listeners);
-}
-
 export function toggleFocusOut(gameContainer, isNotFocus = true) {
     if (gameContainer.querySelector('.game-modal-name__end') !== null) {
         return ;
@@ -251,7 +246,7 @@ export function exitInviteGame(container, socketApp, chatApp, userDetail) {
     container.querySelector('.matching-game__btn').addEventListener('click', () => {
         socketApp.gameClose();
         // TODO: invite Game Cancel event
-        chatApp.sendMessage(userDetail.id, 'Cancel Invite.');
+        chatApp.cancelInviteGame(userDetail.id);
     })
 }
 

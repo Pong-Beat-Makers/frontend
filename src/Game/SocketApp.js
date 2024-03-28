@@ -11,7 +11,7 @@ import {
     getInfoPlayerList,
     generateGuest,
     orderPlayers, setCommentInfoModal, removeExitBtnInfoModal,
-    exitInviteGame, toggleFocusOut, removeAllEventListener
+    exitInviteGame, toggleFocusOut
 } from "./gameUtils.js";
 import GameApp from "./gameApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
