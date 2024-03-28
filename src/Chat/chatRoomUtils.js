@@ -1,7 +1,13 @@
 import { routes } from "../route.js";
-import {friendModalClick, modalRender, setAvatar} from "../Profile/modalUtils.js";
-import {CHATLOG_PREFIX, renderChatBox, showChatList} from "./chatPageUtils.js";
-import {closedChatLog, readChatLog} from "./chatSocketUtils.js";
+import {modalRender, setAvatar} from "../Profile/modalUtils.js";
+import {SYSTEM_MESSAGE, CHATLOG_PREFIX, renderChatBox, showChatList, renderSystemChatAdmin} from "./chatPageUtils.js";
+import {readChatLog, readSystemLog} from "./chatSocketUtils.js";
+
+export function getSystemLog() {
+    const systemLog = localStorage.getItem(SYSTEM_MESSAGE);
+
+    return systemLog? JSON.parse(systemLog) : [];
+}
 
 function getChatLog(userId) {
     /*
@@ -17,6 +23,20 @@ function getChatLog(userId) {
 
     return chatLog ? JSON.parse(chatLog) : [];
 }
+
+export function loadSystemChatLog(chatContainer) {
+    const frameNode = chatContainer.querySelector('.chat__body--frame');
+
+    if (frameNode !== null) {
+        frameNode.innerHTML = "";
+
+        const systemLog = getSystemLog();
+        systemLog.forEach(log => {
+            renderSystemChatAdmin(chatContainer, log);
+        });
+    }
+}
+
 export function loadChatLog(chatContainer, userId, chatApp) {
     const frameNode = chatContainer.querySelector('.chat__body--frame');
 
@@ -53,6 +73,27 @@ async function handleBlockToggle(chatApp, userData, blockToggleBtn, isBlocked) {
     } catch (e) {
         // TODO: error modal
     }
+}
+
+export async function showSystemRoom(chatApp) {
+    const chatModal = modalRender('chat', routes["/chat"].modalTemplate());
+    const chatContainer = chatModal.querySelector('.chat__container');
+    const avatar = chatContainer.querySelector('.chat__header--avatar');
+    const chatHeaderBtns = chatContainer.querySelectorAll(".chat__header--btn");
+    const controller = chatContainer.querySelector('.chat__body--controller');
+    const roomName = chatContainer.querySelector('.chat__header--name');
+
+    chatContainer.classList.add('system__chat--container');
+
+    avatar.classList.add('system__avatar');
+    chatHeaderBtns.forEach(btn => btn.remove());
+    controller.remove();
+    roomName.innerHTML = 'System';
+
+    loadSystemChatLog(chatContainer);
+
+    readSystemLog();
+    await showChatList(chatApp);
 }
 
 export async function showChatroom(chatApp, userData) {

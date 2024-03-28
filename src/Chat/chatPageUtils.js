@@ -1,16 +1,45 @@
 import { routes } from "../route.js";
-import { showChatroom } from "./chatRoomUtils.js";
+import {showChatroom, showSystemRoom} from "./chatRoomUtils.js";
 import {player} from "../app.js";
 import {setAvatar} from "../Profile/modalUtils.js";
-import {closedChatLog, getChatLog, getOpponent, saveNewMsg} from "./chatSocketUtils.js";
+import {closedChatLog, getChatLog, getOpponent, saveNewMsg, saveSystemMsg} from "./chatSocketUtils.js";
 import SocketApp from "../Game/SocketApp.js";
 
+export const SYSTEM_MESSAGE = 'systemLog';
 export const CHATLOG_PREFIX = 'chatLog_';
 
-function getLastObj(chatId) {
-    const valueAll = JSON.parse(localStorage.getItem(chatId));
-    const lastObj = valueAll[valueAll.length - 1];
-    return lastObj;
+function getLastObj(key) {
+    const localStorageLog = localStorage.getItem(key);
+    const chatLog = localStorageLog ? JSON.parse(localStorageLog) : [];
+
+    if (chatLog.length > 0) {
+        return chatLog[chatLog.length - 1];
+    }
+    return undefined;
+}
+
+export function renderSystemChatAdmin(chatContainer, newMsgObj, isNew = false) {
+    /*
+    * newMsgObj: {
+    *   type: <string>,
+    *   to_id: <int>,
+    *   message: <string>,
+    *   time: <string>,
+    *   toRead: <boolean>
+    * }
+    * */
+    const frameNode = chatContainer.querySelector('.chat__body--frame');
+
+    const chatBoxItem = document.createElement('div');
+    chatBoxItem.classList.add('chatbox__system');
+
+    chatBoxItem.innerHTML = newMsgObj.message;
+
+    frameNode.appendChild(chatBoxItem);
+
+    if (isNew) {
+        saveSystemMsg(newMsgObj);
+    }
 }
 
 export function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) {
@@ -86,6 +115,41 @@ export function renderSystemChatBox(app, message, userId) {
     });
 }
 
+export function renderSystemRoom(chatRoomList, lastObj, chatApp) {
+    /*
+    * lastObj: {
+    *   type: "system_message",
+    *   from: "admin",
+    *   room_id: <string>,
+    *   message: <string>,
+    *   time: <string>,
+    *   isRead: <boolean>
+    *   }
+    * */
+    const systemRoom = document.createElement('div');
+    systemRoom.classList.add('chat__room', 'chat__room--system');
+
+    let message = "";
+    let timeStamp = "";
+
+    if (lastObj !== undefined) {
+        message = lastObj.message;
+        const msgTime = new Date(lastObj.time);
+        timeStamp = `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`;
+
+        if (!lastObj.isRead) {
+            systemRoom.classList.add('chat__room--no-read');
+        }
+    }
+    systemRoom.innerHTML = routes['/chat'].systemRoomTemplate(message, timeStamp);
+
+    chatRoomList.appendChild(systemRoom);
+
+    systemRoom.addEventListener('click', async () => {
+        await showSystemRoom(chatApp);
+    });
+}
+
 export async function renderChatRoom(chatRoomList, lastObj, chatApp) {
     /*
     * lastObj : {
@@ -139,10 +203,16 @@ export async function showChatList(chatApp) {
 
     if (chatRoomList !== null) {
         chatRoomList.innerHTML = "";
+
+        renderSystemRoom(chatRoomList, getLastObj(SYSTEM_MESSAGE), chatApp);
+
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (key.startsWith(CHATLOG_PREFIX)) {
-                await renderChatRoom(chatRoomList, getLastObj(key), chatApp);
+                const lastObj = getLastObj(key);
+                if (lastObj !== undefined) {
+                    await renderChatRoom(chatRoomList, lastObj, chatApp);
+                }
             }
         }
         if (chatRoomList.innerHTML === "")

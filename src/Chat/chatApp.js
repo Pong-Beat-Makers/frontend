@@ -6,7 +6,7 @@ import {
     setupFriendListStatus
 } from "../Profile/modalUtils.js";
 import {renderSystemChatBox} from "./chatPageUtils.js";
-import {closedChatLog, getOpponent, processMessage} from "./chatSocketUtils.js";
+import {closedChatLog, getOpponent, processMessage, processSystemMessage} from "./chatSocketUtils.js";
 import {SOCKET_STATE} from "../Game/SocketApp.js";
 import SocketApp from "../Game/SocketApp.js";
 
@@ -33,10 +33,14 @@ class ChatApp {
         chatSocket.onmessage = async e => {
             const data = JSON.parse(e.data);
 
-            if (data.message === 'You have successfully logged') {
-                this._friendsOnline = data.online_friends;
+            if (data.type === 'system_message') {
+                if (data.message === 'You have successfully logged') {
+                    this._friendsOnline = data.online_friends;
+                    delete data.online_friends;
 
-                setupFriendListStatus(this._friendListNode, this._friendsOnline);
+                    setupFriendListStatus(this._friendListNode, this._friendsOnline);
+                }
+                await processSystemMessage(this, data);
             } else if (data.type === 'send_status') {
                 const friendItem = findItemFromFriendList(this._friendListNode, data.from_id);
                 if (friendItem !== undefined) {
