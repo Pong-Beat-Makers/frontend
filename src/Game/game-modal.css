@@ -293,6 +293,10 @@ canvas {
     opacity: .7;
 }
 
+.game-modal__background.light {
+    opacity: .4;
+}
+
 .game-modal__wrapper {
     position: absolute;
     display: flex;
@@ -312,4 +316,10 @@ canvas {
 
 .game-modal__lose {
     color: #9d1a1a;
+}
+
+.game-modal__message {
+    position: absolute;
+    font-size: 60px;
+    color: rgb(var(--sub-color));
 }

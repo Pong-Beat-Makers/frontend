@@ -4,6 +4,7 @@ import SocketApp from "./SocketApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
 import {player} from "../app.js";
 import {PROFILE_DEFAULT_IMAGE} from "../Login/player.js";
+import {closedChatLog} from "../Chat/chatSocketUtils.js";
 
 export function generateGuest(guestName = 'GUEST', avoidList = []) {
     let profileIdx = Math.floor(Math.random() * PROFILE_DEFAULT_IMAGE.length);
@@ -52,6 +53,7 @@ export function orderPlayers(playerNumber, players) {
 
 export function openPlayGameModal(socketApp, gameType, players) {
     const modalContainer = modalRender('play-game', routes['/game'].playGameTemplate(), false);
+    const playGround = modalContainer.querySelector('#game_playground');
 
     modalContainer.querySelector('.playgame__btn').addEventListener('click', () => {
         socketApp.gameClose();
@@ -61,7 +63,17 @@ export function openPlayGameModal(socketApp, gameType, players) {
     setupInfoAtModal(modalContainer, gameType, players);
 
     socketApp.setGameContainer(modalContainer);
-    socketApp.setGameCanvas(modalContainer.querySelector('#game_playground'));
+    socketApp.setGameCanvas(playGround);
+
+    playGround.focus();
+
+    const focusOutEvent = playGround.addEventListener('focusout', () => {
+        toggleFocusOut(playGround, true);
+    });
+
+    playGround.addEventListener('focusin', () => {
+        toggleFocusOut(playGround, false);
+    })
 }
 
 export function openMatchingModal(gameType) {
@@ -70,7 +82,7 @@ export function openMatchingModal(gameType) {
 
     socketApp.matching(gameType);
 
-    document.querySelector('.matching-game__btn').addEventListener('click', () => {
+    modalContainer.querySelector('.matching-game__btn').addEventListener('click', () => {
         closeMatchingModal(modalContainer, socketApp);
     });
 
@@ -181,9 +193,29 @@ export function handleGameModal() {
     });
 }
 
+export function toggleFocusOut(gameContainer, isNotFocus = true) {
+    if (gameContainer.querySelector('.game-modal-name__end') !== null) {
+        return ;
+    }
+
+    if (isNotFocus) {
+        const modalContainer = document.createElement('div');
+        modalContainer.classList.add('game-modal__container', 'game-modal-name__focus');
+
+        modalContainer.innerHTML = routes['/game'].gameInfoModalTemplate('Out of focus');
+
+        gameContainer.appendChild(modalContainer);
+    } else {
+        const modalContainer = gameContainer.querySelector('.game-modal__container.game-modal-name__focus');
+        if (modalContainer !== null) {
+            modalContainer.remove();
+        }
+    }
+}
+
 export function renderEndStatus(gameContainer, gamePlayer, score, gameType) {
     const modalContainer = document.createElement('div');
-    modalContainer.classList.add('game-modal__container');
+    modalContainer.classList.add('game-modal__container', 'game-modal-name__end');
 
     let status = 'YOU <span class="game-modal__win">WIN!</span>';
 
@@ -206,10 +238,29 @@ export function renderEndStatus(gameContainer, gamePlayer, score, gameType) {
     gameContainer.appendChild(modalContainer);
 }
 
-export function openErrorModal(comment) {
-    const modalContainer = modalRender('matching-game', routes['/game'].errorModalTemplate(comment));
+export function removeExitBtnInfoModal(container) {
+    container.querySelector('.matching-game__btn').remove();
+}
+
+export function exitInviteGame(container, socketApp, chatApp, userDetail) {
+    container.querySelector('.matching-game__btn').addEventListener('click', () => {
+        socketApp.gameClose();
+        // TODO: invite Game Cancel event
+        chatApp.cancelInviteGame(userDetail.id);
+    })
+}
+
+export function setCommentInfoModal(container, comment) {
+    const commentNode = container.querySelector('.matching-game__wrapper span');
+
+    commentNode.innerHTML = comment;
+}
+
+export function openInfoModal(comment, backgroundClick = true) {
+    const modalContainer = modalRender('matching-game', routes['/game'].infoModalTemplate(comment), backgroundClick);
 
     modalContainer.querySelector('.matching-game__btn').addEventListener('click', () => {
         modalContainer.remove();
     });
+    return modalContainer;
 }

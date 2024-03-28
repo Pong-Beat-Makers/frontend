@@ -14,6 +14,20 @@ class Chat {
         `;
     }
 
+    systemRoomTemplate(msg, time) {
+        return `
+            <div class="system-room__profile system__avatar"></div>
+            <div class="system-room__contents">
+                <div class="system-room__name">System</div>
+                <div class="system-room__msg">${msg}</div>
+            </div>
+            <div class="system-room__info">
+                <div class="system-room__alert"></div>
+                <div class="system-room__time">${time}</div>
+            </div>
+        `;
+    }
+
     chatRoomTemplate(name, msg, time) {
         return `
             <div class="chat__empty"></div>

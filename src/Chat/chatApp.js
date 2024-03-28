@@ -6,8 +6,9 @@ import {
     setupFriendListStatus
 } from "../Profile/modalUtils.js";
 import {renderSystemChatBox} from "./chatPageUtils.js";
-import {processMessage} from "./chatSocketUtils.js";
+import {closedChatLog, getOpponent, processMessage, processSystemMessage} from "./chatSocketUtils.js";
 import {SOCKET_STATE} from "../Game/SocketApp.js";
+import SocketApp from "../Game/SocketApp.js";
 
 const CHAT_API = `${CHAT_SERVER_DOMAIN}/${CHAT_API_DOMAIN}`;
 
@@ -32,10 +33,14 @@ class ChatApp {
         chatSocket.onmessage = async e => {
             const data = JSON.parse(e.data);
 
-            if (data.message === 'You have successfully logged') {
-                this._friendsOnline = data.online_friends;
+            if (data.type === 'system_message') {
+                if (data.message === 'You have successfully logged') {
+                    this._friendsOnline = data.online_friends;
+                    delete data.online_friends;
 
-                setupFriendListStatus(this._friendListNode, this._friendsOnline);
+                    setupFriendListStatus(this._friendListNode, this._friendsOnline);
+                }
+                await processSystemMessage(this, data);
             } else if (data.type === 'send_status') {
                 const friendItem = findItemFromFriendList(this._friendListNode, data.from_id);
                 if (friendItem !== undefined) {
@@ -56,11 +61,31 @@ class ChatApp {
                 *   time: <string>
                 * }
                 * */
-                await processMessage(this, app, data);
+                await processMessage(this, data);
             } else if (data.type === 'system_message') {
                 if (data.error === 'No User or Offline') {
                     // TODO: offline message
                     renderSystemChatBox(this._app, 'Offline User', data.from_id);
+                }
+            } else if (data.type === 'invite_game') {
+                /*
+                * type: <string>,
+                * from_id: <int>,
+                * to_id: <int>,
+                * room_id: <string>,
+                * time: <string>
+                * */
+                // TODO: Blocked User 에게도 보내짐
+                closedChatLog(getOpponent(data), this);
+                await processMessage(this, data);
+
+                if (data.status === 'invite' && player.getId() === data.from_id) {
+                    closedChatLog(getOpponent(data), this);
+
+                    const userDetail = await player.getUserDetail(getOpponent(data));
+                    const socketApp = SocketApp;
+
+                    socketApp.inviteGameRoom(data.room_id, [player.getInfo(), userDetail], this);
                 }
             }
         }
@@ -93,6 +118,24 @@ class ChatApp {
             throw {error: res.status};
         }
         return await res.json();
+    }
+
+    inviteGame(userId) {
+        /*
+        *   "target_id": "<초대하고자 하는 대상 id>",
+        *   "type" : "invite_game",
+        *   "status: "invite"
+        * */
+        this._send({target_id: userId, type: "invite_game", status: 'invite'});
+    }
+
+    cancelInviteGame(userId) {
+        /*
+        *   "target_id": "<초대하고자 하는 대상 id>",
+        *   "type" : "invite_game",
+        *   "status: "cancel"
+        * */
+        this._send({target_id: userId, type: "invite_game", status: 'cancel'});
     }
 
     sendMessage(userId, message) {

@@ -1,9 +1,13 @@
-import {FRONTEND, GAME_WEBSOCKET} from "../Public/global.js";
 import { routes } from "../route.js";
-import {friendModalClick, modalRender, setAvatar} from "../Profile/modalUtils.js";
-import Player from "../Login/player.js";
-import {CHATLOG_PREFIX, renderChatBox, showChatList} from "./chatPageUtils.js";
-import {readChatLog} from "./chatSocketUtils.js";
+import {modalRender, setAvatar} from "../Profile/modalUtils.js";
+import {SYSTEM_MESSAGE, CHATLOG_PREFIX, renderChatBox, showChatList, renderSystemChatAdmin} from "./chatPageUtils.js";
+import {readChatLog, readSystemLog} from "./chatSocketUtils.js";
+
+export function getSystemLog() {
+    const systemLog = localStorage.getItem(SYSTEM_MESSAGE);
+
+    return systemLog? JSON.parse(systemLog) : [];
+}
 
 function getChatLog(userId) {
     /*
@@ -19,23 +23,38 @@ function getChatLog(userId) {
 
     return chatLog ? JSON.parse(chatLog) : [];
 }
-function loadChatLog(chatContainer, userId) {
-    const chatLog = getChatLog(userId);
-    chatLog.forEach(log => {
-        renderChatBox(chatContainer, log);
-    });
-    // localStorage.setItem(chatId, JSON.stringify(chatLog));
+
+export function loadSystemChatLog(chatContainer) {
+    const frameNode = chatContainer.querySelector('.chat__body--frame');
+
+    if (frameNode !== null) {
+        frameNode.innerHTML = "";
+
+        const systemLog = getSystemLog();
+        systemLog.forEach(log => {
+            renderSystemChatAdmin(chatContainer, log);
+        });
+    }
+}
+
+export function loadChatLog(chatContainer, userId, chatApp) {
+    const frameNode = chatContainer.querySelector('.chat__body--frame');
+
+    if (frameNode !== null) {
+        frameNode.innerHTML = "";
+
+        const chatLog = getChatLog(userId);
+        chatLog.forEach(log => {
+            renderChatBox(chatContainer, log, chatApp);
+        });
+    }
 }
 
 function handleInvite(chatApp, userData) {
     /*
     * userData: {id: <string>, nickname: <string>, profile: <string>}
     * */
-    const roomAddress = `${GAME_WEBSOCKET}/ws/game/${crypto.randomUUID()}`;
-
-    chatApp.sendMessage(userData.id, `<button class="chatbox__invite-btn" id="${crypto.randomUUID()}">invite</button>`);
-    // 추후 식별 가능 문자열로 바꿔서 이 메시지 받으면 게임 참여하기 버튼으로 바뀌게 하기 !
-    // window.location.href(roomAddress);
+    chatApp.inviteGame(userData.id);
 }
 
 async function handleBlockToggle(chatApp, userData, blockToggleBtn, isBlocked) {
@@ -54,6 +73,27 @@ async function handleBlockToggle(chatApp, userData, blockToggleBtn, isBlocked) {
     } catch (e) {
         // TODO: error modal
     }
+}
+
+export async function showSystemRoom(chatApp) {
+    const chatModal = modalRender('chat', routes["/chat"].modalTemplate());
+    const chatContainer = chatModal.querySelector('.chat__container');
+    const avatar = chatContainer.querySelector('.chat__header--avatar');
+    const chatHeaderBtns = chatContainer.querySelectorAll(".chat__header--btn");
+    const controller = chatContainer.querySelector('.chat__body--controller');
+    const roomName = chatContainer.querySelector('.chat__header--name');
+
+    chatContainer.classList.add('system__chat--container');
+
+    avatar.classList.add('system__avatar');
+    chatHeaderBtns.forEach(btn => btn.remove());
+    controller.remove();
+    roomName.innerHTML = 'System';
+
+    loadSystemChatLog(chatContainer);
+
+    readSystemLog();
+    await showChatList(chatApp);
 }
 
 export async function showChatroom(chatApp, userData) {
@@ -93,7 +133,7 @@ export async function showChatroom(chatApp, userData) {
 
         chatModal.querySelector(".chat__header--name").innerHTML = userData.nickname;
 
-        loadChatLog(chatContainer, userData.id);
+        loadChatLog(chatContainer, userData.id, chatApp);
 
         sendBtn.addEventListener('click', e => {
             chatApp.sendMessage(userData.id, msgInput.value);

@@ -2,7 +2,7 @@ import {
     closeMatchingModal,
     openPlayGameModal,
     openBoardModal,
-    openErrorModal,
+    openInfoModal,
     setupConnectPeopleAtMatchingModal,
     changeGiveUpToEnd,
     renderEndStatus,
@@ -10,7 +10,8 @@ import {
     setInfoMessageAtModal,
     getInfoPlayerList,
     generateGuest,
-    orderPlayers
+    orderPlayers, setCommentInfoModal, removeExitBtnInfoModal,
+    exitInviteGame, toggleFocusOut
 } from "./gameUtils.js";
 import GameApp from "./gameApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
@@ -90,7 +91,7 @@ class SocketApp {
         }
 
         waitSocket.onerror = () => {
-            openErrorModal('There was a problem with the game server.');
+            openInfoModal('There was a problem with the game server.');
         }
 
         waitSocket.onclose = () => {
@@ -107,7 +108,72 @@ class SocketApp {
         this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.TWO_PLAYER, userList);
     }
 
-    _enterGameRoom(room_id, gameType, userList, tournamentPlayerNumber) {
+    inviteGameRoom(room_id, userList, chatApp) {
+        const gameSocket = new WebSocket(`${GAME_WEBSOCKET}/ws/game/${room_id}/`);
+        console.log(`enter the room id: ${room_id}`);
+        this._matchingContainer = openInfoModal('Waiting for user', false);
+        this._matchingContainer.querySelector('.matching-game__wrapper span').classList.add('ingAnimation');
+        exitInviteGame(this._matchingContainer, this, chatApp, userList[1]);
+
+        gameSocket.addEventListener('message', async e => {
+            const data = JSON.parse(e.data);
+
+            if (data.type === 'send_system_message') {
+                if (data.message === 'Game Ready') {
+                    if (data.counter === 10) {
+                        removeExitBtnInfoModal(this._matchingContainer);
+                        this._matchingContainer.querySelector('.matching-game__wrapper span').classList.remove('ingAnimation');
+                        setCommentInfoModal(this._matchingContainer, `Start for ${data.counter - 5}s`);
+                    } else if (5 < data.counter) {
+                        setCommentInfoModal(this._matchingContainer, `Start for ${data.counter - 5}s`);
+                    } else if (data.counter === 5) {
+                        openPlayGameModal(this, GAME_TYPE.RANDOM, userList);
+                        this._gameApp = new GameApp(this._gameCanvas, GAME_TYPE.RANDOM);
+                        this._gameApp.setPlayer(data.player);
+
+                        this._matchingContainer.remove();
+                        this._matchingContainer = undefined;
+
+                        this._gameApp.renderConter(data.counter);
+                    } else if (data.counter < 5) {
+                        this._gameApp.renderConter(data.counter);
+                    }
+                } else if (data.message === 'Game Start') {
+                    this._gameApp.renderConter(data.counter);
+
+                    this._gameContiner.addEventListener('keydown', e => {
+                        if (e.key === 'ArrowLeft') this._gameSend({'move': 'up'});
+                        else if (e.key === 'ArrowRight') this._gameSend({'move': 'down'});
+                        else if (e.keyCode === 67) this._gameApp.toggleCamera();
+                    });
+
+                    this._gameContiner.addEventListener('keyup', e => {
+                        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') this._gameSend({'move': 'stop'});
+                    });
+                } else if (data.message === 'Game End') {
+                    toggleFocusOut(this._gameCanvas, false);
+                    renderEndStatus(this._gameCanvas, this._gameApp.getPlayer(), data.score, GAME_TYPE.RANDOM);
+                    changeGiveUpToEnd(this._gameContiner);
+                }
+            } else if (data.type === 'send_game_status') {
+                this._gameApp.dataRander(data);
+            }
+        });
+
+        gameSocket.onopen = () => {
+            this.readyToPlay();
+        }
+
+        gameSocket.onerror = () => {
+            this._matchingContainer.remove();
+            this.gameClose();
+            openInfoModal('There was a problem with the game server.');
+        }
+
+        this._gameSocket = gameSocket;
+    }
+
+    _enterGameRoom(room_id, gameType, userList) {
         const gameSocket = new WebSocket(`${GAME_WEBSOCKET}/ws/game/${room_id}/`);
         console.log(`enter the room id: ${room_id}`);
 
@@ -165,6 +231,7 @@ class SocketApp {
                         });
                     }
                 } else if (data.message === 'Game End') {
+                    toggleFocusOut(this._gameCanvas, false);
                     renderEndStatus(this._gameCanvas, this._gameApp.getPlayer(), data.score, gameType);
                     changeGiveUpToEnd(this._gameContiner);
                 }
@@ -184,7 +251,7 @@ class SocketApp {
        gameSocket.onerror = () => {
            this._boardContainer.remove();
            this.gameClose();
-           openErrorModal('There was a problem with the game server.');
+           openInfoModal('There was a problem with the game server.');
        }
 
         this._gameSocket = gameSocket;

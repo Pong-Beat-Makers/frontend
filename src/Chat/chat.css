@@ -82,6 +82,7 @@ input#chat__search--input::placeholder {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding: 5px 0;
 }
 
 .chat__room--msg {
@@ -89,6 +90,7 @@ input#chat__search--input::placeholder {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    padding: 5px 0;
 }
 
 .chat__room--info {
@@ -134,4 +136,74 @@ input#chat__search--input::placeholder {
     text-overflow: ellipsis;
     text-align: center;
     text-wrap: nowrap;
+}
+
+/*
+* system room
+*/
+
+.chat__room--system {
+    background-color: #989898;
+}
+
+.system__avatar {
+    background-image: url("../assets/system.svg");
+    background-size: cover;
+}
+
+.system-room__profile {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background-color: #D9D9D9;
+    margin: 0 20px;
+}
+
+.system-room__name {
+    font-size: 24px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 5px 0;
+}
+
+.system-room__contents {
+    width: 65%;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.system__room--msg {
+    font-size: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 5px 0;
+}
+
+.system-room__info {
+    margin-top: 7px;
+    display: flex;
+    align-self: flex-start;
+    margin-left: auto;
+}
+
+.system-room__time {
+    font-size: 15px;
+    font-weight: 100;
+    margin-left: 15px;
+    margin-right: 10px;
+}
+
+.chat__room.chat__room--no-read .system-room__alert {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: #FF8730;
+    margin-left: 2px;
+    position: relative;
+    top: 1px;
 }
