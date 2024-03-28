@@ -210,6 +210,19 @@ class Player {
             status: this._status
         };
     }
+
+    forgetMe() {
+        this._status = USER_STATUS.DOSE_NOT_EXIST;
+        this._token = undefined;
+        this._id = undefined;
+        this._nickName = undefined;
+        this._profile = undefined;
+        this._status_message = undefined;
+        this._win = undefined;
+        this._lose = undefined;
+        this._rank = undefined;
+        this._set_2fa = undefined;
+    }
 }
 
 export default new Player();

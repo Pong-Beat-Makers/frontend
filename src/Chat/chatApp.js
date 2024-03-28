@@ -15,7 +15,6 @@ const CHAT_API = `${CHAT_SERVER_DOMAIN}/${CHAT_API_DOMAIN}`;
 class ChatApp {
     constructor(app) {
         this._app = app;
-        this._friendListNode = app.querySelector('.profile-section__friends--list');
         this._friendsOnline = [];
 
         const chatSocket = new WebSocket(`${CHAT_WEBSOCKET}/ws/chatting/`);
@@ -38,7 +37,7 @@ class ChatApp {
                     this._friendsOnline = data.online_friends;
                     delete data.online_friends;
 
-                    setupFriendListStatus(this._friendListNode, this._friendsOnline);
+                    setupFriendListStatus();
                 } else if (data.message === 'Next Match') {
                     const room_id = data.room_id;
                     delete data.room_id;
@@ -49,6 +48,10 @@ class ChatApp {
 
                     socketApp.closeGameModal();
                     socketApp.inviteGameRoom(room_id, [player.getInfo(), userDetail], this);
+                } else if (data.error === 'No User or Offline') {
+                    // TODO: offline message
+                    renderSystemChatBox(this._app, 'Offline User', data.from_id);
+                    return;
                 }
                 await processSystemMessage(this, data);
             } else if (data.type === 'send_status') {
@@ -72,11 +75,6 @@ class ChatApp {
                 * }
                 * */
                 await processMessage(this, data);
-            } else if (data.type === 'system_message') {
-                if (data.error === 'No User or Offline') {
-                    // TODO: offline message
-                    renderSystemChatBox(this._app, 'Offline User', data.from_id);
-                }
             } else if (data.type === 'invite_game') {
                 /*
                 * type: <string>,
@@ -99,11 +97,6 @@ class ChatApp {
                 }
             }
         }
-
-    }
-
-    setFriendsOnline(friendListNode = this._friendListNode) {
-        setupFriendListStatus(friendListNode, this._friendsOnline);
     }
 
     async userBlock(id, isBlocked) {
@@ -158,6 +151,10 @@ class ChatApp {
         }
     }
 
+    setFriendListNode(friendListNode) {
+        this._friendListNode = friendListNode;
+    }
+
     isState() {
         if (this._chatSocket !== undefined)
             return this._chatSocket.readyState;
@@ -166,6 +163,14 @@ class ChatApp {
 
     getApp() {
         return this._app;
+    }
+
+    getFriendListNode() {
+        return this._friendListNode;
+    }
+
+    getFriendsOnline() {
+        return this._friendsOnline;
     }
 }
 
