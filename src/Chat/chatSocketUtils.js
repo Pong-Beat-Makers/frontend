@@ -7,6 +7,7 @@ import {
 } from "./chatPageUtils.js";
 import {player} from "../app.js";
 import {loadChatLog} from "./chatRoomUtils.js";
+import {routes} from "../route.js";
 
 export function getChatLog(usersData = []) {
     /*
@@ -126,6 +127,17 @@ export function saveNewMsg(newMsgObj) {
     }
 }
 
+export async function processNextMatch(chatApp) {
+    const data = {
+        type: "system_message",
+        to_id: player.getId(),
+        message: "Start after 5s",
+        time: new Date().toISOString()
+    }
+
+    await processSystemMessage(chatApp, data);
+}
+
 export async function processSystemMessage(chatApp, messageData) {
     /*
     * messageData: {
@@ -140,22 +152,20 @@ export async function processSystemMessage(chatApp, messageData) {
     if (systemChatContainer !== null) {
         renderSystemChatAdmin(systemChatContainer, messageData);
     } else {
-        // TODO: message alert
-        await Notification.requestPermission(function (result) {
-            if (result === "denied")
-                alert('알림이 차단된 상태입니다. 브라우저 설정에서 알림을 허용해주세요!');
-        });
+        const newToast = document.createElement('div');
+        const msgTime = new Date(messageData.time);
+        // TODO : fromNickname 수정
+        newToast.innerHTML = routes["/chat"].chatAlertTemplate("System Alert", messageData.message, `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
+
+        chatApp.getApp().querySelector(".toast").appendChild(newToast);
+        newToast.querySelector(".chat__alert--close-btn").onclick = () => {
+            newToast.remove();
+        }
+        setTimeout( function() { newToast.remove(); }, 3000);
 
         messageData.isRead = false;
         saveSystemMsg(messageData);
         await showChatList(chatApp);
-
-        // TODO: 알림 기능 체크, 아이콘 등록
-        const noti = new Notification(messageData.from, {
-            body: messageData.message,
-            // icon: `/lib/img/novalogo_copy.png`,
-        });
-        setTimeout( function() { noti.close(); }, 3000);
     }
 }
 
@@ -186,7 +196,7 @@ export async function processMessage(chatApp, messageData) {
         // TODO : fromNickname 수정
         newToast.innerHTML = routes["/chat"].chatAlertTemplate("New Message", messageData.message, `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
         
-        app.querySelector(".toast").appendChild(newToast);
+        chatApp.getApp().querySelector(".toast").appendChild(newToast);
         newToast.querySelector(".chat__alert--close-btn").onclick = () => {
             newToast.remove();
         }

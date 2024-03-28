@@ -148,6 +148,7 @@ export async function showChatroom(chatApp, userData) {
         });
         readChatLog(userData.id);
         await showChatList(chatApp);
+        chatContainer.querySelector('.chat__body--text').focus();
     } catch(e) {
         // TODO: error modal
     }

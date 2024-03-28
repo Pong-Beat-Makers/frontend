@@ -3,8 +3,7 @@ import {DOING, PROFILE_DEFAULT_IMAGE} from '../Login/player.js';
 import {player} from "../app.js";
 import {openInfoModal} from "../Game/gameUtils.js";
 import {showChatroom} from "../Chat/chatRoomUtils.js";
-import {profileModalTemplate, setFriendList} from "../Login/loginUtils.js";
-
+import {profileModalTemplate, renderMainPage, setFriendList} from "../Login/loginUtils.js";
 
 export function decodeHtml(html) {
     const txt = document.createElement("textarea");
@@ -52,7 +51,7 @@ export function toggleAddAndDeleteBtn(chatApp, btnNode, id, doing) {
             btnNode.innerHTML = buttonMsg[1];
             toggleAddAndDeleteBtn(chatApp, btnNode, id, doing === DOING.ADD? DOING.DELETE : DOING.ADD);
             await setFriendList(chatApp);
-            chatApp.setFriendsOnline();
+            setupFriendListStatus();
         }
     } catch (e) {
         // TODO: error modal
@@ -308,7 +307,7 @@ export function handleEditUserModalUtils(app) {
             } else {
                 try {
                     await player.setProfile(data);
-                    location.reload();
+                    await renderMainPage();
                 } catch (e) {
                     openInfoModal(`Something was wrong .. Error code: ${e.error}`);
                 }
@@ -328,6 +327,7 @@ export function setAvatar(playerProfile, divNode) {
 export function setFriendStatus(friendItemNode, isOnline = true) {
     const friendStatus = friendItemNode.querySelector('.profile-section__friends--status');
     const statusText = friendStatus.children[0];
+
 
     if (isOnline) {
         statusText.innerHTML = 'online';
@@ -349,12 +349,18 @@ export function findItemFromFriendList(friendListNode, friendId) {
     return undefined;
 }
 
-export function setupFriendListStatus(friendListNode, friendListData = []) {
-    const friendItems = friendListNode.querySelectorAll('.profile-section__friends--item');
+export function setupFriendListStatus() {
+    const chatApp = player.getChatApp();
+    const friendListNode = chatApp.getFriendListNode();
+    const friendListData = chatApp.getFriendsOnline();
 
-    friendItems.forEach(item => {
-        if (friendListData.includes(Number(item.id))) {
-            setFriendStatus(item, true);
-        }
-    });
+    if (friendListNode !== undefined) {
+        const friendItems = friendListNode.querySelectorAll('.profile-section__friends--item');
+
+        friendItems.forEach(item => {
+            if (friendListData.includes(Number(item.id))) {
+                setFriendStatus(item, true);
+            }
+        });
+    }
 }
