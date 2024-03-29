@@ -211,6 +211,10 @@ class Player {
         };
     }
 
+    setChatApp(chatApp) {
+        this._chatApp = chatApp;
+    }
+
     forgetMe() {
         this._status = USER_STATUS.DOSE_NOT_EXIST;
         this._token = undefined;
@@ -222,6 +226,11 @@ class Player {
         this._lose = undefined;
         this._rank = undefined;
         this._set_2fa = undefined;
+
+        if (this._chatApp !== undefined) {
+            this._chatApp.closeSocket();
+            this._chatApp = undefined;
+        }
     }
 }
 

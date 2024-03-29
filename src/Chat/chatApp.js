@@ -191,6 +191,12 @@ class ChatApp {
     getFriendsOnline() {
         return this._friendsOnline;
     }
+
+    closeSocket() {
+        if (this._chatSocket !== undefined) {
+            this._chatSocket.close();
+        }
+    }
 }
 
 export default ChatApp;
