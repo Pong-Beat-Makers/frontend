@@ -9,6 +9,7 @@ import {renderSystemChatBox} from "./chatPageUtils.js";
 import {closedChatLog, getOpponent, processMessage, processNextMatch, processSystemMessage} from "./chatSocketUtils.js";
 import {SOCKET_STATE} from "../Game/SocketApp.js";
 import SocketApp from "../Game/SocketApp.js";
+import {DOING} from "../Login/player.js";
 
 const CHAT_API = `${CHAT_SERVER_DOMAIN}/${CHAT_API_DOMAIN}`;
 
@@ -59,8 +60,10 @@ class ChatApp {
                 if (friendItem !== undefined) {
                     if (data.status === 'online'){
                         setFriendStatus(friendItem, true);
+                        this.setFriendsOnline(data.from_id);
                     } else if (data.status === 'offline') {
                         setFriendStatus(friendItem, false);
+                        this.setFriendsOnline(data.from_id, DOING.DELETE);
                     }
                 }
             } else if (data.type === 'chat_message') {
@@ -115,9 +118,17 @@ class ChatApp {
         }
     }
 
+    async isOnline(id) {
+        const res = await player._getServer(`${CHAT_API}/is-online/?id=${id}`);
+        if (!res.ok) {
+            throw {error: res.status};
+        }
+        return await res.json();
+    }
+
     async isBlocked(id) {
         const res = await player._getServer(`${CHAT_API}/blockedusers/?target_id=${id}`);
-        if (res.status !== 200) {
+        if (!res.ok) {
             throw {error: res.status};
         }
         return await res.json();
@@ -148,6 +159,14 @@ class ChatApp {
     _send(data) {
         if (this.isState() === SOCKET_STATE.OPEN) {
             this._chatSocket.send(JSON.stringify(data));
+        }
+    }
+
+    setFriendsOnline(id, doing = DOING.ADD) {
+        if (doing === DOING.ADD) {
+            this._friendsOnline.push(id);
+        } else if (doing === DOING.DELETE) {
+            this._friendsOnline = this._friendsOnline.filter(userId => userId !== id);
         }
     }
 

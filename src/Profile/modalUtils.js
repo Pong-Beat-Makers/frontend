@@ -48,6 +48,7 @@ export function toggleAddAndDeleteBtn(chatApp, btnNode, id, doing) {
         btnNode.onclick = async () => {
             await player.friend(id, doing);
 
+            chatApp.setFriendsOnline(id, doing);
             btnNode.innerHTML = buttonMsg[1];
             toggleAddAndDeleteBtn(chatApp, btnNode, id, doing === DOING.ADD? DOING.DELETE : DOING.ADD);
             await setFriendList(chatApp);
