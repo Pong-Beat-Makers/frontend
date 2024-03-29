@@ -1,4 +1,4 @@
-import { USER_SERVER_DOMAIN, GAME_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN, GAME_API_DOMAIN, CHAT_WEBSOCKET } from "../Public/global.js"
+import { USER_SERVER_DOMAIN, USER_MANAGEMENT_DOMAIN } from "../Public/global.js"
 import LoginSuccess from "./loginSuccessTemplate.js";
 import Login from "./loginTemplate.js";
 import ProfileModal from "../Profile/profileModalTemplate.js";
@@ -9,10 +9,9 @@ import {
     friendModalClick,
     handleEditUserModalUtils,
     modalRender,
-    setAvatar
+    setAvatar, setupFriendListStatus
 } from "../Profile/modalUtils.js";
 import Player from "./player.js";
-import ChatApp from "../Chat/chatApp.js";
 
 export const loginSuccessTemplate = LoginSuccess;
 export const profileModalTemplate = ProfileModal;
@@ -132,7 +131,7 @@ export function changeTo2FAPage(loginUser) {
 
         infoContainer.innerHTML = "";
         try {
-            location.reload();
+            await renderMainPage();
         } catch (e) {
             infoContainer.innerHTML = "Wrong code!";
         }
@@ -149,12 +148,11 @@ export function getInfoJWT(token) {
     return JSON.parse(jsonPayload);
 }
 
-export async function renderMainPage(player) {
+export async function renderMainPage() {
     const app = document.getElementById('app');
 
     if (player !== undefined && player.getStatus() === USER_STATUS.AUTHORIZED) {
         app.innerHTML = LoginSuccess.template();
-        player._chatApp = new ChatApp(app);
 
         const requestedUrl = (window.location.pathname === '/' ? "/home" : window.location.pathname);
         history.replaceState(requestedUrl, null, requestedUrl);
@@ -168,6 +166,10 @@ export async function renderMainPage(player) {
         friendAddButton.onclick = () => {
             handleAddFriendBtn(player.getChatApp());
         };
+        const friendListNode = app.querySelector('.profile-section__friends--list');
+        player.getChatApp().setFriendListNode(friendListNode);
+
+        setupFriendListStatus();
     } else {
         app.innerHTML = Login.template();
         handleLoginBtn();

@@ -1,9 +1,10 @@
 import changeUrl from "../route.js";
-import { socialLogin } from "../Login/loginUtils.js";
+import {renderMainPage, socialLogin} from "../Login/loginUtils.js";
 import { setChatPage } from "../Chat/chatPageUtils.js";
 import { handleGameModal } from "../Game/gameUtils.js";
 import { setRankPage } from "../Rank/rankUtils.js";
 import { deleteCookie } from "./cookieUtils.js";
+import {player} from "../app.js";
 
 export function handleLoginBtn() {
     const loginBtns = document.querySelectorAll(".login-btn");
@@ -11,10 +12,11 @@ export function handleLoginBtn() {
     loginBtns[1].onclick = () => { socialLogin("42intra"); };
 }
 
-function handleLogoutBtn(event) {
+async function handleLogoutBtn() {
     localStorage.clear();
     deleteCookie('access_token');
-    location.reload();
+    player.forgetMe();
+    await renderMainPage();
 }
 
 export function handleNaviClick(chatApp) {
@@ -35,5 +37,5 @@ export function handleNaviClick(chatApp) {
         await setRankPage(chatApp.getApp());
     }
     const logoutBtn = chatApp.getApp().querySelector(".header__logout--btn");
-    logoutBtn.onclick = handleLogoutBtn;
+    logoutBtn.onclick = async () => await handleLogoutBtn();
 }
