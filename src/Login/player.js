@@ -22,8 +22,13 @@ class Player {
         this._status = USER_STATUS.DOSE_NOT_EXIST;
     }
 
-    async whoAmI(token) {
+    async whoAmI(token = this._token) {
         this._token = token;
+
+        if (token === undefined) {
+            this._status = USER_STATUS.DOSE_NOT_EXIST;
+            return ;
+        }
 
         const { user_id } = getInfoJWT(this._token);
         this._id = user_id;
