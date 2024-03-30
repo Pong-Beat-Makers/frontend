@@ -86,7 +86,7 @@ export async function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = f
                 const socketApp = SocketApp;
 
                 socketApp.inviteGameRoom(newMsgObj.room_id, [player.getInfo(), userDetail], chatApp);
-                closedChatLog(userDetail.id, chatApp);
+                await closedChatLog(userDetail.id, chatApp);
             }
         } else if (newMsgObj.status === 'cancel') {
             chatBoxNode.remove();

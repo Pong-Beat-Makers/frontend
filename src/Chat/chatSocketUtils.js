@@ -6,8 +6,9 @@ import {
     renderSystemChatAdmin, rerenderChatRoom, rerenderSystemRoom
 } from "./chatPageUtils.js";
 import {player} from "../app.js";
-import {loadChatLog} from "./chatRoomUtils.js";
+import {loadChatLog, showChatroom} from "./chatRoomUtils.js";
 import {routes} from "../route.js";
+import {openInfoModal} from "../Game/gameUtils.js";
 
 export function getChatLog(usersData = []) {
     /*
@@ -50,7 +51,7 @@ export function foundChatContainer(userId, chatApp) {
     return foundContainer;
 }
 
-export function closedChatLog(userId, chatApp) {
+export async function closedChatLog(userId, chatApp) {
     const localStorageLog = localStorage.getItem(CHATLOG_PREFIX + userId);
     let chatLog = localStorageLog ? JSON.parse(localStorageLog) : [];
 
@@ -64,7 +65,7 @@ export function closedChatLog(userId, chatApp) {
 
     const chatContainer = foundChatContainer(userId, chatApp);
     if (chatContainer !== undefined) {
-        loadChatLog(chatContainer, userId, chatApp);
+        await loadChatLog(chatContainer, userId, chatApp);
     }
 }
 
@@ -127,6 +128,16 @@ export function saveNewMsg(newMsgObj) {
     }
 }
 
+async function handleAlertClick(chatApp, opponentId) {
+    try {
+        const userDetail = await player.getUserDetail(opponentId);
+
+        await showChatroom(chatApp, userDetail);
+    } catch (e) {
+        openInfoModal(`Something was wrong .. Error code: ${e.error}`);
+    }
+}
+
 export async function processNextMatch(chatApp) {
     const data = {
         type: "system_message",
@@ -154,6 +165,8 @@ export async function processSystemMessage(chatApp, messageData) {
     } else {
         const newToast = document.createElement('div');
         const msgTime = new Date(messageData.time);
+
+        newToast.classList.add('chat__alert--container');
         // TODO : fromNickname 수정
         newToast.innerHTML = routes["/chat"].chatAlertTemplate("System Alert", messageData.message, `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
 
@@ -199,7 +212,9 @@ export async function processMessage(chatApp, messageData) {
         let title = 'New Message';
         let message = messageData.message;
 
+        newToast.classList.add('chat__alert--container');
         if (messageData.type === 'invite_game') {
+            newToast.classList.add('game-alert');
             title = 'Game Invitation';
             if (messageData.status === 'invite') {
                 message = `${inviter} invite you!`;
@@ -219,6 +234,9 @@ export async function processMessage(chatApp, messageData) {
 
         messageData.isRead = false;
         saveNewMsg(messageData);
+
+        newToast.onclick = async () => await handleAlertClick(chatApp, getOpponent(messageData));
+
         await rerenderChatRoom(getOpponent(messageData), messageData, chatApp);
     }
 }

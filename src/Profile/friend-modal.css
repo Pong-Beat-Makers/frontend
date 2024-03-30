@@ -54,6 +54,7 @@
 
 .friend-modal__info--status {
     font-size: 15px;
+    word-break: break-all;
 }
 
 .friend-modal__game-info {

@@ -90,11 +90,11 @@ class ChatApp {
                 const userDetail = await player.getUserDetail(opponent);
                 data.opponentNickname = userDetail.nickname;
 
-                closedChatLog(opponent, this);
+                await closedChatLog(opponent, this);
                 await processMessage(this, data);
 
                 if (data.status === 'invite' && player.getId() === data.from_id) {
-                    closedChatLog(opponent, this);
+                    await closedChatLog(opponent, this);
 
                     const socketApp = SocketApp;
 
