@@ -3,7 +3,7 @@ import {
     renderChatBox,
     CHATLOG_PREFIX,
     SYSTEM_MESSAGE,
-    renderSystemChatAdmin
+    renderSystemChatAdmin, rerenderChatRoom, rerenderSystemRoom
 } from "./chatPageUtils.js";
 import {player} from "../app.js";
 import {loadChatLog} from "./chatRoomUtils.js";
@@ -150,7 +150,7 @@ export async function processSystemMessage(chatApp, messageData) {
     const systemChatContainer = chatApp.getApp().querySelector('.system__chat--container');
 
     if (systemChatContainer !== null) {
-        renderSystemChatAdmin(systemChatContainer, messageData);
+        renderSystemChatAdmin(systemChatContainer, messageData, chatApp, true);
     } else {
         const newToast = document.createElement('div');
         const msgTime = new Date(messageData.time);
@@ -165,7 +165,7 @@ export async function processSystemMessage(chatApp, messageData) {
 
         messageData.isRead = false;
         saveSystemMsg(messageData);
-        await showChatList(chatApp);
+        rerenderSystemRoom(messageData, chatApp);
     }
 }
 
@@ -219,6 +219,6 @@ export async function processMessage(chatApp, messageData) {
 
         messageData.isRead = false;
         saveNewMsg(messageData);
-        await showChatList(chatApp);
+        await rerenderChatRoom(getOpponent(messageData), messageData, chatApp);
     }
 }
