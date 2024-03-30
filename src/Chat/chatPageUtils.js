@@ -4,6 +4,7 @@ import {player} from "../app.js";
 import {setAvatar} from "../Profile/modalUtils.js";
 import {closedChatLog, getChatLog, getOpponent, saveNewMsg, saveSystemMsg} from "./chatSocketUtils.js";
 import SocketApp from "../Game/SocketApp.js";
+import {openInfoModal} from "../Game/gameUtils.js";
 
 export const SYSTEM_MESSAGE = 'systemLog';
 export const CHATLOG_PREFIX = 'chatLog_';
@@ -54,6 +55,8 @@ export function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) 
     *   isRead: <boolean>
     * }
     * */
+    newMsgObj.isRead = true;
+
     const frameNode = chatContainer.querySelector('.chat__body--frame');
 
     const msgTime = new Date(newMsgObj.time);
@@ -98,6 +101,7 @@ export function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) 
     frameNode.scrollTop = frameNode.scrollHeight;
     if (isNew) {
         saveNewMsg(newMsgObj);
+        rerenderChatRoom(getOpponent(newMsgObj), newMsgObj, chatApp);
     }
 }
 
@@ -106,7 +110,6 @@ export function renderSystemChatBox(app, message, userId) {
 
     chatContainers.forEach(container => {
         if (Number(container.id) === userId) {
-            // TODO: system message render
             const frameNode = container.querySelector('.chat__body--frame');
 
             frameNode.innerHTML += routes['/chat'].systemChatBoxTemplate(message);
@@ -150,6 +153,22 @@ export function renderSystemRoom(chatRoomList, lastObj, chatApp) {
     });
 }
 
+export function rerenderChatRoom(id, lastObj, chatApp) {
+    const chatRoomList = chatApp.getApp().querySelector(".chat__room--list");
+
+    if (chatRoomList === null) {
+        return ;
+    }
+
+    const chatRoomItems = chatRoomList.querySelectorAll('.chat__room');
+
+    chatRoomItems.forEach(roomItem => {
+        if (Number(roomItem.id) === id) {
+            roomItem.querySelector('.chat__room--msg').innerHTML = lastObj.message;
+        }
+    });
+}
+
 export async function renderChatRoom(chatRoomList, lastObj, chatApp) {
     /*
     * lastObj : {
@@ -166,10 +185,12 @@ export async function renderChatRoom(chatRoomList, lastObj, chatApp) {
     }
 
     try {
-        const userDetail = await player.getUserDetail(getOpponent(lastObj));
+        const opponent = getOpponent(lastObj);
+        const userDetail = await player.getUserDetail(opponent);
 
         const chatRoomItem = document.createElement('div');
         chatRoomItem.classList.add('chat__room');
+        chatRoomItem.id = opponent;
 
         const msgTime = new Date(lastObj.time);
 
@@ -231,7 +252,7 @@ async function getChatLogByKeyword(keyword) {
         const searchUsers = await player.searchUser(keyword);
         return getChatLog(searchUsers);
     } catch (e) {
-        // TODO: error modal
+        openInfoModal(`Something was wrong .. Error code: ${e.error}`);
     }
     return [];
 }
@@ -269,7 +290,15 @@ export async function setChatPage(chatApp) {
     chatSearchBtn.onsubmit = function (e) {
         e.preventDefault();
     }
-    chatSearchBtn.onkeyup = async () => {
+
+    let timeoutFunction = setTimeout(async () => {
         await checkChatroomSearch(chatApp);
+    }, 500);
+
+    chatSearchBtn.onkeyup = async () => {
+        clearTimeout(timeoutFunction);
+        timeoutFunction = setTimeout(async () => {
+            await checkChatroomSearch(chatApp);
+        }, 500);
     };
 }

@@ -55,7 +55,7 @@ export function toggleAddAndDeleteBtn(chatApp, btnNode, id, doing) {
             setupFriendListStatus();
         }
     } catch (e) {
-        // TODO: error modal
+        openInfoModal(`Something was wrong .. Error code: ${e.error}`);
     }
 }
 
@@ -173,7 +173,7 @@ export async function friendModalClick(id, chatApp) {
             toggleAddAndDeleteBtn(chatApp, profileBtns[1], id, is_friend ? DOING.DELETE : DOING.ADD);
         }
     } catch (e) {
-        // TODO: error modal
+        openInfoModal(`Something was wrong .. Error code: ${e.error}`);
     }
 }
 
@@ -310,7 +310,7 @@ export function handleEditUserModalUtils(app) {
                     await player.setProfile(data);
                     await renderMainPage();
                 } catch (e) {
-                    openInfoModal(`Something was wrong .. Error code: ${e.error}`);
+                    openInfoModal(`Something was wrong ..<br />Error code: ${e.error}`);
                 }
             }
         });
