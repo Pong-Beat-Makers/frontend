@@ -10,6 +10,7 @@ import {closedChatLog, getOpponent, processMessage, processNextMatch, processSys
 import {SOCKET_STATE} from "../Game/SocketApp.js";
 import SocketApp from "../Game/SocketApp.js";
 import {DOING} from "../Login/player.js";
+import {openInfoModal} from "../Game/gameUtils.js";
 
 const CHAT_API = `${CHAT_SERVER_DOMAIN}/${CHAT_API_DOMAIN}`;
 
@@ -26,8 +27,7 @@ class ChatApp {
         }
 
         chatSocket.onerror = e => {
-            console.error(e);
-            // TODO: chatSocket error modal
+            openInfoModal(`Something was wrong .. Error code: ${e.error}`);
         }
 
         chatSocket.onmessage = async e => {

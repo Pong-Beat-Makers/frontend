@@ -1,6 +1,7 @@
 import {friendModalClick, setAvatar} from "../Profile/modalUtils.js";
 import {player} from "../app.js";
 import {setFriendItem} from "../Login/loginUtils.js";
+import {openInfoModal} from "../Game/gameUtils.js";
 
 function getStageProfile(tier, data, chatApp) {
     const tableNode = document.createElement('div');
@@ -64,6 +65,6 @@ export async function setRankPage(app) {
         No ranker presents yet. Be the first ranker!
         </div>`
     } catch (e) {
-        // TODO: error modal
+        openInfoModal(`Something was wrong .. Error code: ${e.error}`);
     }
 }

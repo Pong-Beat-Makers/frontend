@@ -12,6 +12,7 @@ import {
     setAvatar, setupFriendListStatus
 } from "../Profile/modalUtils.js";
 import Player from "./player.js";
+import {openInfoModal} from "../Game/gameUtils.js";
 
 export const loginSuccessTemplate = LoginSuccess;
 export const profileModalTemplate = ProfileModal;
@@ -97,7 +98,7 @@ async function handleProfileSearch(listNode, keyword, chatApp) {
             listNode.appendChild(itemContainer);
         });
     } catch (e) {
-        // TODO: error modal
+        openInfoModal(`Something was wrong .. Error code: ${e.error}`);
     }
 }
 

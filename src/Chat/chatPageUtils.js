@@ -4,6 +4,7 @@ import {player} from "../app.js";
 import {setAvatar} from "../Profile/modalUtils.js";
 import {closedChatLog, getChatLog, getOpponent, saveNewMsg, saveSystemMsg} from "./chatSocketUtils.js";
 import SocketApp from "../Game/SocketApp.js";
+import {openInfoModal} from "../Game/gameUtils.js";
 
 export const SYSTEM_MESSAGE = 'systemLog';
 export const CHATLOG_PREFIX = 'chatLog_';
@@ -251,7 +252,7 @@ async function getChatLogByKeyword(keyword) {
         const searchUsers = await player.searchUser(keyword);
         return getChatLog(searchUsers);
     } catch (e) {
-        // TODO: error modal
+        openInfoModal(`Something was wrong .. Error code: ${e.error}`);
     }
     return [];
 }
