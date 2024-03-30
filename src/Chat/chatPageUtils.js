@@ -174,6 +174,7 @@ export function rerenderChatRoom(id, lastObj, chatApp) {
 
     chatRoomItems.forEach(roomItem => {
         if (Number(roomItem.id) === id) {
+            roomItem.classList.remove('chat__room--no-read');
             roomItem.querySelector('.chat__room--msg').innerHTML = lastObj.message;
         }
     });
