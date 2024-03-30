@@ -20,7 +20,7 @@ function getStageProfile(tier, data, chatApp) {
     return tableNode;
 }
 
-function getRankerItem(rank, data, app) {
+function getRankerItem(rank, data, chatApp) {
     const item = document.createElement('div');
     const rankNode = document.createElement('div');
 
@@ -30,12 +30,13 @@ function getRankerItem(rank, data, app) {
     rankNode.innerHTML = rank;
 
     item.appendChild(rankNode);
-    setFriendItem(app, item, data, false);
+    setFriendItem(chatApp, item, data, false);
     return item;
 }
 
-export async function setRankPage(app) {
+export async function setRankPage(chatApp) {
     try {
+        const app = chatApp.getApp();
         const data = await player.getRankerList();
         /*
         * rankerList: [{
@@ -49,14 +50,14 @@ export async function setRankPage(app) {
         const rankerList = app.querySelector(".rank__list--friends");
 
         if (rankerNumber >= 2)
-            rankerStage.appendChild(getStageProfile('silver', data[1], app));
+            rankerStage.appendChild(getStageProfile('silver', data[1], chatApp));
         if (rankerNumber >= 1)
-            rankerStage.appendChild(getStageProfile('gold', data[0], app));
+            rankerStage.appendChild(getStageProfile('gold', data[0], chatApp));
         if (rankerNumber >= 3) {
-            rankerStage.appendChild(getStageProfile('bronze', data[2], app));
+            rankerStage.appendChild(getStageProfile('bronze', data[2], chatApp));
 
             for (let i = 3; i < rankerNumber; ++i) {
-                rankerList.appendChild(getRankerItem(i + 1, data[i], app));
+                rankerList.appendChild(getRankerItem(i + 1, data[i], chatApp));
             }
         }
 
