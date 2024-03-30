@@ -66,6 +66,6 @@ export async function setRankPage(chatApp) {
         No ranker presents yet. Be the first ranker!
         </div>`
     } catch (e) {
-        openInfoModal(`Something was wrong .. Error code: ${e}`);
+        openInfoModal(`Something was wrong .. Error code: ${e.error}`);
     }
 }
