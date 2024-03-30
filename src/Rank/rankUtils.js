@@ -20,7 +20,7 @@ function getStageProfile(tier, data, chatApp) {
     return tableNode;
 }
 
-function getRankerItem(rank, data, app) {
+function getRankerItem(rank, data, chatApp) {
     const item = document.createElement('div');
     const rankNode = document.createElement('div');
 
@@ -30,7 +30,7 @@ function getRankerItem(rank, data, app) {
     rankNode.innerHTML = rank;
 
     item.appendChild(rankNode);
-    setFriendItem(app, item, data, false);
+    setFriendItem(chatApp, item, data, false);
     return item;
 }
 
