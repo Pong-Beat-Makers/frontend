@@ -126,11 +126,11 @@ export function changeTo2FAPage(loginUser) {
   });
 
   twoFABtn.addEventListener('click', async () => {
-        const status = await loginUser.send2FACode(codeInput.value);
-        const infoContainer = loginBody.querySelector('.login__body--info');
-
-        infoContainer.innerHTML = "";
         try {
+            const infoContainer = loginBody.querySelector('.login__body--info');
+            await loginUser.send2FACode(codeInput.value);
+
+            infoContainer.innerHTML = "";
             await renderMainPage();
         } catch (e) {
             infoContainer.innerHTML = "Wrong code!";

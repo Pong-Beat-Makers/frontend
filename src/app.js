@@ -12,7 +12,8 @@ const application = async () => {
         const app = document.getElementById('app');
 
         await player.whoAmI(token);
-        player._chatApp = new ChatApp(app);
+        const chatApp = new ChatApp(app);
+        player.setChatApp(chatApp);
     }
     await renderMainPage();
 }
