@@ -137,15 +137,17 @@ export function changeTo2FAPage(loginUser) {
   });
 
   twoFABtn.addEventListener('click', async () => {
-        try {
-            const infoContainer = loginBody.querySelector('.login__body--info');
-            await loginUser.send2FACode(codeInput.value);
+    const infoContainer = loginBody.querySelector('.login__body--info');
 
-            infoContainer.innerHTML = "";
-            await renderMainPage();
-        } catch (e) {
-            infoContainer.innerHTML = "Wrong code!";
-        }
+    try {
+        await loginUser.send2FACode(codeInput.value);
+
+        infoContainer.innerHTML = "";
+        await loginUser.whoAmI();
+        await renderMainPage();
+    } catch (e) {
+        infoContainer.innerHTML = "Wrong code!";
+    }
   });
 }
 

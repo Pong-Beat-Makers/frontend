@@ -77,6 +77,15 @@ export function readSystemLog() {
     localStorage.setItem(SYSTEM_MESSAGE, JSON.stringify((chatLog)));
 }
 
+export function readChatLog(userId) {
+    const localStorageLog = localStorage.getItem(CHATLOG_PREFIX + userId);
+    let chatLog = localStorageLog ? JSON.parse(localStorageLog) : [];
+
+    chatLog.forEach(log => log.isRead = true);
+
+    localStorage.setItem(CHATLOG_PREFIX + userId, JSON.stringify((chatLog)));
+}
+
 export function saveSystemMsg(newMsgObj) {
     const localStorageLog = localStorage.getItem(SYSTEM_MESSAGE);
     let chatLog = localStorageLog ? JSON.parse(localStorageLog) : [];
