@@ -179,6 +179,8 @@ export async function processMessage(chatApp, messageData) {
     *   message: <string>,
     *   time: <string>
     * }
+    *
+    * invite_game : add opponentNickname
     * */
     const chatContainers = chatApp.getApp().querySelectorAll('.chat__container');
     let isRender = false;
@@ -193,8 +195,21 @@ export async function processMessage(chatApp, messageData) {
     if (!isRender) {
         const newToast = document.createElement('div');
         const msgTime = new Date(messageData.time);
+        const inviter = messageData.from_id === player.getId() ? player.getNickName() : messageData.opponentNickname;
+        let title = 'New Message';
+        let message = messageData.message;
+
+        if (messageData.type === 'invite_game') {
+            title = 'Game Invitation';
+            if (messageData.status === 'invite') {
+                message = `${inviter} invite you!`;
+            } else if (messageData.status === 'cancel') {
+                message = `${inviter} Canceled The Game`;
+            }
+        }
+
         // TODO : fromNickname 수정
-        newToast.innerHTML = routes["/chat"].chatAlertTemplate("New Message", messageData.message, `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
+        newToast.innerHTML = routes["/chat"].chatAlertTemplate(title, message, `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
         
         chatApp.getApp().querySelector(".toast").appendChild(newToast);
         newToast.querySelector(".chat__alert--close-btn").onclick = () => {

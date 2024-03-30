@@ -160,6 +160,16 @@ export function rerenderChatRoom(id, lastObj, chatApp) {
         return ;
     }
 
+    const inviter = lastObj.from_id === player.getId() ? player.getNickName() : lastObj.opponentNickname;
+
+    if (lastObj.type === 'invite_game') {
+        if (lastObj.status === 'invite') {
+            lastObj.message = `${inviter} invite you!`;
+        } else if (lastObj.status === 'cancel') {
+            lastObj.message = `${inviter} User Canceled The Game`;
+        }
+    }
+
     const chatRoomItems = chatRoomList.querySelectorAll('.chat__room');
 
     chatRoomItems.forEach(roomItem => {
@@ -192,10 +202,15 @@ export async function renderChatRoom(chatRoomList, lastObj, chatApp) {
         chatRoomItem.classList.add('chat__room');
         chatRoomItem.id = opponent;
 
+        const inviter = lastObj.from_id === player.getId() ? player.getNickName() : lastObj.opponentNickname;
         const msgTime = new Date(lastObj.time);
 
         if (lastObj.type === 'invite_game') {
-            lastObj.message = `${userDetail.nickname} invite you!`;
+            if (lastObj.status === 'invite') {
+                lastObj.message = `${inviter} invite you!`;
+            } else if (lastObj.status === 'cancel') {
+                lastObj.message = `${inviter} User Canceled The Game`;
+            }
         }
 
         chatRoomItem.innerHTML = routes['/chat'].chatRoomTemplate(userDetail.nickname, lastObj.message, `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);

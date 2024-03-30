@@ -86,14 +86,16 @@ class ChatApp {
                 * room_id: <string>,
                 * time: <string>
                 * */
-                // TODO: Blocked User 에게도 보내짐
-                closedChatLog(getOpponent(data), this);
+                const opponent = getOpponent(data);
+                const userDetail = await player.getUserDetail(opponent);
+                data.opponentNickname = userDetail.nickname;
+
+                closedChatLog(opponent, this);
                 await processMessage(this, data);
 
                 if (data.status === 'invite' && player.getId() === data.from_id) {
-                    closedChatLog(getOpponent(data), this);
+                    closedChatLog(opponent, this);
 
-                    const userDetail = await player.getUserDetail(getOpponent(data));
                     const socketApp = SocketApp;
 
                     socketApp.inviteGameRoom(data.room_id, [player.getInfo(), userDetail], this);
