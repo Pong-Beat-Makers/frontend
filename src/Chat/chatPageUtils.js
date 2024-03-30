@@ -54,6 +54,8 @@ export function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) 
     *   isRead: <boolean>
     * }
     * */
+    newMsgObj.isRead = true;
+
     const frameNode = chatContainer.querySelector('.chat__body--frame');
 
     const msgTime = new Date(newMsgObj.time);
@@ -98,6 +100,7 @@ export function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) 
     frameNode.scrollTop = frameNode.scrollHeight;
     if (isNew) {
         saveNewMsg(newMsgObj);
+        rerenderChatRoom(getOpponent(newMsgObj), newMsgObj, chatApp);
     }
 }
 
@@ -106,7 +109,6 @@ export function renderSystemChatBox(app, message, userId) {
 
     chatContainers.forEach(container => {
         if (Number(container.id) === userId) {
-            // TODO: system message render
             const frameNode = container.querySelector('.chat__body--frame');
 
             frameNode.innerHTML += routes['/chat'].systemChatBoxTemplate(message);
@@ -150,6 +152,22 @@ export function renderSystemRoom(chatRoomList, lastObj, chatApp) {
     });
 }
 
+export function rerenderChatRoom(id, lastObj, chatApp) {
+    const chatRoomList = chatApp.getApp().querySelector(".chat__room--list");
+
+    if (chatRoomList === null) {
+        return ;
+    }
+
+    const chatRoomItems = chatRoomList.querySelectorAll('.chat__room');
+
+    chatRoomItems.forEach(roomItem => {
+        if (Number(roomItem.id) === id) {
+            roomItem.querySelector('.chat__room--msg').innerHTML = lastObj.message;
+        }
+    });
+}
+
 export async function renderChatRoom(chatRoomList, lastObj, chatApp) {
     /*
     * lastObj : {
@@ -166,10 +184,12 @@ export async function renderChatRoom(chatRoomList, lastObj, chatApp) {
     }
 
     try {
-        const userDetail = await player.getUserDetail(getOpponent(lastObj));
+        const opponent = getOpponent(lastObj);
+        const userDetail = await player.getUserDetail(opponent);
 
         const chatRoomItem = document.createElement('div');
         chatRoomItem.classList.add('chat__room');
+        chatRoomItem.id = opponent;
 
         const msgTime = new Date(lastObj.time);
 
@@ -269,7 +289,15 @@ export async function setChatPage(chatApp) {
     chatSearchBtn.onsubmit = function (e) {
         e.preventDefault();
     }
-    chatSearchBtn.onkeyup = async () => {
+
+    let timeoutFunction = setTimeout(async () => {
         await checkChatroomSearch(chatApp);
+    }, 500);
+
+    chatSearchBtn.onkeyup = async () => {
+        clearTimeout(timeoutFunction);
+        timeoutFunction = setTimeout(async () => {
+            await checkChatroomSearch(chatApp);
+        }, 500);
     };
 }

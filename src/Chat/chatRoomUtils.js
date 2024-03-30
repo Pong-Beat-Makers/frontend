@@ -1,7 +1,7 @@
 import { routes } from "../route.js";
 import {modalRender, setAvatar} from "../Profile/modalUtils.js";
 import {SYSTEM_MESSAGE, CHATLOG_PREFIX, renderChatBox, showChatList, renderSystemChatAdmin} from "./chatPageUtils.js";
-import {readChatLog, readSystemLog} from "./chatSocketUtils.js";
+import {readSystemLog} from "./chatSocketUtils.js";
 
 export function getSystemLog() {
     const systemLog = localStorage.getItem(SYSTEM_MESSAGE);
@@ -146,7 +146,6 @@ export async function showChatroom(chatApp, userData) {
                 sendBtn.click();
             }
         });
-        readChatLog(userData.id);
         await showChatList(chatApp);
         chatContainer.querySelector('.chat__body--text').focus();
     } catch(e) {

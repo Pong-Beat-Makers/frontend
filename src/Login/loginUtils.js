@@ -106,7 +106,17 @@ export async function handleAddFriendBtn(chatApp) {
 
     const profileSearchInput = addFriendModal.querySelector(".search-friend__body--input");
     const profileSearchList = addFriendModal.querySelector('.search-friend__body--list');
-    profileSearchInput.onkeyup = async () => { await handleProfileSearch(profileSearchList, profileSearchInput.value, chatApp); };
+
+    let timeoutFunction = setTimeout(async () => {
+        await handleProfileSearch(profileSearchList, profileSearchInput.value, chatApp);
+    }, 500);
+
+    profileSearchInput.onkeyup = async () => {
+        clearTimeout(timeoutFunction);
+        timeoutFunction = setTimeout(async () => {
+            await handleProfileSearch(profileSearchList, profileSearchInput.value, chatApp);
+        }, 500);
+    };
 }
 
 export function changeTo2FAPage(loginUser) {
