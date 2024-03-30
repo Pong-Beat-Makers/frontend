@@ -56,7 +56,7 @@ export async function setRankPage(app) {
             rankerStage.appendChild(getStageProfile('bronze', data[2], app));
 
             for (let i = 3; i < rankerNumber; ++i) {
-                rankerList.appendChild(getRankerItem(i, data[i], app));
+                rankerList.appendChild(getRankerItem(i + 1, data[i], app));
             }
         }
 

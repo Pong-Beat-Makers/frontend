@@ -72,5 +72,11 @@
 .game__manual--picture {
     width: 325px;
     height: 235px;
-    background-color: #D9D9D9;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.howto-game-three {
+    background-image: url(../assets/howto_game_three.png);
 }

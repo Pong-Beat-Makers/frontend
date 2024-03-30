@@ -32,15 +32,15 @@ class Game {
 		<div class="game__body">
 				<div class="game__manual">
 						<div class="game__manual--text">1. Select a friend from the friends list</div>
-						<div class="game__manual--picture"></div>
+						<div class="game__manual--picture new-chat-one"></div>
 				</div>
 				<div class="game__manual">
-						<div class="game__manual--text">2. Click “Invite” button</div>
-						<div class="game__manual--picture"></div>
+						<div class="game__manual--text">2. Click “chat” button</div>
+						<div class="game__manual--picture add-friend-three"></div>
 				</div>
 				<div class="game__manual">
-						<div class="game__manual--text">3. Enjoy!</div>
-						<div class="game__manual--picture"></div>
+						<div class="game__manual--text">3. Click “invite” button</div>
+						<div class="game__manual--picture howto-game-three"></div>
 				</div>
 		</div>
 		`;
