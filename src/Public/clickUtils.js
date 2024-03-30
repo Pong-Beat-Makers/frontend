@@ -34,7 +34,7 @@ export function handleNaviClick(chatApp) {
     }
     headerElements[3].onclick = async () => {
         changeUrl("/rank");
-        await setRankPage(chatApp.getApp());
+        await setRankPage(chatApp);
     }
     const logoutBtn = chatApp.getApp().querySelector(".header__logout--btn");
     logoutBtn.onclick = async () => await handleLogoutBtn();

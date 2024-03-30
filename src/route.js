@@ -48,7 +48,7 @@ export async function setPages(chatApp) {
     else if (requestedUrl === "/game")
         handleGameModal();
     else if (requestedUrl === "/rank")
-        await setRankPage(chatApp.getApp());
+        await setRankPage(chatApp);
 }
 
 window.addEventListener("popstate", async () => await setPages(player.getChatApp()));

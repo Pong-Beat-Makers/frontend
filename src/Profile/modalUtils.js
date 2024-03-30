@@ -157,12 +157,8 @@ export async function friendModalClick(id, chatApp) {
         friendInfo[0].innerHTML = name;
         friendInfo[1].innerHTML = status_message;
 
-        winRate.innerHTML = (win + lose) ? `${(win / (win + lose) * 100).toPrecision(5)}%` : '0%';
+        winRate.innerHTML = (win + lose) ? `${(win / (win + lose).toPrecision(5) * 100)}%` : '0%';
         rankPoint.innerHTML = rank;
-
-        const gameHistoryListNode = modalContainer.querySelector('.friend-modal__history-list');
-        const gameHistory = await player.getMatchHistoryById(id);
-        await renderGameHistoryList(id, gameHistoryListNode, gameHistory);
 
         if (player.getId() === id) {
             profileBtns.forEach(btn => btn.remove());
@@ -172,6 +168,11 @@ export async function friendModalClick(id, chatApp) {
             }
             toggleAddAndDeleteBtn(chatApp, profileBtns[1], id, is_friend ? DOING.DELETE : DOING.ADD);
         }
+
+        const gameHistoryListNode = modalContainer.querySelector('.friend-modal__history-list');
+        const gameHistory = await player.getMatchHistoryById(id);
+        await renderGameHistoryList(id, gameHistoryListNode, gameHistory);
+
     } catch (e) {
         openInfoModal(`Something was wrong .. Error code: ${e.error}`);
     }

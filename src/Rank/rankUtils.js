@@ -34,8 +34,9 @@ function getRankerItem(rank, data, app) {
     return item;
 }
 
-export async function setRankPage(app) {
+export async function setRankPage(chatApp) {
     try {
+        const app = chatApp.getApp();
         const data = await player.getRankerList();
         /*
         * rankerList: [{
@@ -49,14 +50,14 @@ export async function setRankPage(app) {
         const rankerList = app.querySelector(".rank__list--friends");
 
         if (rankerNumber >= 2)
-            rankerStage.appendChild(getStageProfile('silver', data[1], app));
+            rankerStage.appendChild(getStageProfile('silver', data[1], chatApp));
         if (rankerNumber >= 1)
-            rankerStage.appendChild(getStageProfile('gold', data[0], app));
+            rankerStage.appendChild(getStageProfile('gold', data[0], chatApp));
         if (rankerNumber >= 3) {
-            rankerStage.appendChild(getStageProfile('bronze', data[2], app));
+            rankerStage.appendChild(getStageProfile('bronze', data[2], chatApp));
 
             for (let i = 3; i < rankerNumber; ++i) {
-                rankerList.appendChild(getRankerItem(i + 1, data[i], app));
+                rankerList.appendChild(getRankerItem(i + 1, data[i], chatApp));
             }
         }
 
@@ -65,6 +66,6 @@ export async function setRankPage(app) {
         No ranker presents yet. Be the first ranker!
         </div>`
     } catch (e) {
-        openInfoModal(`Something was wrong .. Error code: ${e.error}`);
+        openInfoModal(`Something was wrong .. Error code: ${e}`);
     }
 }
