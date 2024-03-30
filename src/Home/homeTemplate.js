@@ -58,7 +58,7 @@ class Home {
                         </div>
                         <div class="home__body--box-contents">
                             <div class="home__body--box-text">2. click</div>
-                            <div class="home__body--box-pic new-chat-two"></div>
+                            <div class="home__body--box-pic add-friend-three"></div>
                         </div>
                         <div class="home__body--box-contents">
                             <div class="home__body--box-text">3. later you can find the chatting room in the chat tab!</div>
