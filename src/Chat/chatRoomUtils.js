@@ -137,8 +137,10 @@ export async function showChatroom(chatApp, userData) {
         loadChatLog(chatContainer, userData.id, chatApp);
 
         sendBtn.addEventListener('click', e => {
-            chatApp.sendMessage(userData.id, msgInput.value);
-            msgInput.value = "";
+            if (msgInput.value.length > 0) {
+                chatApp.sendMessage(userData.id, msgInput.value);
+                msgInput.value = "";
+            }
         });
 
         msgInput.addEventListener('keydown', e => {
@@ -148,7 +150,6 @@ export async function showChatroom(chatApp, userData) {
             }
         });
         readChatLog(userData.id);
-        await showChatList(chatApp);
         chatContainer.querySelector('.chat__body--text').focus();
     } catch(e) {
         openInfoModal(`Something was wrong .. Error code: ${e.error}`);
