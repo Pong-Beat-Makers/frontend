@@ -250,11 +250,11 @@ export function handleEditUserModalUtils(app) {
 
         if (PROFILE_DEFAULT_IMAGE.indexOf(player.getProfile()) === -1) {
             setAvatar(player.getProfile(), avatars[1]);
+            avatars[1].setAttribute('data-image', player.getProfile());
             avatars[0].classList.toggle('profile-modal__selected-avatar');
             avatars[1].classList.toggle('profile-modal__selected-avatar');
         } else {
             setAvatar(player.getProfile(), avatars[0]);
-            avatars[0].setAttribute('data-image', player.getProfile());
         }
 
         avatars.forEach((element, i) => {
