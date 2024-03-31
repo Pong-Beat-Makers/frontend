@@ -23,7 +23,7 @@ class Login {
 		`;
 	}
 
-  twoFATempate() {
+  twoFATemplate() {
     return `
     <div class="login__body--message">Please enter the 6-digit</div>
     <div class="login__body--message"> code sent to your email.</div>
