@@ -209,6 +209,27 @@ class Game {
             </div>
         `;	
 	}
+
+	// TODO: alias name Template add css, required field does not work
+	localTournamentAliasTemplate() {
+		return `
+            <div class="modal__background"></div>
+            <div class="matching-game__wrapper">
+				<input class="search-friend__body--input" type="text" placeholder="set alias names for the tournament" value="guest 1" required/>
+				<input class="search-friend__body--input" type="text" placeholder="set alias names for the tournament" value="guest 2" required/>
+				<input class="search-friend__body--input" type="text" placeholder="set alias names for the tournament" value="guest 3" required/>
+				<input class="search-friend__body--input" type="text" placeholder="set alias names for the tournament" value="guest 4" required/>
+				<button class="modal__btn matching-game__btn">
+					<i class="bi bi-check-square"></i>
+					set alias nickname for tournament
+				</button>
+				<button class="modal__btn matching-game__btn">
+					<i class="bi bi-x-square"></i>
+					cancel & exit
+				</button>
+            </div>
+        `;	
+	}
 }
 
 export default new Game();

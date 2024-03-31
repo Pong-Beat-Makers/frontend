@@ -109,16 +109,9 @@ class SocketApp {
         this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.TWO_PLAYER, userList);
     }
 
-    localTournament() {
+    localTournament(userList) {
         if (localStorage.getItem("local_tournament"))
             localStorage.removeItem("local_tournament");
-
-        // TODO: alias name input
-        const opponent1 = generateGuest('GUEST1', [player.getProfile()]);
-        const opponent2 = generateGuest('GUEST2', [player.getProfile()]);
-        const opponent3 = generateGuest('GUEST3', [player.getProfile()]);
-        
-        const userList = [player.getInfo(), opponent1, opponent2, opponent3];
 
         openBoardModal(this, GAME_TYPE.TWO_TOURNAMENT, userList);
         this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.TWO_TOURNAMENT, userList);

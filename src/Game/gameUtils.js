@@ -190,9 +190,29 @@ export function handleGameModal() {
         
         modalBtns[0].addEventListener('click', () => {
             socketApp.localTwo();
+            closeMatchingModal(modalContainer, socketApp);
         });
         modalBtns[1].addEventListener('click', () => {
-            socketApp.localTournament();
+            const aliasModalTemplate = routes['/game'].localTournamentAliasTemplate();
+            const aliasModalContainer = modalRender('local-tournament-alias', aliasModalTemplate, false);
+            const aliasModalBtns = aliasModalContainer.querySelectorAll('.matching-game__btn');
+
+            aliasModalBtns[0].addEventListener('click', () => {
+                const aliasNames = aliasModalContainer.querySelectorAll('.search-friend__body--input');
+                const userList = [];
+                
+                aliasNames.forEach((aliasName) => {
+                  const opponent = generateGuest(aliasName.value, [player.getProfile()]);
+                  userList.push(opponent);
+                });
+
+                socketApp.localTournament(userList);
+                closeMatchingModal(aliasModalContainer, socketApp);
+                closeMatchingModal(modalContainer, socketApp);
+            })
+            aliasModalBtns[1].addEventListener('click', () => {
+                closeMatchingModal(aliasModalContainer, socketApp);
+            })
         });
         modalBtns[2].addEventListener('click', () => {
             closeMatchingModal(modalContainer, socketApp);
