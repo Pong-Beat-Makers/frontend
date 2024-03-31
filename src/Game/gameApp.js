@@ -141,7 +141,7 @@ class PlayGameApp {
         );
     }
 
-    renderConter(counter) {
+    renderCounter(counter) {
         if (counter !== undefined && (0 < counter && counter < 6)) {
             const loader = new FontLoader();
             loader.load('src/assets/Poetsen_One_Regular.json', font => {

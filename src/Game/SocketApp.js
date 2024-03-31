@@ -146,12 +146,12 @@ class SocketApp {
                         this._boardContainer.remove();
                         this._boardContainer = undefined;
 
-                        this._gameApp.renderConter(data.counter);
+                        this._gameApp.renderCounter(data.counter);
                     } else if (data.counter < 5) {
-                        this._gameApp.renderConter(data.counter);
+                        this._gameApp.renderCounter(data.counter);
                     }
                 } else if (data.message === 'Game Start') {
-                    this._gameApp.renderConter(data.counter);
+                    this._gameApp.renderCounter(data.counter);
 
                     this._gameContiner.addEventListener('keydown', e => {
                         if (e.key === 'ArrowLeft') this._gameSend({'move': 'up'});
@@ -198,17 +198,15 @@ class SocketApp {
                         setInfoMessageAtModal(this._boardContainer, data.counter - 5);
                     } else if (data.counter === 5) {
                         openPlayGameModal(this, gameType, userList);
-                        // TODO: GameApp이 PlayGameApp을 잘못 쓴건쥐 . ?
                         this._gameApp = new GameApp(this._gameCanvas, gameType);
                         this._gameApp.setPlayer(data.player);
 
                         this._boardContainer.remove();
                         this._boardContainer = undefined;
 
-                        this._gameApp.renderConter(data.counter);
+                        this._gameApp.renderCounter(data.counter);
                     } else if (data.counter < 5) {
-                        // TODO: renderConter => renderCounter
-                        this._gameApp.renderConter(data.counter);
+                        this._gameApp.renderCounter(data.counter);
                     }
                 } else if (data.message === 'Game Start') {
                     if (gameType === GAME_TYPE.TWO_PLAYER || GAME_TYPE.TWO_TOURNAMENT) {
@@ -232,7 +230,7 @@ class SocketApp {
                             else if (e.keyCode === 83 || e.keyCode === 87) this._gameSend({'player': 1, 'move': 'stop'});
                         });
                     } else {
-                        this._gameApp.renderConter(data.counter);
+                        this._gameApp.renderCounter(data.counter);
 
                         this._gameContiner.addEventListener('keydown', e => {
                             if (e.key === 'ArrowLeft') this._gameSend({'move': 'up'});
