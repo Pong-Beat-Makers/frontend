@@ -122,7 +122,7 @@ export function changeTo2FAPage(loginUser) {
     const loginBody = document.querySelector(".login__container--body");
 
     loginBody.querySelector(".login__wrapper--header").innerHTML = "<span class='login__wrapper--header_'>Verification</span>";
-    loginBody.querySelector(".login__wrapper--list").innerHTML = Login.twoFATempate();
+    loginBody.querySelector(".login__wrapper--list").innerHTML = Login.twoFATemplate();
 
     const codeInput = loginBody.querySelector('.login__body--input');
     const twoFABtn = loginBody.querySelector('.login__2fa-btn');
