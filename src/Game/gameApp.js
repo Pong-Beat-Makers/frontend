@@ -31,7 +31,7 @@ class PlayGameApp {
         this._renderer = renderer;
         this._scene = scene;
 
-        if (gameType === GAME_TYPE.TWO_PLAYER) {
+        if (gameType === GAME_TYPE.TWO_PLAYER || gameType === GAME_TYPE.TWO_TOURNAMENT) {
             this._camPosition = CAM_INDEX.MID;
         }
         this._setupCamera();

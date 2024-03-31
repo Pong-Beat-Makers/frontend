@@ -51,11 +51,12 @@ export function orderPlayers(playerNumber, players) {
     return players;
 }
 
+// TODO: gameType 전달 필요 없음
 export function openPlayGameModal(socketApp, gameType, players) {
     const modalContainer = modalRender('play-game', routes['/game'].playGameTemplate(), false);
     const playGround = modalContainer.querySelector('#game_playground');
 
-    modalContainer.querySelector('.playgame__btn').addEventListener('click', () => {
+    modalContainer.querySelector('.exitgame__btn').addEventListener('click', () => {
         socketApp.gameClose();
         modalContainer.remove();
         socketApp.cancelRenderGameApp();
@@ -93,7 +94,7 @@ export function openBoardModal(socketApp, gameType, players) {
     let modalName;
     let modalHtml;
 
-    if (gameType === GAME_TYPE.TOURNAMENT) {
+    if (gameType === GAME_TYPE.TOURNAMENT || gameType === GAME_TYPE.TWO_TOURNAMENT) {
         modalName = "tournament";
         modalHtml = routes['/game'].tournamentModalTemplate();
     } else {
@@ -103,7 +104,7 @@ export function openBoardModal(socketApp, gameType, players) {
 
     const modalContainer = modalRender(modalName, modalHtml, false);
 
-    if (gameType === GAME_TYPE.TWO_PLAYER) {
+    if (gameType === GAME_TYPE.TWO_PLAYER || gameType === GAME_TYPE.TWO_TOURNAMENT) {
         modalContainer.querySelector('.modal__ready-btn').addEventListener('click', () => {
             // const info = modalContainer.querySelector('.board-modal__info');
             //
@@ -116,7 +117,7 @@ export function openBoardModal(socketApp, gameType, players) {
     }
 
     socketApp.setBoardContainer(modalContainer);
-    setupInfoAtModal(modalContainer, gameType, players, gameType !== GAME_TYPE.TOURNAMENT);
+    setupInfoAtModal(modalContainer, gameType, players, gameType === GAME_TYPE.RANDOM || gameType === GAME_TYPE.TWO_PLAYER);
 }
 
 export function closeMatchingModal(matchingContainer, socketApp) {
@@ -124,6 +125,7 @@ export function closeMatchingModal(matchingContainer, socketApp) {
     matchingContainer.remove();
 }
 
+// TODO: gameType 전달 필요 없음
 export function setupInfoAtModal(container, gameType, players, setName = true) {
     const avatarNodes = container.querySelectorAll('.insert-playerAvatar');
     const nameNodes = container.querySelectorAll('.insert-playerName');
@@ -155,9 +157,15 @@ export function setupActiveReadyBtn(container) {
 }
 
 export function changeGiveUpToEnd(container) {
-    const giveUpBtn = container.querySelector('.playgame__btn');
+    const giveUpBtn = container.querySelector('.exitgame__btn');
 
     giveUpBtn.innerHTML = '<i class="bi bi-door-closed"></i> Exit';
+}
+
+export function changeEndToNextMatch(container) {
+    const endBtn = container.querySelector('.exitgame__btn');
+
+    endBtn.innerHTML = '<i class="bi bi-door-closed"></i> Next Match';
 }
 
 export function setInfoMessageAtModal(modalContainer, message, ingAnimation = false) {
@@ -170,19 +178,26 @@ export function setInfoMessageAtModal(modalContainer, message, ingAnimation = fa
     info.innerHTML = message;
 }
 
-export function setupAvatarAtTournament(container, players) {
-    // profile 추가
-    console.log("users:", players);
-}
-
 export function handleGameModal() {
     const playBtn = document.querySelectorAll('.game__playbtn');
 
-    playBtn[GAME_TYPE.TWO_PLAYER].addEventListener('click', () => {
+    playBtn[GAME_TYPE.LOCAL_GAME].addEventListener('click', () => {
         const socketApp = SocketApp;
 
-        socketApp.localPlay();
-    });
+        const modalHtml = routes['/game'].localGameModalTemplate();
+        const modalContainer = modalRender('local-play-select', modalHtml, false);
+        const modalBtns = modalContainer.querySelectorAll('.matching-game__btn');
+        
+        modalBtns[0].addEventListener('click', () => {
+            socketApp.localTwo();
+        });
+        modalBtns[1].addEventListener('click', () => {
+            socketApp.localTournament();
+        });
+        modalBtns[2].addEventListener('click', () => {
+            closeMatchingModal(modalContainer, socketApp);
+        });
+    })
 
     playBtn[GAME_TYPE.RANDOM].addEventListener('click', () => {
         openMatchingModal(GAME_TYPE.RANDOM);
@@ -219,11 +234,33 @@ export function renderEndStatus(gameContainer, gamePlayer, score, gameType) {
 
     let status = 'YOU <span class="game-modal__win">WIN!</span>';
 
-    if (gameType === GAME_TYPE.TWO_PLAYER) {
+    if (gameType === GAME_TYPE.TWO_PLAYER && !localStorage.getItem("local_tournament")) {
         if (score[0] > score[1]) {
             status = `${player.getNickName()} <span class="game-modal__win">WIN!</span>`;
         } else {
             status = `GUEST <span class="game-modal__win">WIN!</span>`;
+        }
+    } else if (gameType === GAME_TYPE.TWO_PLAYER || gameType === GAME_TYPE.TWO_TOURNAMENT) {
+        const players = gameContainer.parentNode.parentNode.querySelectorAll('.playgame__header--profile');
+        let winnerIdx = 0;
+
+        if (score[0] > score[1]) {
+            status = `${players[0].children[1].innerText} <span class="game-modal__win">WIN!</span>`;
+        } else {
+            winnerIdx = 1;
+            status = `${players[1].children[1].innerText} <span class="game-modal__win">WIN!</span>`;
+        }
+
+        let winnerProfile = players[winnerIdx].children[0].getAttribute('data-image');
+        let winnerName = players[winnerIdx].children[1].innerText;
+
+        if (gameType === GAME_TYPE.TWO_PLAYER)
+            localStorage.removeItem("local_tournament");
+        else {
+            let winners;
+            localStorage.getItem("local_tournament") ? winners = JSON.parse(localStorage.getItem("local_tournament")) : winners = [];
+            winners.push({profile: winnerProfile, nickname: winnerName});
+            localStorage.setItem("local_tournament", JSON.stringify(winners));
         }
     } else {
         if (gamePlayer === 1 && score[0] < score[1]) {

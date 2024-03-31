@@ -5,6 +5,7 @@ import {
     openInfoModal,
     setupConnectPeopleAtMatchingModal,
     changeGiveUpToEnd,
+    changeEndToNextMatch,
     renderEndStatus,
     setupActiveReadyBtn,
     setInfoMessageAtModal,
@@ -101,11 +102,26 @@ class SocketApp {
         this._waitSocket = waitSocket;
     }
 
-    localPlay() {
-        const userList = [player.getInfo(), generateGuest('GUEST', [player.getProfile()])];
+    localTwo(playerInfo = player.getInfo(), guestInfo = generateGuest('GUEST', [player.getProfile()])) {
+        const userList = [playerInfo, guestInfo];
 
         openBoardModal(this, GAME_TYPE.TWO_PLAYER, userList);
         this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.TWO_PLAYER, userList);
+    }
+
+    localTournament() {
+        if (localStorage.getItem("local_tournament"))
+            localStorage.removeItem("local_tournament");
+
+        // TODO: alias name input
+        const opponent1 = generateGuest('GUEST1', [player.getProfile()]);
+        const opponent2 = generateGuest('GUEST2', [player.getProfile()]);
+        const opponent3 = generateGuest('GUEST3', [player.getProfile()]);
+        
+        const userList = [player.getInfo(), opponent1, opponent2, opponent3];
+
+        openBoardModal(this, GAME_TYPE.TWO_TOURNAMENT, userList);
+        this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.TWO_TOURNAMENT, userList);
     }
 
     inviteGameRoom(room_id, userList, chatApp) {
@@ -189,6 +205,7 @@ class SocketApp {
                         setInfoMessageAtModal(this._boardContainer, data.counter - 5);
                     } else if (data.counter === 5) {
                         openPlayGameModal(this, gameType, userList);
+                        // TODO: GameApp이 PlayGameApp을 잘못 쓴건쥐 . ?
                         this._gameApp = new GameApp(this._gameCanvas, gameType);
                         this._gameApp.setPlayer(data.player);
 
@@ -197,10 +214,11 @@ class SocketApp {
 
                         this._gameApp.renderConter(data.counter);
                     } else if (data.counter < 5) {
+                        // TODO: renderConter => renderCounter
                         this._gameApp.renderConter(data.counter);
                     }
                 } else if (data.message === 'Game Start') {
-                    if (gameType === GAME_TYPE.TWO_PLAYER) {
+                    if (gameType === GAME_TYPE.TWO_PLAYER || GAME_TYPE.TWO_TOURNAMENT) {
                         openPlayGameModal(this, gameType, userList);
                         changeGiveUpToEnd(this._gameContiner);
                         this._gameApp = new GameApp(this._gameCanvas, gameType);
@@ -237,6 +255,21 @@ class SocketApp {
                     toggleFocusOut(this._gameCanvas, false);
                     renderEndStatus(this._gameCanvas, this._gameApp.getPlayer(), data.score, gameType);
                     changeGiveUpToEnd(this._gameContiner);
+                    if (gameType === GAME_TYPE.TWO_TOURNAMENT) {
+                        changeEndToNextMatch(this._gameContiner);
+                        this._gameContiner.querySelector('.exitgame__btn').onclick = () => {
+                            this.gameClose();
+                            this._gameContiner.remove();
+                            this.cancelRenderGameApp();
+
+                            if (JSON.parse(localStorage.getItem("local_tournament")).length === 2) {
+                                this.localTwo(JSON.parse(localStorage.getItem("local_tournament"))[0], JSON.parse(localStorage.getItem("local_tournament"))[1]);
+                            } else {
+                                openBoardModal(this, GAME_TYPE.TWO_PLAYER, userList.slice(-2));
+                                this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.TWO_TOURNAMENT, userList.slice(-2));
+                            }
+                        };
+                    }
                 }
             } else if (data.type === 'send_game_status') {
                 this._gameApp.dataRander(data);
@@ -244,7 +277,7 @@ class SocketApp {
         });
 
        gameSocket.onopen = () => {
-           if (gameType === GAME_TYPE.TWO_PLAYER) {
+           if (gameType === GAME_TYPE.TWO_PLAYER || gameType === GAME_TYPE.TWO_TOURNAMENT) {
                setupActiveReadyBtn(this._boardContainer);
            } else {
                this.readyToPlay();
