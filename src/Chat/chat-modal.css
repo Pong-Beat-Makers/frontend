@@ -21,7 +21,6 @@
 
 .chat__header--profile {
     min-width: 0;
-    cursor: pointer;
     display: flex;
     align-items: center;
     color: white;
@@ -42,6 +41,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    padding: 5px 0;
 }
 
 .chat__header--controlls {

@@ -19,7 +19,7 @@ function getLastObj(key) {
     return undefined;
 }
 
-export function renderSystemChatAdmin(chatContainer, newMsgObj, isNew = false) {
+export function renderSystemChatAdmin(chatContainer, newMsgObj, chatApp, isNew = false) {
     /*
     * newMsgObj: {
     *   type: <string>,
@@ -40,10 +40,11 @@ export function renderSystemChatAdmin(chatContainer, newMsgObj, isNew = false) {
 
     if (isNew) {
         saveSystemMsg(newMsgObj);
+        rerenderSystemRoom(newMsgObj, chatApp);
     }
 }
 
-export function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) {
+export async function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) {
     /*
     * newMsgObj: {
     *   type: <string>,
@@ -85,7 +86,7 @@ export function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) 
                 const socketApp = SocketApp;
 
                 socketApp.inviteGameRoom(newMsgObj.room_id, [player.getInfo(), userDetail], chatApp);
-                closedChatLog(userDetail.id, chatApp);
+                await closedChatLog(userDetail.id, chatApp);
             }
         } else if (newMsgObj.status === 'cancel') {
             chatBoxNode.remove();
@@ -101,7 +102,7 @@ export function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) 
     frameNode.scrollTop = frameNode.scrollHeight;
     if (isNew) {
         saveNewMsg(newMsgObj);
-        rerenderChatRoom(getOpponent(newMsgObj), newMsgObj, chatApp);
+        await rerenderChatRoom(getOpponent(newMsgObj), newMsgObj, chatApp);
     }
 }
 
@@ -116,6 +117,22 @@ export function renderSystemChatBox(app, message, userId) {
             frameNode.scrollTop = frameNode.scrollHeight;
         }
     });
+}
+
+export function rerenderSystemRoom(lastObj, chatApp) {
+    const chatRoomList = chatApp.getApp().querySelector(".chat__room--list");
+
+    if (chatRoomList === null) {
+        return ;
+    }
+    const chatRoomItems = chatRoomList.querySelector('.chat__room--system');
+
+    if (lastObj.isRead) {
+        chatRoomItems.classList.remove('chat__room--no-read');
+    } else {
+        chatRoomItems.classList.add('chat__room--no-read');
+    }
+    chatRoomItems.querySelector('.system-room__msg').innerHTML = lastObj.message;
 }
 
 export function renderSystemRoom(chatRoomList, lastObj, chatApp) {
@@ -153,16 +170,16 @@ export function renderSystemRoom(chatRoomList, lastObj, chatApp) {
     });
 }
 
-export function rerenderChatRoom(id, lastObj, chatApp) {
+export async function rerenderChatRoom(id, lastObj, chatApp) {
     const chatRoomList = chatApp.getApp().querySelector(".chat__room--list");
 
     if (chatRoomList === null) {
         return ;
     }
 
-    const inviter = lastObj.from_id === player.getId() ? player.getNickName() : lastObj.opponentNickname;
-
     if (lastObj.type === 'invite_game') {
+        const inviter = lastObj.from_id === player.getId() ? player.getNickName() : lastObj.opponentNickname;
+
         if (lastObj.status === 'invite') {
             lastObj.message = `${inviter} invite you!`;
         } else if (lastObj.status === 'cancel') {
@@ -171,12 +188,22 @@ export function rerenderChatRoom(id, lastObj, chatApp) {
     }
 
     const chatRoomItems = chatRoomList.querySelectorAll('.chat__room');
+    let isRender = false;
 
     chatRoomItems.forEach(roomItem => {
         if (Number(roomItem.id) === id) {
+            if (lastObj.isRead) {
+                roomItem.classList.remove('chat__room--no-read');
+            } else {
+                roomItem.classList.add('chat__room--no-read');
+            }
             roomItem.querySelector('.chat__room--msg').innerHTML = lastObj.message;
+            isRender = true;
         }
     });
+    if (!isRender) {
+        await renderChatRoom(chatRoomList, lastObj, chatApp);
+    }
 }
 
 export async function renderChatRoom(chatRoomList, lastObj, chatApp) {

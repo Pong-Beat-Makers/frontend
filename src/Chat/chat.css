@@ -208,6 +208,10 @@ input#chat__search--input::placeholder {
     top: 1px;
 }
 
+/*
+* chat alert
+*/
+
 .chat__alert--container {
     position: fixed;
     width: 380px;
@@ -218,6 +222,8 @@ input#chat__search--input::placeholder {
     display: flex;
     justify-content: space-around;
     align-items: center;
+    cursor: pointer;
+    animation: alert-modal .3s ease-in-out forwards;
 }
 
 .chat__alert--icon {
@@ -267,4 +273,19 @@ input#chat__search--input::placeholder {
     font-size: 18px;
     align-self: flex-start;
     margin: 10px 5px 0 0;
+}
+
+.chat__alert--container.game-alert .chat__alert--title {
+    color: rgb(250, 99, 84);
+}
+
+@keyframes alert-modal {
+    from {
+        transform: translateX(380px);
+        opacity: 0;
+    }
+    to {
+        transform: none;
+        opacity: 1;
+    }
 }
