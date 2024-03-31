@@ -1,7 +1,9 @@
 export const GAME_TYPE = {
-	TWO_PLAYER: 0,
+	LOCAL_GAME: 0,
 	RANDOM: 1,
-	TOURNAMENT: 2
+	TOURNAMENT: 2,
+	TWO_PLAYER: 3,
+	TWO_TOURNAMENT: 4
 }
 
 class Game {
@@ -13,7 +15,7 @@ class Game {
 						<div class="game__playbtn--picture">
 								<i class="bi bi-people"></i>
 						</div>
-						<div class="game__playbtn--text">2 Players</div>
+						<div class="game__playbtn--text">Local game</div>
 				</div>
 				<div class="game__playbtn">
 						<div class="game__playbtn--picture">
@@ -62,10 +64,10 @@ class Game {
 				</div>
 				<div class="playgame__body">
 					<div id="game_playground" tabindex="0"></div>
-					<botton class="modal__btn playgame__btn">
+					<button class="modal__btn exitgame__btn">
 						<i class="bi bi-flag"></i>
 						give up
-					</botton>
+					</button>
 				</div>
 			</div>
 		`
@@ -186,6 +188,47 @@ class Game {
                 </button>
             </div>
         `;
+	}
+
+	localGameModalTemplate() {
+		return `
+            <div class="modal__background"></div>
+            <div class="matching-game__wrapper">
+                <button class="modal__btn matching-game__btn">
+                    <i class="bi bi-lightning"></i>
+                    Two players
+                </button>
+                <button class="modal__btn matching-game__btn">
+                    <i class="bi bi-trophy"></i>
+                    Tournament
+                </button>
+                <button class="modal__btn matching-game__btn">
+                    <i class="bi bi-x-square"></i>
+                    cancel & exit
+                </button>
+            </div>
+        `;	
+	}
+
+	// TODO: alias name Template add css, required field does not work
+	localTournamentAliasTemplate() {
+		return `
+            <div class="modal__background"></div>
+            <div class="matching-game__wrapper">
+				<input class="search-friend__body--input" type="text" placeholder="set alias names for the tournament" value="guest 1" required/>
+				<input class="search-friend__body--input" type="text" placeholder="set alias names for the tournament" value="guest 2" required/>
+				<input class="search-friend__body--input" type="text" placeholder="set alias names for the tournament" value="guest 3" required/>
+				<input class="search-friend__body--input" type="text" placeholder="set alias names for the tournament" value="guest 4" required/>
+				<button class="modal__btn matching-game__btn">
+					<i class="bi bi-check-square"></i>
+					set alias nickname for tournament
+				</button>
+				<button class="modal__btn matching-game__btn">
+					<i class="bi bi-x-square"></i>
+					cancel & exit
+				</button>
+            </div>
+        `;	
 	}
 }
 
