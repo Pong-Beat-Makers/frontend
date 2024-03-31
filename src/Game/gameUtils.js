@@ -202,7 +202,7 @@ export function handleGameModal() {
                 const userList = [];
                 
                 aliasNames.forEach((aliasName) => {
-                  const opponent = generateGuest(aliasName.value, [player.getProfile()]);
+                  const opponent = generateGuest(aliasName.value, userList.map(user => user.profile));
                   userList.push(opponent);
                 });
 
