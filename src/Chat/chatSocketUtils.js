@@ -51,7 +51,7 @@ export function foundChatContainer(userId, chatApp) {
     return foundContainer;
 }
 
-export async function closedChatLog(userId, chatApp) {
+export function closedChatLog(userId, chatApp) {
     const localStorageLog = localStorage.getItem(CHATLOG_PREFIX + userId);
     let chatLog = localStorageLog ? JSON.parse(localStorageLog) : [];
 
@@ -65,7 +65,16 @@ export async function closedChatLog(userId, chatApp) {
 
     const chatContainer = foundChatContainer(userId, chatApp);
     if (chatContainer !== undefined) {
-        await loadChatLog(chatContainer, userId, chatApp);
+        const chatFrame = chatContainer.querySelector('.chat__body--frame');
+        const inviteBtn = chatFrame.querySelectorAll('.chatbox__invite-btn');
+
+        inviteBtn.forEach(btn => {
+            btn.disabled = true;
+            btn.onclick = () => {
+                inviteBtn.innerText = "Hey! don't touch me!";
+                inviteBtn.disabled = true;
+            };
+        });
     }
 }
 
@@ -225,7 +234,7 @@ export async function processMessage(chatApp, messageData) {
 
         // TODO : fromNickname 수정
         newToast.innerHTML = routes["/chat"].chatAlertTemplate(title, message, `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
-        
+
         chatApp.getApp().querySelector(".toast").appendChild(newToast);
         newToast.querySelector(".chat__alert--close-btn").onclick = () => {
             newToast.remove();

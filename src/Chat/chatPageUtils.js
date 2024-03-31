@@ -68,6 +68,7 @@ export async function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = f
 
     frameNode.appendChild(chatBoxNode);
     if (newMsgObj.type === 'invite_game') {
+        const containerInviteBtn = chatContainer.querySelectorAll('.chat__header--btn')[0];
         if (newMsgObj.status === 'invite') {
             const messageNode = chatBoxNode.querySelector('.chatbox__message');
             const inviteBtn = document.createElement('button');
@@ -77,26 +78,32 @@ export async function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = f
 
             if (newMsgObj.closed) {
                 inviteBtn.disabled = true;
-            }
+                inviteBtn.onclick = () => {
+                    inviteBtn.innerText = "Hey! don't touch me!";
+                    inviteBtn.disabled = true;
+                };
+            } else {
+                inviteBtn.onclick = async () => {
+                    const userDetail = await player.getUserDetail(getOpponent(newMsgObj));
+                    const socketApp = SocketApp;
 
+                    socketApp.inviteGameRoom(newMsgObj.room_id, [player.getInfo(), userDetail], chatApp);
+                    closedChatLog(userDetail.id, chatApp);
+                }
+            }
             messageNode.appendChild(inviteBtn);
-
-            inviteBtn.onclick = async () => {
-                const userDetail = await player.getUserDetail(getOpponent(newMsgObj));
-                const socketApp = SocketApp;
-
-                socketApp.inviteGameRoom(newMsgObj.room_id, [player.getInfo(), userDetail], chatApp);
-                await closedChatLog(userDetail.id, chatApp);
-            }
+            containerInviteBtn.disabled = true;
         } else if (newMsgObj.status === 'cancel') {
             chatBoxNode.remove();
 
+            const inviter = newMsgObj.from_id === player.getId() ? player.getNickName() : newMsgObj.opponentNickname;
             const cancelMessageNode = document.createElement('div');
             cancelMessageNode.classList.add('chatbox__system');
 
-            cancelMessageNode.innerHTML = 'User Canceled The Game';
+            cancelMessageNode.innerHTML = `${inviter} Canceled The Game`;
 
             frameNode.appendChild(cancelMessageNode);
+            containerInviteBtn.disabled = false;
         }
     }
     frameNode.scrollTop = frameNode.scrollHeight;
@@ -183,7 +190,7 @@ export async function rerenderChatRoom(id, lastObj, chatApp) {
         if (lastObj.status === 'invite') {
             lastObj.message = `${inviter} invite you!`;
         } else if (lastObj.status === 'cancel') {
-            lastObj.message = `${inviter} User Canceled The Game`;
+            lastObj.message = `${inviter} Canceled The Game`;
         }
     }
 
@@ -236,7 +243,7 @@ export async function renderChatRoom(chatRoomList, lastObj, chatApp) {
             if (lastObj.status === 'invite') {
                 lastObj.message = `${inviter} invite you!`;
             } else if (lastObj.status === 'cancel') {
-                lastObj.message = `${inviter} User Canceled The Game`;
+                lastObj.message = `${inviter} Canceled The Game`;
             }
         }
 
@@ -333,9 +340,7 @@ export async function setChatPage(chatApp) {
         e.preventDefault();
     }
 
-    let timeoutFunction = setTimeout(async () => {
-        await checkChatroomSearch(chatApp);
-    }, 500);
+    let timeoutFunction;
 
     chatSearchBtn.onkeyup = async () => {
         clearTimeout(timeoutFunction);

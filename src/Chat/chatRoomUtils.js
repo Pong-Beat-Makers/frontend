@@ -135,7 +135,7 @@ export async function showChatroom(chatApp, userData) {
     setAvatar(userData.profile, avatar);
 
     const data = await chatApp.isBlocked(userData.id);
-    // try {
+    try {
         const blockIcon = `<i class="bi bi-person-slash"></i>`;
 
         if (data.is_blocked === true) {
@@ -165,7 +165,7 @@ export async function showChatroom(chatApp, userData) {
         });
         readChatLog(userData.id);
         chatContainer.querySelector('.chat__body--text').focus();
-    // } catch(e) {
-    //     openInfoModal(`Something was wrong .. Error code: ${e}`);
-    // }
+    } catch(e) {
+        openInfoModal(`Something was wrong .. Error code: ${e}`);
+    }
 }
