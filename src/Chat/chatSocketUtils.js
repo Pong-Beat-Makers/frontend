@@ -65,6 +65,7 @@ export function closedChatLog(userId, chatApp) {
 
     const chatContainer = foundChatContainer(userId, chatApp);
     if (chatContainer !== undefined) {
+        const containerInviteBtn = chatContainer.querySelectorAll('.chat__header--btn')[0];
         const chatFrame = chatContainer.querySelector('.chat__body--frame');
         const inviteBtn = chatFrame.querySelectorAll('.chatbox__invite-btn');
 
@@ -75,6 +76,7 @@ export function closedChatLog(userId, chatApp) {
                 inviteBtn.disabled = true;
             };
         });
+        containerInviteBtn.disabled = false;
     }
 }
 

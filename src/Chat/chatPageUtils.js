@@ -90,9 +90,9 @@ export async function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = f
                     socketApp.inviteGameRoom(newMsgObj.room_id, [player.getInfo(), userDetail], chatApp);
                     closedChatLog(userDetail.id, chatApp);
                 }
+                containerInviteBtn.disabled = true;
             }
             messageNode.appendChild(inviteBtn);
-            containerInviteBtn.disabled = true;
         } else if (newMsgObj.status === 'cancel') {
             chatBoxNode.remove();
 
