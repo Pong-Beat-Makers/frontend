@@ -85,7 +85,7 @@ class Game {
 		}
 		return `
             <div class="modal__background"></div>
-            <div class="matching-game__wrapper">
+            <div class="matching-game__wrapper modal__fade-in-modal">
             	<span class="ingAnimation">${ comment }</span>
             	${ peoples }
                 <button class="modal__btn matching-game__btn">
@@ -99,7 +99,7 @@ class Game {
 	versusModalTemplate() {
 		return `
 			<div class="modal__background"></div>
-			<div class="modal__playgame--background"></div>
+			<div class="modal__playgame--background modal__fade-in-modal"></div>
 			<div class="versus-modal__wrapper">
 				<div class="versus-modal__header">Get ready for the match!</div>
 				<div class="versus-modal__body">
@@ -180,7 +180,7 @@ class Game {
 	infoModalTemplate(comment) {
 		return `
             <div class="modal__background"></div>
-            <div class="matching-game__wrapper">
+            <div class="matching-game__wrapper modal__fade-in-modal">
             	<span>${ comment }</span>
                 <button class="modal__btn matching-game__btn">
                     <i class="bi bi-x-square"></i>

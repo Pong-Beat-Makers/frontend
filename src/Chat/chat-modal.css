@@ -21,7 +21,6 @@
 
 .chat__header--profile {
     min-width: 0;
-    cursor: pointer;
     display: flex;
     align-items: center;
     color: white;
@@ -42,6 +41,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    padding: 5px 0;
 }
 
 .chat__header--controlls {
@@ -56,6 +56,11 @@
     border-radius: 10px;
     font-size: 18px;
     color: #351361B2;
+}
+
+.chat__header--btn:disabled {
+    filter: brightness(.5);
+    cursor: default;
 }
 
 .chat__header--btn:not(:last-child) {

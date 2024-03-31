@@ -1,7 +1,14 @@
 import { routes } from "../route.js";
 import {modalRender, setAvatar} from "../Profile/modalUtils.js";
-import {SYSTEM_MESSAGE, CHATLOG_PREFIX, renderChatBox, showChatList, renderSystemChatAdmin} from "./chatPageUtils.js";
-import {readSystemLog} from "./chatSocketUtils.js";
+import {
+    SYSTEM_MESSAGE,
+    CHATLOG_PREFIX,
+    renderChatBox,
+    showChatList,
+    renderSystemChatAdmin,
+    rerenderChatRoom, rerenderSystemRoom
+} from "./chatPageUtils.js";
+import {readChatLog, readSystemLog} from "./chatSocketUtils.js";
 import {openInfoModal} from "../Game/gameUtils.js";
 
 export function getSystemLog() {
@@ -25,7 +32,7 @@ function getChatLog(userId) {
     return chatLog ? JSON.parse(chatLog) : [];
 }
 
-export function loadSystemChatLog(chatContainer) {
+export async function loadSystemChatLog(chatContainer, chatApp) {
     const frameNode = chatContainer.querySelector('.chat__body--frame');
 
     if (frameNode !== null) {
@@ -33,12 +40,16 @@ export function loadSystemChatLog(chatContainer) {
 
         const systemLog = getSystemLog();
         systemLog.forEach(log => {
-            renderSystemChatAdmin(chatContainer, log);
+            log.isRead = true;
+            renderSystemChatAdmin(chatContainer, log, chatApp);
         });
+        if (systemLog.length > 0) {
+            await rerenderSystemRoom(systemLog[systemLog.length - 1], chatApp);
+        }
     }
 }
 
-export function loadChatLog(chatContainer, userId, chatApp) {
+export async function loadChatLog(chatContainer, userId, chatApp) {
     const frameNode = chatContainer.querySelector('.chat__body--frame');
 
     if (frameNode !== null) {
@@ -46,8 +57,12 @@ export function loadChatLog(chatContainer, userId, chatApp) {
 
         const chatLog = getChatLog(userId);
         chatLog.forEach(log => {
+            log.isRead = true;
             renderChatBox(chatContainer, log, chatApp);
         });
+        if (chatLog.length > 0) {
+            await rerenderChatRoom(userId, chatLog[chatLog.length - 1], chatApp);
+        }
     }
 }
 
@@ -91,10 +106,9 @@ export async function showSystemRoom(chatApp) {
     controller.remove();
     roomName.innerHTML = 'System';
 
-    loadSystemChatLog(chatContainer);
+    await loadSystemChatLog(chatContainer, chatApp);
 
     readSystemLog();
-    await showChatList(chatApp);
 }
 
 export async function showChatroom(chatApp, userData) {
@@ -134,11 +148,13 @@ export async function showChatroom(chatApp, userData) {
 
         chatModal.querySelector(".chat__header--name").innerHTML = userData.nickname;
 
-        loadChatLog(chatContainer, userData.id, chatApp);
+        await loadChatLog(chatContainer, userData.id, chatApp);
 
         sendBtn.addEventListener('click', e => {
-            chatApp.sendMessage(userData.id, msgInput.value);
-            msgInput.value = "";
+            if (msgInput.value.length > 0) {
+                chatApp.sendMessage(userData.id, msgInput.value);
+                msgInput.value = "";
+            }
         });
 
         msgInput.addEventListener('keydown', e => {
@@ -147,9 +163,9 @@ export async function showChatroom(chatApp, userData) {
                 sendBtn.click();
             }
         });
-        await showChatList(chatApp);
+        readChatLog(userData.id);
         chatContainer.querySelector('.chat__body--text').focus();
     } catch(e) {
-        openInfoModal(`Something was wrong .. Error code: ${e.error}`);
+        openInfoModal(`Something was wrong .. Error code: ${e}`);
     }
 }

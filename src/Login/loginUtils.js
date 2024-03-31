@@ -108,9 +108,7 @@ export async function handleAddFriendBtn(chatApp) {
     const profileSearchInput = addFriendModal.querySelector(".search-friend__body--input");
     const profileSearchList = addFriendModal.querySelector('.search-friend__body--list');
 
-    let timeoutFunction = setTimeout(async () => {
-        await handleProfileSearch(profileSearchList, profileSearchInput.value, chatApp);
-    }, 500);
+    let timeoutFunction;
 
     profileSearchInput.onkeyup = async () => {
         clearTimeout(timeoutFunction);
@@ -121,32 +119,34 @@ export async function handleAddFriendBtn(chatApp) {
 }
 
 export function changeTo2FAPage(loginUser) {
-  const loginBody = document.querySelector(".login__container--body");
+    const loginBody = document.querySelector(".login__container--body");
 
-  loginBody.querySelector(".login__wrapper--header").innerHTML = "<span class='login__wrapper--header_'>Verification</span>";
-  loginBody.querySelector(".login__wrapper--list").innerHTML = Login.twoFATempate();
+    loginBody.querySelector(".login__wrapper--header").innerHTML = "<span class='login__wrapper--header_'>Verification</span>";
+    loginBody.querySelector(".login__wrapper--list").innerHTML = Login.twoFATempate();
 
-  const codeInput = loginBody.querySelector('.login__body--input');
-  const twoFABtn = loginBody.querySelector('.login__2fa-btn');
+    const codeInput = loginBody.querySelector('.login__body--input');
+    const twoFABtn = loginBody.querySelector('.login__2fa-btn');
 
-  codeInput.addEventListener('keyup', e => {
-          twoFABtn.disabled = e.target.value.length !== 6;
-          if (e.keyCode === 13) {
-              twoFABtn.click();
-          }
-  });
+    codeInput.addEventListener('keyup', e => {
+        twoFABtn.disabled = e.target.value.length !== 6;
+        if (e.keyCode === 13) {
+            twoFABtn.click();
+        }
+    });
 
-  twoFABtn.addEventListener('click', async () => {
+    twoFABtn.addEventListener('click', async () => {
+        const infoContainer = loginBody.querySelector('.login__body--info');
+
         try {
-            const infoContainer = loginBody.querySelector('.login__body--info');
             await loginUser.send2FACode(codeInput.value);
 
             infoContainer.innerHTML = "";
+            await loginUser.whoAmI();
             await renderMainPage();
         } catch (e) {
             infoContainer.innerHTML = "Wrong code!";
         }
-  });
+    });
 }
 
 export function getInfoJWT(token) {

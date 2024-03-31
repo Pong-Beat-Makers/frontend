@@ -3,11 +3,12 @@ import {
     renderChatBox,
     CHATLOG_PREFIX,
     SYSTEM_MESSAGE,
-    renderSystemChatAdmin
+    renderSystemChatAdmin, rerenderChatRoom, rerenderSystemRoom
 } from "./chatPageUtils.js";
 import {player} from "../app.js";
-import {loadChatLog} from "./chatRoomUtils.js";
+import {loadChatLog, showChatroom} from "./chatRoomUtils.js";
 import {routes} from "../route.js";
+import {openInfoModal} from "../Game/gameUtils.js";
 
 export function getChatLog(usersData = []) {
     /*
@@ -64,7 +65,16 @@ export function closedChatLog(userId, chatApp) {
 
     const chatContainer = foundChatContainer(userId, chatApp);
     if (chatContainer !== undefined) {
-        loadChatLog(chatContainer, userId, chatApp);
+        const chatFrame = chatContainer.querySelector('.chat__body--frame');
+        const inviteBtn = chatFrame.querySelectorAll('.chatbox__invite-btn');
+
+        inviteBtn.forEach(btn => {
+            btn.disabled = true;
+            btn.onclick = () => {
+                inviteBtn.innerText = "Hey! don't touch me!";
+                inviteBtn.disabled = true;
+            };
+        });
     }
 }
 
@@ -75,6 +85,15 @@ export function readSystemLog() {
     chatLog.forEach(log => log.isRead = true);
 
     localStorage.setItem(SYSTEM_MESSAGE, JSON.stringify((chatLog)));
+}
+
+export function readChatLog(userId) {
+    const localStorageLog = localStorage.getItem(CHATLOG_PREFIX + userId);
+    let chatLog = localStorageLog ? JSON.parse(localStorageLog) : [];
+
+    chatLog.forEach(log => log.isRead = true);
+
+    localStorage.setItem(CHATLOG_PREFIX + userId, JSON.stringify((chatLog)));
 }
 
 export function saveSystemMsg(newMsgObj) {
@@ -118,6 +137,16 @@ export function saveNewMsg(newMsgObj) {
     }
 }
 
+async function handleAlertClick(chatApp, opponentId) {
+    try {
+        const userDetail = await player.getUserDetail(opponentId);
+
+        await showChatroom(chatApp, userDetail);
+    } catch (e) {
+        openInfoModal(`Something was wrong .. Error code: ${e.error}`);
+    }
+}
+
 export async function processNextMatch(chatApp) {
     const data = {
         type: "system_message",
@@ -141,10 +170,12 @@ export async function processSystemMessage(chatApp, messageData) {
     const systemChatContainer = chatApp.getApp().querySelector('.system__chat--container');
 
     if (systemChatContainer !== null) {
-        renderSystemChatAdmin(systemChatContainer, messageData);
+        renderSystemChatAdmin(systemChatContainer, messageData, chatApp, true);
     } else {
         const newToast = document.createElement('div');
         const msgTime = new Date(messageData.time);
+
+        newToast.classList.add('chat__alert--container');
         // TODO : fromNickname 수정
         newToast.innerHTML = routes["/chat"].chatAlertTemplate("System Alert", messageData.message, `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
 
@@ -156,7 +187,7 @@ export async function processSystemMessage(chatApp, messageData) {
 
         messageData.isRead = false;
         saveSystemMsg(messageData);
-        await showChatList(chatApp);
+        rerenderSystemRoom(messageData, chatApp);
     }
 }
 
@@ -170,6 +201,8 @@ export async function processMessage(chatApp, messageData) {
     *   message: <string>,
     *   time: <string>
     * }
+    *
+    * invite_game : add opponentNickname
     * */
     const chatContainers = chatApp.getApp().querySelectorAll('.chat__container');
     let isRender = false;
@@ -184,9 +217,24 @@ export async function processMessage(chatApp, messageData) {
     if (!isRender) {
         const newToast = document.createElement('div');
         const msgTime = new Date(messageData.time);
+        const inviter = messageData.from_id === player.getId() ? player.getNickName() : messageData.opponentNickname;
+        let title = 'New Message';
+        let message = messageData.message;
+
+        newToast.classList.add('chat__alert--container');
+        if (messageData.type === 'invite_game') {
+            newToast.classList.add('game-alert');
+            title = 'Game Invitation';
+            if (messageData.status === 'invite') {
+                message = `${inviter} invite you!`;
+            } else if (messageData.status === 'cancel') {
+                message = `${inviter} Canceled The Game`;
+            }
+        }
+
         // TODO : fromNickname 수정
-        newToast.innerHTML = routes["/chat"].chatAlertTemplate("New Message", messageData.message, `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
-        
+        newToast.innerHTML = routes["/chat"].chatAlertTemplate(title, message, `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
+
         chatApp.getApp().querySelector(".toast").appendChild(newToast);
         newToast.querySelector(".chat__alert--close-btn").onclick = () => {
             newToast.remove();
@@ -195,6 +243,9 @@ export async function processMessage(chatApp, messageData) {
 
         messageData.isRead = false;
         saveNewMsg(messageData);
-        await showChatList(chatApp);
+
+        newToast.onclick = async () => await handleAlertClick(chatApp, getOpponent(messageData));
+
+        await rerenderChatRoom(getOpponent(messageData), messageData, chatApp);
     }
 }

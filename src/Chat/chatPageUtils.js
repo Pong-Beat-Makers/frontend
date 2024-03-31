@@ -19,7 +19,7 @@ function getLastObj(key) {
     return undefined;
 }
 
-export function renderSystemChatAdmin(chatContainer, newMsgObj, isNew = false) {
+export function renderSystemChatAdmin(chatContainer, newMsgObj, chatApp, isNew = false) {
     /*
     * newMsgObj: {
     *   type: <string>,
@@ -40,10 +40,11 @@ export function renderSystemChatAdmin(chatContainer, newMsgObj, isNew = false) {
 
     if (isNew) {
         saveSystemMsg(newMsgObj);
+        rerenderSystemRoom(newMsgObj, chatApp);
     }
 }
 
-export function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) {
+export async function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) {
     /*
     * newMsgObj: {
     *   type: <string>,
@@ -67,6 +68,7 @@ export function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) 
 
     frameNode.appendChild(chatBoxNode);
     if (newMsgObj.type === 'invite_game') {
+        const containerInviteBtn = chatContainer.querySelectorAll('.chat__header--btn')[0];
         if (newMsgObj.status === 'invite') {
             const messageNode = chatBoxNode.querySelector('.chatbox__message');
             const inviteBtn = document.createElement('button');
@@ -76,32 +78,38 @@ export function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = false) 
 
             if (newMsgObj.closed) {
                 inviteBtn.disabled = true;
-            }
+                inviteBtn.onclick = () => {
+                    inviteBtn.innerText = "Hey! don't touch me!";
+                    inviteBtn.disabled = true;
+                };
+            } else {
+                inviteBtn.onclick = async () => {
+                    const userDetail = await player.getUserDetail(getOpponent(newMsgObj));
+                    const socketApp = SocketApp;
 
+                    socketApp.inviteGameRoom(newMsgObj.room_id, [player.getInfo(), userDetail], chatApp);
+                    closedChatLog(userDetail.id, chatApp);
+                }
+            }
             messageNode.appendChild(inviteBtn);
-
-            inviteBtn.onclick = async () => {
-                const userDetail = await player.getUserDetail(getOpponent(newMsgObj));
-                const socketApp = SocketApp;
-
-                socketApp.inviteGameRoom(newMsgObj.room_id, [player.getInfo(), userDetail], chatApp);
-                closedChatLog(userDetail.id, chatApp);
-            }
+            containerInviteBtn.disabled = true;
         } else if (newMsgObj.status === 'cancel') {
             chatBoxNode.remove();
 
+            const inviter = newMsgObj.from_id === player.getId() ? player.getNickName() : newMsgObj.opponentNickname;
             const cancelMessageNode = document.createElement('div');
             cancelMessageNode.classList.add('chatbox__system');
 
-            cancelMessageNode.innerHTML = 'User Canceled The Game';
+            cancelMessageNode.innerHTML = `${inviter} Canceled The Game`;
 
             frameNode.appendChild(cancelMessageNode);
+            containerInviteBtn.disabled = false;
         }
     }
     frameNode.scrollTop = frameNode.scrollHeight;
     if (isNew) {
         saveNewMsg(newMsgObj);
-        rerenderChatRoom(getOpponent(newMsgObj), newMsgObj, chatApp);
+        await rerenderChatRoom(getOpponent(newMsgObj), newMsgObj, chatApp);
     }
 }
 
@@ -116,6 +124,22 @@ export function renderSystemChatBox(app, message, userId) {
             frameNode.scrollTop = frameNode.scrollHeight;
         }
     });
+}
+
+export function rerenderSystemRoom(lastObj, chatApp) {
+    const chatRoomList = chatApp.getApp().querySelector(".chat__room--list");
+
+    if (chatRoomList === null) {
+        return ;
+    }
+    const chatRoomItems = chatRoomList.querySelector('.chat__room--system');
+
+    if (lastObj.isRead) {
+        chatRoomItems.classList.remove('chat__room--no-read');
+    } else {
+        chatRoomItems.classList.add('chat__room--no-read');
+    }
+    chatRoomItems.querySelector('.system-room__msg').innerHTML = lastObj.message;
 }
 
 export function renderSystemRoom(chatRoomList, lastObj, chatApp) {
@@ -153,20 +177,40 @@ export function renderSystemRoom(chatRoomList, lastObj, chatApp) {
     });
 }
 
-export function rerenderChatRoom(id, lastObj, chatApp) {
+export async function rerenderChatRoom(id, lastObj, chatApp) {
     const chatRoomList = chatApp.getApp().querySelector(".chat__room--list");
 
     if (chatRoomList === null) {
         return ;
     }
 
+    if (lastObj.type === 'invite_game') {
+        const inviter = lastObj.from_id === player.getId() ? player.getNickName() : lastObj.opponentNickname;
+
+        if (lastObj.status === 'invite') {
+            lastObj.message = `${inviter} invite you!`;
+        } else if (lastObj.status === 'cancel') {
+            lastObj.message = `${inviter} Canceled The Game`;
+        }
+    }
+
     const chatRoomItems = chatRoomList.querySelectorAll('.chat__room');
+    let isRender = false;
 
     chatRoomItems.forEach(roomItem => {
         if (Number(roomItem.id) === id) {
+            if (lastObj.isRead) {
+                roomItem.classList.remove('chat__room--no-read');
+            } else {
+                roomItem.classList.add('chat__room--no-read');
+            }
             roomItem.querySelector('.chat__room--msg').innerHTML = lastObj.message;
+            isRender = true;
         }
     });
+    if (!isRender) {
+        await renderChatRoom(chatRoomList, lastObj, chatApp);
+    }
 }
 
 export async function renderChatRoom(chatRoomList, lastObj, chatApp) {
@@ -192,10 +236,15 @@ export async function renderChatRoom(chatRoomList, lastObj, chatApp) {
         chatRoomItem.classList.add('chat__room');
         chatRoomItem.id = opponent;
 
+        const inviter = lastObj.from_id === player.getId() ? player.getNickName() : lastObj.opponentNickname;
         const msgTime = new Date(lastObj.time);
 
         if (lastObj.type === 'invite_game') {
-            lastObj.message = `${userDetail.nickname} invite you!`;
+            if (lastObj.status === 'invite') {
+                lastObj.message = `${inviter} invite you!`;
+            } else if (lastObj.status === 'cancel') {
+                lastObj.message = `${inviter} Canceled The Game`;
+            }
         }
 
         chatRoomItem.innerHTML = routes['/chat'].chatRoomTemplate(userDetail.nickname, lastObj.message, `${msgTime.getHours()}:${msgTime.getMinutes()>10?msgTime.getMinutes():'0' + msgTime.getMinutes()}`);
@@ -291,9 +340,7 @@ export async function setChatPage(chatApp) {
         e.preventDefault();
     }
 
-    let timeoutFunction = setTimeout(async () => {
-        await checkChatroomSearch(chatApp);
-    }, 500);
+    let timeoutFunction;
 
     chatSearchBtn.onkeyup = async () => {
         clearTimeout(timeoutFunction);

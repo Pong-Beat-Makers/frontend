@@ -91,3 +91,16 @@ div[data-image="upload"]:before {
         content: "..";
     }
 }
+
+.modal__fade-in-modal {
+    animation: fadeInModal .3s ease-in-out forwards;
+}
+
+@keyframes fadeInModal {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
