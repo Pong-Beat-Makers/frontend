@@ -58,6 +58,11 @@
     color: #351361B2;
 }
 
+.chat__header--btn:disabled {
+    filter: brightness(.5);
+    cursor: default;
+}
+
 .chat__header--btn:not(:last-child) {
     margin-right: 5px;
 }

@@ -68,6 +68,7 @@ export async function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = f
 
     frameNode.appendChild(chatBoxNode);
     if (newMsgObj.type === 'invite_game') {
+        const containerInviteBtn = chatContainer.querySelectorAll('.chat__header--btn')[0];
         if (newMsgObj.status === 'invite') {
             const messageNode = chatBoxNode.querySelector('.chatbox__message');
             const inviteBtn = document.createElement('button');
@@ -91,6 +92,7 @@ export async function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = f
                 }
             }
             messageNode.appendChild(inviteBtn);
+            containerInviteBtn.disabled = true;
         } else if (newMsgObj.status === 'cancel') {
             chatBoxNode.remove();
 
@@ -101,6 +103,7 @@ export async function renderChatBox(chatContainer, newMsgObj, chatApp, isNew = f
             cancelMessageNode.innerHTML = `${inviter} Canceled The Game`;
 
             frameNode.appendChild(cancelMessageNode);
+            containerInviteBtn.disabled = false;
         }
     }
     frameNode.scrollTop = frameNode.scrollHeight;
