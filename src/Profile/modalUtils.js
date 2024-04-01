@@ -50,7 +50,7 @@ export function toggleAddAndDeleteBtn(chatApp, btnNode, id, doing) {
             await player.friend(id, doing);
 
             const { is_online } = await chatApp.isOnline(id, doing);
-            if (doing !== DOING.DELETE && is_online) {
+            if (is_online || doing === DOING.DELETE) {
                 chatApp.setFriendsOnline(id, doing);
             }
             btnNode.innerHTML = buttonMsg[1];
