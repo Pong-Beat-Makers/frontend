@@ -101,6 +101,10 @@ canvas {
     text-align: center;
 }
 
+.matching-game__wrapper > span {
+    padding: 0 25px;
+}
+
 .matching-game__status {
     margin-top: 10px;
     font-size: 15px;

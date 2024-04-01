@@ -194,7 +194,7 @@ export function handleFileInputAtDiv(avatars, selectedClassName) {
 
             const maxSize = 1024 * 1024;
             if (file.size > maxSize) {
-                openInfoModal('File size must be uploaded under 1MB.');
+                openInfoModal('File size must be under 1MB');
                 return ;
             }
 
