@@ -209,7 +209,7 @@ class SocketApp {
                         this._gameApp.renderCounter(data.counter);
                     }
                 } else if (data.message === 'Game Start') {
-                    if (gameType === GAME_TYPE.TWO_PLAYER || GAME_TYPE.TWO_TOURNAMENT) {
+                    if (gameType === GAME_TYPE.TWO_PLAYER || gameType === GAME_TYPE.TWO_TOURNAMENT) {
                         openPlayGameModal(this, gameType, userList);
                         changeGiveUpToEnd(this._gameContiner);
                         this._gameApp = new GameApp(this._gameCanvas, gameType);

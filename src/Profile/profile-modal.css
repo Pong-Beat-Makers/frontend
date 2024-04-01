@@ -29,6 +29,15 @@
     color: #FFFFFFBD;
 }
 
+.profile-modal__body--warn {
+    position: absolute;
+    top: -25px;
+    left: 100px;
+    font-size: 15px;
+    color: rgb(var(--warn-color));
+    transition: .3s ease-in-out;
+}
+
 .profile-modal__avatar {
     position: relative;
     width: 140px;
@@ -140,6 +149,11 @@
     color: rgba(var(--sub-color) / 70%);
     align-self: center;
     margin-top: 50px;
+}
+
+.profile-modal__save-btn:disabled {
+    filter: brightness(.5);
+    cursor: default;
 }
 
 @keyframes rightPadeInModal {

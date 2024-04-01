@@ -192,6 +192,12 @@ export function handleFileInputAtDiv(avatars, selectedClassName) {
             const file = e.target.files[0];
             const reader = new FileReader();
 
+            const maxSize = 1024 * 1024;
+            if (file.size > maxSize) {
+                openInfoModal('File size must be under 1MB');
+                return ;
+            }
+
             reader.onload = e => {
                 avatars[1].style.backgroundImage = `url(${e.target.result})`;
                 avatars[1].setAttribute('data-image', e.target.result);
@@ -243,12 +249,39 @@ export function handleEditUserModalUtils(app) {
         nickname.nextElementSibling.firstElementChild.innerHTML = nickname.value.length;
         status_message.nextElementSibling.firstElementChild.innerHTML = status_message.value.length;
 
-        modalContainer.querySelectorAll('textarea').forEach(element => {
+        const nicknameContainer = modalContainer.querySelectorAll('.profile-modal__body--content')[1];
+        const warningContainer = nicknameContainer.querySelector('.profile-modal__body--warn');
+        const saveBtn = modalContainer.querySelector('.profile-modal__save-btn');
+
+        modalContainer.querySelectorAll('textarea').forEach((element, i) => {
             element.addEventListener('keyup', e => {
                 const textLenLimit = e.target.nextElementSibling.firstElementChild;
 
                 textLenLimit.innerHTML = `${e.target.value.length}`;
             });
+            if (i === 0) {
+                let timeoutFunction;
+                element.addEventListener('keyup', e => {
+                    clearTimeout(timeoutFunction);
+                    timeoutFunction = setTimeout(async () => {
+                        e.target.classList.remove('warnColor');
+                        warningContainer.innerHTML = '';
+                        saveBtn.disabled = false;
+                        try {
+                            const data = await player.searchUser(e.target.value);
+                            data.forEach(user => {
+                                if (user.nickname !== player.getNickName() && user.nickname === e.target.value) {
+                                    warningContainer.innerHTML = 'duplicate name';
+                                    e.target.classList.add('warnColor');
+                                    saveBtn.disabled = true;
+                                }
+                            });
+                        } catch (e) {
+                            // TODO: error modal?
+                        }
+                    }, 500);
+                });
+            }
         });
 
         const avatars = modalContainer.querySelectorAll('.profile-modal__avatar');
@@ -301,7 +334,7 @@ export function handleEditUserModalUtils(app) {
             });
         });
 
-        modalContainer.querySelector('.profile-modal__save-btn').addEventListener('click', async () =>  {
+        saveBtn.addEventListener('click', async () =>  {
             const data = {
                 'profile_to': getAvatarData(avatars),
                 'nickname_to': nickname.value,

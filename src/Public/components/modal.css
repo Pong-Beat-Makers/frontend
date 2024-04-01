@@ -80,6 +80,10 @@ div[data-image="upload"]:before {
     animation: isIng 2s ease-in infinite;
 }
 
+.warnColor {
+    color: rgb(var(--warn-color)) !important;
+}
+
 @keyframes isIng {
     0% {
         content: "";

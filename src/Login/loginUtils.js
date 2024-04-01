@@ -3,7 +3,7 @@ import LoginSuccess from "./loginSuccessTemplate.js";
 import Login from "./loginTemplate.js";
 import ProfileModal from "../Profile/profileModalTemplate.js";
 import player, {USER_STATUS} from "./player.js";
-import { setPages } from "../route.js";
+import changeUrl, { setPages } from "../route.js";
 import {handleLoginBtn, handleNaviClick} from "../Public/clickUtils.js";
 import {
     friendModalClick,
@@ -164,6 +164,10 @@ export async function renderMainPage() {
 
     if (player !== undefined && player.getStatus() === USER_STATUS.AUTHORIZED) {
         app.innerHTML = LoginSuccess.template();
+
+        const logo = app.querySelector('.header__logo--text');
+
+        logo.onclick = () => changeUrl('/home', true);
 
         const requestedUrl = (window.location.pathname === '/' ? "/home" : window.location.pathname);
         history.replaceState(requestedUrl, null, requestedUrl);
