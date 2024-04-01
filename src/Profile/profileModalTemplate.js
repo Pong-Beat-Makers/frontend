@@ -31,6 +31,7 @@ class ProfileModal {
                 </div>
                 <div class="profile-modal__body--header">nickname</div>
                 <div class="profile-modal__body--content">
+                    <div class="profile-modal__body--warn"></div>
                     <textarea class="profile-modal__nickname" name="profile-modal__nickname" maxlength="15"></textarea>
                     <div class="profile-modal__text--length"><span>0</span>/15</div>
                 </div>
