@@ -192,6 +192,12 @@ export function handleFileInputAtDiv(avatars, selectedClassName) {
             const file = e.target.files[0];
             const reader = new FileReader();
 
+            const maxSize = 1024 * 1024;
+            if (file.size > maxSize) {
+                openInfoModal('File size must be uploaded under 1MB.');
+                return ;
+            }
+
             reader.onload = e => {
                 avatars[1].style.backgroundImage = `url(${e.target.result})`;
                 avatars[1].setAttribute('data-image', e.target.result);
