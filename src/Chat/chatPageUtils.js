@@ -228,8 +228,8 @@ export async function renderChatRoom(chatRoomList, lastObj, chatApp) {
         return ;
     }
 
+    const opponent = getOpponent(lastObj);
     try {
-        const opponent = getOpponent(lastObj);
         const userDetail = await player.getUserDetail(opponent);
 
         const chatRoomItem = document.createElement('div');
@@ -263,7 +263,11 @@ export async function renderChatRoom(chatRoomList, lastObj, chatApp) {
             await showChatroom(chatApp, userDetail);
         });
     } catch (e) {
-        // TODO: error msg
+        if (e.error === 404) {
+            localStorage.removeItem(CHATLOG_PREFIX + opponent);
+        } else {
+            openInfoModal(`Something was wrong .. Error code: ${e.error}`);
+        }
     }
 
 }

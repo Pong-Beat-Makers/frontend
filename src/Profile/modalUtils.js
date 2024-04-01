@@ -46,13 +46,18 @@ export function toggleAddAndDeleteBtn(chatApp, btnNode, id, doing) {
     btnNode.innerHTML = doing === DOING.ADD? buttonMsg[0]:buttonMsg[1];
     try {
         btnNode.onclick = async () => {
+            btnNode.disabled = true;
             await player.friend(id, doing);
 
-            chatApp.setFriendsOnline(id, doing);
+            const { is_online } = await chatApp.isOnline(id, doing);
+            if (is_online || doing === DOING.DELETE) {
+                chatApp.setFriendsOnline(id, doing);
+            }
             btnNode.innerHTML = buttonMsg[1];
             toggleAddAndDeleteBtn(chatApp, btnNode, id, doing === DOING.ADD? DOING.DELETE : DOING.ADD);
             await setFriendList(chatApp);
             setupFriendListStatus();
+            btnNode.disabled = false;
         }
     } catch (e) {
         openInfoModal(`Something was wrong .. Error code: ${e.error}`);
