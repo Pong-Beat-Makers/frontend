@@ -83,6 +83,11 @@
     font-size: 18px;
 }
 
+.friend-modal__btn:disabled {
+    filter: brightness(.5);
+    cursor: default;
+}
+
 .friend-modal__header {
     color: white;
     font-size: 20px;

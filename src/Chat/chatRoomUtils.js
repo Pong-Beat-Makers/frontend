@@ -134,8 +134,8 @@ export async function showChatroom(chatApp, userData) {
     chatContainer.id = userData.id;
     setAvatar(userData.profile, avatar);
 
-    const data = await chatApp.isBlocked(userData.id);
     try {
+        const data = await chatApp.isBlocked(userData.id);
         const blockIcon = `<i class="bi bi-person-slash"></i>`;
 
         if (data.is_blocked === true) {
