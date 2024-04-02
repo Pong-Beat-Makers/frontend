@@ -188,7 +188,7 @@ export async function rerenderChatRoom(id, lastObj, chatApp) {
         const inviter = lastObj.from_id === player.getId() ? player.getNickName() : lastObj.opponentNickname;
 
         if (lastObj.status === 'invite') {
-            lastObj.message = `${inviter} invite you!`;
+            lastObj.message = `${inviter} invited you!`;
         } else if (lastObj.status === 'cancel') {
             lastObj.message = `${inviter} Canceled The Game`;
         }
@@ -241,7 +241,7 @@ export async function renderChatRoom(chatRoomList, lastObj, chatApp) {
 
         if (lastObj.type === 'invite_game') {
             if (lastObj.status === 'invite') {
-                lastObj.message = `${inviter} invite you!`;
+                lastObj.message = `${inviter} invited you!`;
             } else if (lastObj.status === 'cancel') {
                 lastObj.message = `${inviter} Canceled The Game`;
             }

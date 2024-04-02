@@ -228,7 +228,7 @@ export async function processMessage(chatApp, messageData) {
             newToast.classList.add('game-alert');
             title = 'Game Invitation';
             if (messageData.status === 'invite') {
-                message = `${inviter} invite you!`;
+                message = `${inviter} invited you!`;
             } else if (messageData.status === 'cancel') {
                 message = `${inviter} Canceled The Game`;
             }
