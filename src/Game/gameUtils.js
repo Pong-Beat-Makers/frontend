@@ -185,8 +185,8 @@ export function handleGameModal() {
         const socketApp = SocketApp;
 
         const modalHtml = routes['/game'].localGameModalTemplate();
-        const modalContainer = modalRender('local-play-select', modalHtml, false);
-        const modalBtns = modalContainer.querySelectorAll('.matching-game__btn');
+        const modalContainer = modalRender('local-play__select', modalHtml, false);
+        const modalBtns = modalContainer.querySelectorAll('.game__playbtn');
         
         modalBtns[0].addEventListener('click', () => {
             socketApp.localTwo();
@@ -198,12 +198,19 @@ export function handleGameModal() {
             const aliasModalBtns = aliasModalContainer.querySelectorAll('.matching-game__btn');
 
             aliasModalBtns[0].addEventListener('click', () => {
-                const aliasNames = aliasModalContainer.querySelectorAll('.search-friend__body--input');
+                const aliasNames = aliasModalContainer.querySelectorAll('.local-game__alias--input');
                 const userList = [];
+
+                for (let i = 0; i < 4; i++) {
+                    if (aliasNames[i].value.length < 1) {
+                        alert("Alias name is required for every player!");
+                        return ;
+                    }
+                }
                 
                 aliasNames.forEach((aliasName) => {
-                  const opponent = generateGuest(aliasName.value, userList.map(user => user.profile));
-                  userList.push(opponent);
+                    const opponent = generateGuest(aliasName.value, userList.map(user => user.profile));
+                    userList.push(opponent);
                 });
 
                 socketApp.localTournament(userList);
@@ -214,7 +221,7 @@ export function handleGameModal() {
                 closeMatchingModal(aliasModalContainer, socketApp);
             })
         });
-        modalBtns[2].addEventListener('click', () => {
+        modalContainer.querySelector('.matching-game__btn').addEventListener('click', () => {
             closeMatchingModal(modalContainer, socketApp);
         });
     })
