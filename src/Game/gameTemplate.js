@@ -193,35 +193,46 @@ class Game {
 	localGameModalTemplate() {
 		return `
             <div class="modal__background"></div>
-            <div class="matching-game__wrapper">
-                <button class="modal__btn matching-game__btn">
-                    <i class="bi bi-lightning"></i>
-                    Two players
-                </button>
-                <button class="modal__btn matching-game__btn">
-                    <i class="bi bi-trophy"></i>
-                    Tournament
-                </button>
+            <div class="local-game__wrapper">
+				<div class="local-game__title">Select local game type</div>
+				<div class="game__playbtn__wrapper">
+					<div class="game__playbtn">
+						<div class="game__playbtn--picture">
+								<i class="bi bi-people"></i>
+						</div>
+						<div class="game__playbtn--text">2 Players</div>
+					</div>
+					<div class="game__playbtn">
+						<div class="game__playbtn--picture">
+								<i class="bi bi-trophy"></i>
+						</div>
+						<div class="game__playbtn--text">Local Tournament</div>
+					</div>
+				</div>
                 <button class="modal__btn matching-game__btn">
                     <i class="bi bi-x-square"></i>
                     cancel & exit
                 </button>
             </div>
-        `;	
+        `;
 	}
 
-	// TODO: alias name Template add css, required field does not work
 	localTournamentAliasTemplate() {
 		return `
             <div class="modal__background"></div>
-            <div class="matching-game__wrapper">
-				<input class="search-friend__body--input" type="text" placeholder="set alias names for the tournament" value="guest 1" required/>
-				<input class="search-friend__body--input" type="text" placeholder="set alias names for the tournament" value="guest 2" required/>
-				<input class="search-friend__body--input" type="text" placeholder="set alias names for the tournament" value="guest 3" required/>
-				<input class="search-friend__body--input" type="text" placeholder="set alias names for the tournament" value="guest 4" required/>
-				<button class="modal__btn matching-game__btn">
+            <div class="local-game__wrapper">
+				<div class="local-game__title">Set alias names for tournament!</div>
+				<div class="local-game__input__wrapper">
+					<input class="local-game__alias--input" type="text" placeholder="guest1"/>
+					<input class="local-game__alias--input" type="text" placeholder="guest2"/>
+				</div>
+				<div class="local-game__input__wrapper">
+					<input class="local-game__alias--input" type="text" placeholder="guest3"/>
+					<input class="local-game__alias--input" type="text" placeholder="guest4"/>
+				</div>
+				<button class="modal__btn matching-game__btn local-game__alias__btn">
 					<i class="bi bi-check-square"></i>
-					set alias nickname for tournament
+					ready
 				</button>
 				<button class="modal__btn matching-game__btn">
 					<i class="bi bi-x-square"></i>
