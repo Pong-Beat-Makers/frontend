@@ -185,7 +185,6 @@ export function setupNextMatchAtBoardModal(container, includeData) {
     includeData.unIncludeUser.forEach(userData => {
         const { profile_idx } = userData;
 
-        console.log(userData);
         avatarNodes[profile_idx].classList.add('loser-avatar');
     });
 }
