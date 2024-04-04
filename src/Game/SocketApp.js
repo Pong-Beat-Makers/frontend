@@ -14,6 +14,7 @@ import {
     orderPlayers,
     exitInviteGame,
     toggleFocusOut,
+    setupLocalTournaNextMatch,
     setupNextMatchAtBoardModal,
     finalWinnerBoardModalSetting,
     getPlayerIdxInPlayerList,
@@ -38,7 +39,7 @@ class SocketApp {
 
         this._matchingContainer = undefined;
         this._boardContainer = undefined;
-        this._gameContiner = undefined;
+        this._gameContainer = undefined;
 
         this._gameCanvas = undefined;
 
@@ -134,6 +135,7 @@ class SocketApp {
         if (localStorage.getItem("local_tournament"))
             localStorage.removeItem("local_tournament");
 
+        this._allPlayerList = userList;
         openBoardModal(this, GAME_TYPE.TWO_TOURNAMENT, userList);
         this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.TWO_TOURNAMENT, userList);
     }
@@ -173,19 +175,19 @@ class SocketApp {
                 } else if (data.message === 'Game Start') {
                     this._gameApp.renderCounter(data.counter);
 
-                    this._gameContiner.addEventListener('keydown', e => {
+                    this._gameContainer.addEventListener('keydown', e => {
                         if (e.key === 'ArrowLeft') this._gameSend({'move': 'up'});
                         else if (e.key === 'ArrowRight') this._gameSend({'move': 'down'});
                         else if (e.keyCode === 67) this._gameApp.toggleCamera();
                     });
 
-                    this._gameContiner.addEventListener('keyup', e => {
+                    this._gameContainer.addEventListener('keyup', e => {
                         if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') this._gameSend({'move': 'stop'});
                     });
                 } else if (data.message === 'Game End') {
                     toggleFocusOut(this._gameCanvas, false);
                     renderEndStatus(this._gameCanvas, this._gameApp.getPlayer(), data.score, GAME_TYPE.RANDOM);
-                    changeGiveUpToEnd(this._gameContiner);
+                    changeGiveUpToEnd(this._gameContainer);
                     this._gaming = false;
                 }
             } else if (data.type === 'send_game_status') {
@@ -240,33 +242,33 @@ class SocketApp {
                 } else if (data.message === 'Game Start') {
                     if (gameType === GAME_TYPE.TWO_PLAYER || gameType === GAME_TYPE.TWO_TOURNAMENT) {
                         openPlayGameModal(this, userList);
-                        changeGiveUpToEnd(this._gameContiner);
+                        changeGiveUpToEnd(this._gameContainer);
                         this._gameApp = new GameApp(this._gameCanvas, gameType);
                         this._gameApp.setPlayer(2);
 
                         this._boardContainer.style.opacity = 0;
 
-                        this._gameContiner.addEventListener('keydown', e => {
+                        this._gameContainer.addEventListener('keydown', e => {
                             if (e.key === 'ArrowDown') this._gameSend({'player': 2, 'move': 'up'});
                             else if (e.key === 'ArrowUp') this._gameSend({'player': 2, 'move': 'down'});
                             else if (e.keyCode === 83) this._gameSend({'player': 1, 'move': 'up'});
                             else if (e.keyCode === 87) this._gameSend({'player': 1, 'move': 'down'});
                         });
 
-                        this._gameContiner.addEventListener('keyup', e => {
+                        this._gameContainer.addEventListener('keyup', e => {
                             if (e.key === 'ArrowDown' || e.key === 'ArrowUp') this._gameSend({'player': 2, 'move': 'stop'});
                             else if (e.keyCode === 83 || e.keyCode === 87) this._gameSend({'player': 1, 'move': 'stop'});
                         });
                     } else {
                         this._gameApp.renderCounter(data.counter);
 
-                        this._gameContiner.addEventListener('keydown', e => {
+                        this._gameContainer.addEventListener('keydown', e => {
                             if (e.key === 'ArrowLeft') this._gameSend({'move': 'up'});
                             else if (e.key === 'ArrowRight') this._gameSend({'move': 'down'});
                             else if (e.keyCode === 67) this._gameApp.toggleCamera();
                         });
 
-                        this._gameContiner.addEventListener('keyup', e => {
+                        this._gameContainer.addEventListener('keyup', e => {
                             if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') this._gameSend({'move': 'stop'});
                         });
                     }
@@ -276,17 +278,19 @@ class SocketApp {
                     }
                     toggleFocusOut(this._gameCanvas, false);
                     renderEndStatus(this._gameCanvas, this._gameApp.getPlayer(), data.score, gameType);
-                    changeGiveUpToEnd(this._gameContiner);
+                    changeGiveUpToEnd(this._gameContainer);
                     this._gaming = false;
                     if (gameType === GAME_TYPE.TWO_TOURNAMENT) {
-                        changeEndToNextMatch(this._gameContiner);
-                        this._gameContiner.querySelector('.exitgame__btn').onclick = () => {
+                        changeEndToNextMatch(this._gameContainer);
+                        this._gameContainer.querySelector('.exitgame__btn').onclick = () => {
                             this.gameClose();
-                            this._gameContiner.remove();
                             this.cancelRenderGameApp();
+                            this.closeAllModal();
 
                             if (JSON.parse(localStorage.getItem("local_tournament")).length === 2) {
-                                this.localTwo(JSON.parse(localStorage.getItem("local_tournament"))[0], JSON.parse(localStorage.getItem("local_tournament"))[1]);
+                                openBoardModal(this, GAME_TYPE.TWO_TOURNAMENT, this._allPlayerList);
+                                setupLocalTournaNextMatch(this._boardContainer);
+                                this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.TWO_PLAYER, [JSON.parse(localStorage.getItem("local_tournament"))[0], JSON.parse(localStorage.getItem("local_tournament"))[1]]);
                             } else {
                                 openBoardModal(this, GAME_TYPE.TWO_PLAYER, userList.slice(-2));
                                 this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.TWO_TOURNAMENT, userList.slice(-2));
@@ -350,15 +354,15 @@ class SocketApp {
     }
 
     closeGameModal() {
-        if (this._gameContiner !== undefined) {
-            this._gameContiner.remove();
+        if (this._gameContainer !== undefined) {
+            this._gameContainer.remove();
         }
-        this._gameContiner = undefined;
+        this._gameContainer = undefined;
     }
 
     closeAllModal() {
-        if (this._gameContiner !== undefined) {
-            this._gameContiner.remove();
+        if (this._gameContainer !== undefined) {
+            this._gameContainer.remove();
         }
 
         if (this.isGaming() || this.isWaitNextMatch()) {
@@ -367,7 +371,7 @@ class SocketApp {
             }
             return ;
         }
-        this._gameContiner = undefined;
+        this._gameContainer = undefined;
         if (this._boardContainer !== undefined) {
             this._boardContainer.remove();
         }
@@ -378,7 +382,7 @@ class SocketApp {
         this._matchingContainer = undefined;
 
         this._gameCanvas = undefined;
-        this._allPlayerList = undefined;
+        // this._allPlayerList = undefined;
         this._gaming = false;
         this._waitNextMatch = false;
         this._round = 0;
@@ -409,7 +413,7 @@ class SocketApp {
     }
 
     setGameContainer(gameContainer) {
-        this._gameContiner = gameContainer;
+        this._gameContainer = gameContainer;
     }
 
     setMatchingContainer(matchingContainer) {
