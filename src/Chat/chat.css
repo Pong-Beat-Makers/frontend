@@ -224,6 +224,7 @@ input#chat__search--input::placeholder {
     align-items: center;
     cursor: pointer;
     animation: alert-modal .3s ease-in-out forwards;
+    z-index: 999;
 }
 
 .chat__alert--icon {

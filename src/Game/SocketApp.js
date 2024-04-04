@@ -12,7 +12,12 @@ import {
     getInfoPlayerList,
     generateGuest,
     orderPlayers,
-    exitInviteGame, toggleFocusOut, setupNextMatchAtBoardModal, finalWinnerBoardModalSetting, getPlayerIdxInPlayerList
+    exitInviteGame,
+    toggleFocusOut,
+    setupNextMatchAtBoardModal,
+    finalWinnerBoardModalSetting,
+    getPlayerIdxInPlayerList,
+    isWin
 } from "./gameUtils.js";
 import GameApp from "./gameApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
@@ -38,6 +43,9 @@ class SocketApp {
         this._gameCanvas = undefined;
 
         this._allPlayerList = undefined;
+        this._gaming = false;
+        this._waitNextMatch = false;
+        this._round = 0;
     }
 
     readyToPlay() {
@@ -77,10 +85,8 @@ class SocketApp {
 
                 this._allPlayerList = userList;
                 openBoardModal(this, gameType, userList);
-                if (gameType !== GAME_TYPE.TWO_PLAYER) {
-                    this._boardContainer.querySelector('.modal__ready-btn').style.opacity = '0';
-                }
-                this._enterGameRoom(room_id, gameType, userList, playerNumber);
+                this._boardContainer.querySelector('.modal__ready-btn').style.opacity = '0';
+                this._enterGameRoom(room_id, gameType, userList);
             } else if (type === "send_waiting_number") {
                 setupConnectPeopleAtMatchingModal(this._matchingContainer, waiting_number);
             }
@@ -180,6 +186,7 @@ class SocketApp {
                     toggleFocusOut(this._gameCanvas, false);
                     renderEndStatus(this._gameCanvas, this._gameApp.getPlayer(), data.score, GAME_TYPE.RANDOM);
                     changeGiveUpToEnd(this._gameContiner);
+                    this._gaming = false;
                 }
             } else if (data.type === 'send_game_status') {
                 this._gameApp.dataRander(data);
@@ -188,12 +195,17 @@ class SocketApp {
 
         gameSocket.onopen = () => {
             this.readyToPlay();
+            this._gaming = true;
         }
 
         gameSocket.onerror = () => {
             this._matchingContainer.remove();
             this.gameClose();
             openInfoModal('There was a problem with the game server.');
+        }
+
+        gameSocket.onclose = () => {
+            this._gaming = false;
         }
 
         this._gameSocket = gameSocket;
@@ -208,7 +220,11 @@ class SocketApp {
 
             if (data.type === 'send_system_message') {
                 if (data.message === 'Game Ready') {
-                    if (5 < data.counter) {
+                    if (data.counter === 10) {
+                        this._round += 1;
+                        this._waitNextMatch = false;
+                        setInfoMessageAtModal(this._boardContainer, data.counter - 5);
+                    } else if (5 < data.counter) {
                         setInfoMessageAtModal(this._boardContainer, data.counter - 5);
                     } else if (data.counter === 5) {
                         openPlayGameModal(this, userList);
@@ -255,9 +271,13 @@ class SocketApp {
                         });
                     }
                 } else if (data.message === 'Game End') {
+                    if (gameType === GAME_TYPE.TOURNAMENT && this._round === 1 && isWin(this._gameApp.getPlayer(), data.score)) {
+                        this._waitNextMatch = true;
+                    }
                     toggleFocusOut(this._gameCanvas, false);
                     renderEndStatus(this._gameCanvas, this._gameApp.getPlayer(), data.score, gameType);
                     changeGiveUpToEnd(this._gameContiner);
+                    this._gaming = false;
                     if (gameType === GAME_TYPE.TWO_TOURNAMENT) {
                         changeEndToNextMatch(this._gameContiner);
                         this._gameContiner.querySelector('.exitgame__btn').onclick = () => {
@@ -285,12 +305,17 @@ class SocketApp {
            } else {
                this.readyToPlay();
            }
+           this._gaming = true;
        }
 
        gameSocket.onerror = () => {
            this._boardContainer.remove();
            this.gameClose();
            openInfoModal('There was a problem with the game server.');
+       }
+
+       gameSocket.onclose = () => {
+           this._gaming = false;
        }
 
         this._gameSocket = gameSocket;
@@ -318,6 +343,12 @@ class SocketApp {
         }
     }
 
+    appearBoardModal() {
+        if (this._boardContainer !== undefined) {
+            this._boardContainer.style.display = '';
+        }
+    }
+
     closeGameModal() {
         if (this._gameContiner !== undefined) {
             this._gameContiner.remove();
@@ -329,12 +360,36 @@ class SocketApp {
         if (this._gameContiner !== undefined) {
             this._gameContiner.remove();
         }
+
+        if (this.isGaming() || this.isWaitNextMatch()) {
+            if (this._boardContainer !== undefined) {
+                this._boardContainer.style.display = 'none';
+            }
+            return ;
+        }
+        this._gameContiner = undefined;
         if (this._boardContainer !== undefined) {
             this._boardContainer.remove();
         }
+        this._boardContainer = undefined;
         if (this._matchingContainer !== undefined) {
             this._matchingContainer.remove();
         }
+        this._matchingContainer = undefined;
+
+        this._gameCanvas = undefined;
+        this._allPlayerList = undefined;
+        this._gaming = false;
+        this._waitNextMatch = false;
+        this._round = 0;
+    }
+
+    isGaming() {
+        return this._gaming;
+    }
+
+    isWaitNextMatch() {
+        return this._waitNextMatch;
     }
 
     isGameState() {
