@@ -51,24 +51,45 @@ export function orderPlayers(playerNumber, players) {
     return players;
 }
 
-// TODO: gameType 전달 필요 없음
-export function openPlayGameModal(socketApp, gameType, players) {
+export function getPlayerIdxInPlayerList(includeId = [], playerList = []) {
+    const data = {
+        includeUser: [],
+        unIncludeUser: []
+    };
+    playerList.forEach((user, i) => {
+        user.profile_idx = i;
+        if (includeId.includes(user.id)) {
+            data.includeUser.push(user);
+        } else {
+            data.unIncludeUser.push(user);
+        }
+    });
+    /*
+    * data {
+    *   includeUser: [ userData: {profile_idx} ],
+    *   unIncludeUser: [ userData: {profile_idx} ]
+    * }
+    * */
+    return data;
+}
+
+export function openPlayGameModal(socketApp, players) {
     const modalContainer = modalRender('play-game', routes['/game'].playGameTemplate(), false);
     const playGround = modalContainer.querySelector('#game_playground');
 
     modalContainer.querySelector('.exitgame__btn').addEventListener('click', () => {
         socketApp.gameClose();
-        modalContainer.remove();
+        socketApp.closeAllModal();
         socketApp.cancelRenderGameApp();
     });
-    setupInfoAtModal(modalContainer, gameType, players);
+    setupInfoAtModal(modalContainer, players);
 
     socketApp.setGameContainer(modalContainer);
     socketApp.setGameCanvas(playGround);
 
     playGround.focus();
 
-    const focusOutEvent = playGround.addEventListener('focusout', () => {
+    playGround.addEventListener('focusout', () => {
         toggleFocusOut(playGround, true);
     });
 
@@ -117,7 +138,7 @@ export function openBoardModal(socketApp, gameType, players) {
     }
 
     socketApp.setBoardContainer(modalContainer);
-    setupInfoAtModal(modalContainer, gameType, players, gameType === GAME_TYPE.RANDOM || gameType === GAME_TYPE.TWO_PLAYER);
+    setupInfoAtModal(modalContainer, players, gameType === GAME_TYPE.RANDOM || gameType === GAME_TYPE.TWO_PLAYER);
 }
 
 export function closeMatchingModal(matchingContainer, socketApp) {
@@ -125,8 +146,51 @@ export function closeMatchingModal(matchingContainer, socketApp) {
     matchingContainer.remove();
 }
 
-// TODO: gameType 전달 필요 없음
-export function setupInfoAtModal(container, gameType, players, setName = true) {
+export function finalWinnerBoardModalSetting(socketApp, container) {
+    const avatar = container.querySelector('.insert-finalAvatar');
+    const winnerAvatars = container.querySelectorAll('.insert-winnerAvatar');
+
+    winnerAvatars[1].classList.add('loser-avatar');
+
+    avatar.classList.remove('anonymous-avatar');
+    setAvatar(player.getProfile(), avatar);
+
+    container.querySelector('.board-modal__info').style.opacity = '0';
+
+    const btn = container.querySelector('.modal__ready-btn');
+    btn.innerHTML = '<i class="bi bi-door-closed"></i> Exit';
+
+    btn.onclick = () => {
+        socketApp.closeAllModal();
+    }
+
+    btn.disabled = false;
+    btn.style.opacity = '1';
+    container.style.opacity = '1';
+}
+
+export function setupNextMatchAtBoardModal(container, includeData) {
+    const winnerAvatars = container.querySelectorAll('.insert-winnerAvatar');
+    const avatarNodes = container.querySelectorAll('.insert-playerAvatar');
+
+    includeData.includeUser.forEach((winnerData, i) => {
+        const {profile} = winnerData;
+
+        if (winnerAvatars[i] !== undefined) {
+            winnerAvatars[i].classList.remove('anonymous-avatar');
+            setAvatar(profile, winnerAvatars[i]);
+        }
+    });
+
+    includeData.unIncludeUser.forEach(userData => {
+        const { profile_idx } = userData;
+
+        console.log(userData);
+        avatarNodes[profile_idx].classList.add('loser-avatar');
+    });
+}
+
+export function setupInfoAtModal(container, players, setName = true) {
     const avatarNodes = container.querySelectorAll('.insert-playerAvatar');
     const nameNodes = container.querySelectorAll('.insert-playerName');
 

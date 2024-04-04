@@ -44,11 +44,15 @@ class ChatApp {
                     delete data.room_id;
 
                     await processNextMatch(this);
-                    const userDetail = await player.getUserDetail(data.opponent_id);
                     const socketApp = SocketApp;
 
                     socketApp.closeGameModal();
-                    socketApp.inviteGameRoom(room_id, [player.getInfo(), userDetail], this);
+                    socketApp.nextMatch(room_id, data.opponent_id);
+                } else if (data.message === 'YOU WIN!') {
+                    const socketApp = SocketApp;
+
+                    socketApp.closeGameModal();
+                    socketApp.finalWinner();
                 } else if (data.error === 'No User or Offline') {
                     // TODO: offline message
                     renderSystemChatBox(this._app, 'Offline User', data.from_id);

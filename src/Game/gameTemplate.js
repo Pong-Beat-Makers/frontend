@@ -130,12 +130,12 @@ class Game {
 				<div class="tournament__header">Knockout Rounds Bracket</div>
 				<div class="tournament__body">
 					<div class="tournament__layer">
-						<div class="tournament__avatar tournament__champion anonymous-avatar"></div>
+						<div class="tournament__avatar tournament__champion anonymous-avatar insert-finalAvatar"></div>
 					</div>
 					<div class="tournament__layer">
 						<div class="tournament__versus">
-							<div class="tournament__avatar anonymous-avatar"></div>
-							<div class="tournament__avatar anonymous-avatar"></div>
+							<div class="tournament__avatar anonymous-avatar insert-winnerAvatar"></div>
+							<div class="tournament__avatar anonymous-avatar insert-winnerAvatar"></div>
 						</div>
 					</div>
 					<div class="tournament__layer">

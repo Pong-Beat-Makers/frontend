@@ -277,6 +277,10 @@ canvas {
     color: rgb(var(--sub-color));
 }
 
+.loser-avatar {
+    filter: grayscale(1);
+}
+
 /*
 * game canvas modal
 */
