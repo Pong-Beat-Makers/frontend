@@ -255,7 +255,7 @@ function handleLocalGame(socketApp) {
 
             for (let i = 0; i < 4; i++) {
                 if (aliasNames[i].value.length < 1) {
-                    alert("Alias name is required for every player!");
+                    openInfoModal("Alias name is required for every player!");
                     return ;
                 }
             }
