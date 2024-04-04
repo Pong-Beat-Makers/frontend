@@ -47,6 +47,7 @@ class ChatApp {
                     const socketApp = SocketApp;
 
                     socketApp.closeGameModal();
+                    socketApp.appearBoardModal();
                     socketApp.nextMatch(room_id, data.opponent_id);
                 } else if (data.message === 'YOU WIN!') {
                     const socketApp = SocketApp;

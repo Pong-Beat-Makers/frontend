@@ -1,10 +1,9 @@
 import { routes } from "../route.js";
 import {modalRender, setAvatar} from "../Profile/modalUtils.js";
-import SocketApp from "./SocketApp.js";
+import SocketApp, {SOCKET_STATE} from "./SocketApp.js";
 import { GAME_TYPE } from "./gameTemplate.js";
 import {player} from "../app.js";
 import {PROFILE_DEFAULT_IMAGE} from "../Login/player.js";
-import {closedChatLog} from "../Chat/chatSocketUtils.js";
 
 export function generateGuest(guestName = 'GUEST', avoidList = []) {
     let profileIdx = Math.floor(Math.random() * PROFILE_DEFAULT_IMAGE.length);
@@ -79,8 +78,8 @@ export function openPlayGameModal(socketApp, players) {
 
     modalContainer.querySelector('.exitgame__btn').addEventListener('click', () => {
         socketApp.gameClose();
-        socketApp.closeAllModal();
         socketApp.cancelRenderGameApp();
+        socketApp.closeAllModal();
     });
     setupInfoAtModal(modalContainer, players);
 
@@ -98,9 +97,8 @@ export function openPlayGameModal(socketApp, players) {
     })
 }
 
-export function openMatchingModal(gameType) {
+export function openMatchingModal(socketApp, gameType) {
     const modalContainer = modalRender('matching-game', routes['/game'].matchModalTemplate(gameType), false);
-    const socketApp = SocketApp;
 
     socketApp.matching(gameType);
 
@@ -220,9 +218,11 @@ export function setupActiveReadyBtn(container) {
 }
 
 export function changeGiveUpToEnd(container) {
-    const giveUpBtn = container.querySelector('.exitgame__btn');
+    if (container !== undefined) {
+        const giveUpBtn = container.querySelector('.exitgame__btn');
 
-    giveUpBtn.innerHTML = '<i class="bi bi-door-closed"></i> Exit';
+        giveUpBtn.innerHTML = '<i class="bi bi-door-closed"></i> Exit';
+    }
 }
 
 export function changeEndToNextMatch(container) {
@@ -246,6 +246,11 @@ export function handleGameModal() {
 
     playBtn[GAME_TYPE.LOCAL_GAME].addEventListener('click', () => {
         const socketApp = SocketApp;
+
+        if (socketApp.isWaitNextMatch() || socketApp.isGaming() || socketApp.isGameState() === SOCKET_STATE.OPEN || socketApp.isGameState() === SOCKET_STATE.CONNECTING) {
+            openInfoModal('you are already in game !');
+            return ;
+        }
 
         const modalHtml = routes['/game'].localGameModalTemplate();
         const modalContainer = modalRender('local-play__select', modalHtml, false);
@@ -290,11 +295,23 @@ export function handleGameModal() {
     })
 
     playBtn[GAME_TYPE.RANDOM].addEventListener('click', () => {
-        openMatchingModal(GAME_TYPE.RANDOM);
+        const socketApp = SocketApp;
+
+        if (socketApp.isWaitNextMatch() || socketApp.isGaming() || socketApp.isGameState() === SOCKET_STATE.OPEN || socketApp.isGameState() === SOCKET_STATE.CONNECTING) {
+            openInfoModal('you are already in game!');
+            return ;
+        }
+        openMatchingModal(socketApp, GAME_TYPE.RANDOM);
     });
 
     playBtn[GAME_TYPE.TOURNAMENT].addEventListener('click', () => {
-        openMatchingModal(GAME_TYPE.TOURNAMENT);
+        const socketApp = SocketApp;
+
+        if (socketApp.isWaitNextMatch() || socketApp.isGaming() || socketApp.isGameState() === SOCKET_STATE.OPEN || socketApp.isGameState() === SOCKET_STATE.CONNECTING) {
+            openInfoModal('you are already in game!');
+            return ;
+        }
+        openMatchingModal(socketApp, GAME_TYPE.TOURNAMENT);
     });
 }
 
@@ -316,6 +333,10 @@ export function toggleFocusOut(gameContainer, isNotFocus = true) {
             modalContainer.remove();
         }
     }
+}
+
+export function isWin(gamePlayer, score) {
+    return (gamePlayer === 1 && score[0] > score[1]) || (gamePlayer === 2 && score[0] < score[1]);
 }
 
 export function renderEndStatus(gameContainer, gamePlayer, score, gameType) {
@@ -353,11 +374,11 @@ export function renderEndStatus(gameContainer, gamePlayer, score, gameType) {
             localStorage.setItem("local_tournament", JSON.stringify(winners));
         }
     } else {
-        if (gamePlayer === 1 && score[0] < score[1]) {
+        if (!isWin(gamePlayer, score)) {
             status = 'YOU <span class="game-modal__lose">LOSE..</span>';
-        } else if (gamePlayer === 2 && score[0] > score[1]) {
-            status = 'YOU <span class="game-modal__lose">LOSE..</span>';
-            [score[0], score[1]] = [score[1], score[0]];
+            if (gamePlayer === 2) {
+                [score[0], score[1]] = [score[1], score[0]];
+            }
         }
     }
 
