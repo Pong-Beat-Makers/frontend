@@ -113,7 +113,7 @@ export function openBoardModal(socketApp, gameType, players) {
     let modalName;
     let modalHtml;
 
-    if (gameType === GAME_TYPE.TOURNAMENT || gameType === GAME_TYPE.TWO_TOURNAMENT) {
+    if (gameType === GAME_TYPE.TOURNAMENT || gameType === GAME_TYPE.LOCAL_TOURNAMENT) {
         modalName = "tournament";
         modalHtml = routes['/game'].tournamentModalTemplate();
     } else {
@@ -123,20 +123,14 @@ export function openBoardModal(socketApp, gameType, players) {
 
     const modalContainer = modalRender(modalName, modalHtml, false);
 
-    if (gameType === GAME_TYPE.TWO_PLAYER || gameType === GAME_TYPE.TWO_TOURNAMENT) {
+    if (gameType === GAME_TYPE.LOCAL_TWO || gameType === GAME_TYPE.LOCAL_TOURNAMENT) {
         modalContainer.querySelector('.modal__ready-btn').addEventListener('click', () => {
-            // const info = modalContainer.querySelector('.board-modal__info');
-            //
-            // info.classList.add('ingAnimation');
-            // info.innerHTML = "Waiting for the other one .";
-            //
-            // setupActiveReadyBtn(modalContainer);
             socketApp.readyToPlay();
         });
     }
 
     socketApp.setBoardContainer(modalContainer);
-    setupInfoAtModal(modalContainer, players, gameType === GAME_TYPE.RANDOM || gameType === GAME_TYPE.TWO_PLAYER);
+    setupInfoAtModal(modalContainer, players, gameType === GAME_TYPE.RANDOM || gameType === GAME_TYPE.LOCAL_TWO);
 }
 
 export function closeMatchingModal(matchingContainer, socketApp) {
@@ -144,10 +138,12 @@ export function closeMatchingModal(matchingContainer, socketApp) {
     matchingContainer.remove();
 }
 
-export function finalWinnerBoardModalSetting(socketApp, container) {
+export function setFinalWinnerBoardModal(socketApp, container) {
     const avatar = container.querySelector('.insert-finalAvatar');
     const winnerAvatars = container.querySelectorAll('.insert-winnerAvatar');
+    const title = container.querySelector('.tournament__header');
 
+    title.innerText = "Congratulations! You are the winner 🏆";
     winnerAvatars[1].classList.add('loser-avatar');
 
     avatar.classList.remove('anonymous-avatar');
@@ -241,6 +237,98 @@ export function setInfoMessageAtModal(modalContainer, message, ingAnimation = fa
     info.innerHTML = message;
 }
 
+function handleLocalGame(socketApp) {
+    const modalHtml = routes['/game'].localGameModalTemplate();
+    const modalContainer = modalRender('local-play__select', modalHtml, false);
+    const modalBtns = modalContainer.querySelectorAll('.game__playbtn');
+    
+    modalBtns[0].addEventListener('click', () => {
+        socketApp.localTwo();
+        closeMatchingModal(modalContainer, socketApp);
+    });
+    modalBtns[1].addEventListener('click', () => {
+        const aliasModalTemplate = routes['/game'].localTournamentAliasTemplate();
+        const aliasModalContainer = modalRender('local-tournament-alias', aliasModalTemplate, false);
+        const aliasModalBtns = aliasModalContainer.querySelectorAll('.matching-game__btn');
+
+        aliasModalBtns[0].addEventListener('click', () => {
+            const aliasNames = aliasModalContainer.querySelectorAll('.local-game__alias--input');
+            const userList = [];
+
+            for (let i = 0; i < 4; i++) {
+                if (aliasNames[i].value.length < 1) {
+                    openInfoModal("Alias name is required for every player!");
+                    return ;
+                }
+            }
+            
+            aliasNames.forEach((aliasName) => {
+                const opponent = generateGuest(aliasName.value, userList.map(user => user.profile));
+                userList.push(opponent);
+            });
+
+            socketApp.localTournament(userList);
+            closeMatchingModal(aliasModalContainer, socketApp);
+            closeMatchingModal(modalContainer, socketApp);
+        })
+        aliasModalBtns[1].addEventListener('click', () => {
+            closeMatchingModal(aliasModalContainer, socketApp);
+        })
+    });
+    modalContainer.querySelector('.matching-game__btn').addEventListener('click', () => {
+        closeMatchingModal(modalContainer, socketApp);
+    });
+}
+
+export function setLocalNextMatchBoard(boardContainer) {
+    const winnerAvatars = boardContainer.querySelectorAll('.insert-winnerAvatar');
+    const avatarNodes = boardContainer.querySelectorAll('.insert-playerAvatar');
+    
+    const winners = JSON.parse(localStorage.getItem("local_tournament"));
+    for (let i = 0; i < winners.length; i++) {
+        winnerAvatars[i].setAttribute('data-image', winners[i].profile);
+        winnerAvatars[i].classList.remove('anonymous-avatar');
+    }
+    for (let i = 0; i < winners.length * 2; i++) {
+        if (avatarNodes[i].getAttribute('data-image') !== winners[i < 2 ? 0 : 1].profile)
+            avatarNodes[i].classList.add('loser-avatar');
+    }
+    boardContainer.style.opacity = '1';
+}
+
+export function setLocalFinalBoard(boardContainer, score, socketApp) {
+    const winners = JSON.parse(localStorage.getItem("local_tournament"));
+    const finalAvatar = boardContainer.querySelector('.insert-finalAvatar');
+    const winnerAvatars = boardContainer.querySelectorAll('.insert-winnerAvatar');
+
+    const title = boardContainer.querySelector('.tournament__header');
+    title.innerText = "Result of the tournament";
+
+    let winnerIdx;
+    score[0] > score[1] ? winnerIdx = 0 : winnerIdx = 1;
+    
+    winnerAvatars[1 - winnerIdx].classList.add('loser-avatar');
+
+    finalAvatar.classList.remove('anonymous-avatar');
+    finalAvatar.setAttribute('data-image', winners[winnerIdx].profile);
+
+    // boardContainer.querySelector('.board-modal__info').style.opacity = '0';
+
+    const btn = boardContainer.querySelector('.modal__ready-btn');
+    btn.innerHTML = '<i class="bi bi-door-closed"></i> Exit';
+    btn.onclick = () => {
+        socketApp.closeAllModal();
+    }
+    btn.disabled = false;
+    btn.style.opacity = '1';
+
+    socketApp.closeGameModal();
+    boardContainer.style.opacity = '1';
+    socketApp.appearBoardModal();
+
+    localStorage.removeItem("local_tournament");
+}
+
 export function handleGameModal() {
     const playBtn = document.querySelectorAll('.game__playbtn');
 
@@ -251,48 +339,8 @@ export function handleGameModal() {
             openInfoModal('you are already in game !');
             return ;
         }
-
-        const modalHtml = routes['/game'].localGameModalTemplate();
-        const modalContainer = modalRender('local-play__select', modalHtml, false);
-        const modalBtns = modalContainer.querySelectorAll('.game__playbtn');
-        
-        modalBtns[0].addEventListener('click', () => {
-            socketApp.localTwo();
-            closeMatchingModal(modalContainer, socketApp);
-        });
-        modalBtns[1].addEventListener('click', () => {
-            const aliasModalTemplate = routes['/game'].localTournamentAliasTemplate();
-            const aliasModalContainer = modalRender('local-tournament-alias', aliasModalTemplate, false);
-            const aliasModalBtns = aliasModalContainer.querySelectorAll('.matching-game__btn');
-
-            aliasModalBtns[0].addEventListener('click', () => {
-                const aliasNames = aliasModalContainer.querySelectorAll('.local-game__alias--input');
-                const userList = [];
-
-                for (let i = 0; i < 4; i++) {
-                    if (aliasNames[i].value.length < 1) {
-                        alert("Alias name is required for every player!");
-                        return ;
-                    }
-                }
-                
-                aliasNames.forEach((aliasName) => {
-                    const opponent = generateGuest(aliasName.value, userList.map(user => user.profile));
-                    userList.push(opponent);
-                });
-
-                socketApp.localTournament(userList);
-                closeMatchingModal(aliasModalContainer, socketApp);
-                closeMatchingModal(modalContainer, socketApp);
-            })
-            aliasModalBtns[1].addEventListener('click', () => {
-                closeMatchingModal(aliasModalContainer, socketApp);
-            })
-        });
-        modalContainer.querySelector('.matching-game__btn').addEventListener('click', () => {
-            closeMatchingModal(modalContainer, socketApp);
-        });
-    })
+        handleLocalGame(socketApp);
+    });
 
     playBtn[GAME_TYPE.RANDOM].addEventListener('click', () => {
         const socketApp = SocketApp;
@@ -345,13 +393,13 @@ export function renderEndStatus(gameContainer, gamePlayer, score, gameType) {
 
     let status = 'YOU <span class="game-modal__win">WIN!</span>';
 
-    if (gameType === GAME_TYPE.TWO_PLAYER && !localStorage.getItem("local_tournament")) {
+    if (gameType === GAME_TYPE.LOCAL_TWO && !localStorage.getItem("local_tournament")) {
         if (score[0] > score[1]) {
             status = `${player.getNickName()} <span class="game-modal__win">WIN!</span>`;
         } else {
             status = `GUEST <span class="game-modal__win">WIN!</span>`;
         }
-    } else if (gameType === GAME_TYPE.TWO_PLAYER || gameType === GAME_TYPE.TWO_TOURNAMENT) {
+    } else if (gameType === GAME_TYPE.LOCAL_TOURNAMENT) {
         const players = gameContainer.parentNode.parentNode.querySelectorAll('.playgame__header--profile');
         let winnerIdx = 0;
 
@@ -361,18 +409,13 @@ export function renderEndStatus(gameContainer, gamePlayer, score, gameType) {
             winnerIdx = 1;
             status = `${players[1].children[1].innerText} <span class="game-modal__win">WIN!</span>`;
         }
-
         let winnerProfile = players[winnerIdx].children[0].getAttribute('data-image');
         let winnerName = players[winnerIdx].children[1].innerText;
 
-        if (gameType === GAME_TYPE.TWO_PLAYER)
-            localStorage.removeItem("local_tournament");
-        else {
-            let winners;
-            localStorage.getItem("local_tournament") ? winners = JSON.parse(localStorage.getItem("local_tournament")) : winners = [];
-            winners.push({profile: winnerProfile, nickname: winnerName});
-            localStorage.setItem("local_tournament", JSON.stringify(winners));
-        }
+        let winners;
+        localStorage.getItem("local_tournament") ? winners = JSON.parse(localStorage.getItem("local_tournament")) : winners = [];
+        winners.push({profile: winnerProfile, nickname: winnerName});
+        localStorage.setItem("local_tournament", JSON.stringify(winners));
     } else {
         if (!isWin(gamePlayer, score)) {
             status = 'YOU <span class="game-modal__lose">LOSE..</span>';
