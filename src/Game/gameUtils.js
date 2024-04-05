@@ -113,7 +113,7 @@ export function openBoardModal(socketApp, gameType, players) {
     let modalName;
     let modalHtml;
 
-    if (gameType === GAME_TYPE.TOURNAMENT || gameType === GAME_TYPE.TWO_TOURNAMENT) {
+    if (gameType === GAME_TYPE.TOURNAMENT || gameType === GAME_TYPE.LOCAL_TOURNAMENT) {
         modalName = "tournament";
         modalHtml = routes['/game'].tournamentModalTemplate();
     } else {
@@ -123,14 +123,14 @@ export function openBoardModal(socketApp, gameType, players) {
 
     const modalContainer = modalRender(modalName, modalHtml, false);
 
-    if (gameType === GAME_TYPE.TWO_PLAYER || gameType === GAME_TYPE.TWO_TOURNAMENT) {
+    if (gameType === GAME_TYPE.LOCAL_TWO || gameType === GAME_TYPE.LOCAL_TOURNAMENT) {
         modalContainer.querySelector('.modal__ready-btn').addEventListener('click', () => {
             socketApp.readyToPlay();
         });
     }
 
     socketApp.setBoardContainer(modalContainer);
-    setupInfoAtModal(modalContainer, players, gameType === GAME_TYPE.RANDOM || gameType === GAME_TYPE.TWO_PLAYER);
+    setupInfoAtModal(modalContainer, players, gameType === GAME_TYPE.RANDOM || gameType === GAME_TYPE.LOCAL_TWO);
 }
 
 export function closeMatchingModal(matchingContainer, socketApp) {
@@ -360,13 +360,13 @@ export function renderEndStatus(gameContainer, gamePlayer, score, gameType) {
 
     let status = 'YOU <span class="game-modal__win">WIN!</span>';
 
-    if (gameType === GAME_TYPE.TWO_PLAYER && !localStorage.getItem("local_tournament")) {
+    if (gameType === GAME_TYPE.LOCAL_TWO && !localStorage.getItem("local_tournament")) {
         if (score[0] > score[1]) {
             status = `${player.getNickName()} <span class="game-modal__win">WIN!</span>`;
         } else {
             status = `GUEST <span class="game-modal__win">WIN!</span>`;
         }
-    } else if (gameType === GAME_TYPE.TWO_PLAYER || gameType === GAME_TYPE.TWO_TOURNAMENT) {
+    } else if (gameType === GAME_TYPE.LOCAL_TWO || gameType === GAME_TYPE.LOCAL_TOURNAMENT) {
         const players = gameContainer.parentNode.parentNode.querySelectorAll('.playgame__header--profile');
         let winnerIdx = 0;
 
@@ -380,7 +380,7 @@ export function renderEndStatus(gameContainer, gamePlayer, score, gameType) {
         let winnerProfile = players[winnerIdx].children[0].getAttribute('data-image');
         let winnerName = players[winnerIdx].children[1].innerText;
 
-        if (gameType === GAME_TYPE.TWO_PLAYER)
+        if (gameType === GAME_TYPE.LOCAL_TWO)
             localStorage.removeItem("local_tournament");
         else {
             let winners;

@@ -2,8 +2,8 @@ export const GAME_TYPE = {
 	LOCAL_GAME: 0,
 	RANDOM: 1,
 	TOURNAMENT: 2,
-	TWO_PLAYER: 3,
-	TWO_TOURNAMENT: 4
+	LOCAL_TWO: 3,
+	LOCAL_TOURNAMENT: 4
 }
 
 class Game {
