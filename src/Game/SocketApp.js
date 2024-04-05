@@ -15,6 +15,7 @@ import {
     exitInviteGame,
     toggleFocusOut,
     setLocalNextMatchBoard,
+    setLocalFinalBoard,
     setupNextMatchAtBoardModal,
     setFinalWinnerBoardModal,
     getPlayerIdxInPlayerList,
@@ -273,11 +274,10 @@ class SocketApp {
                         });
                     }
                 } else if (data.message === 'Game End') {
-                    if (gameType === GAME_TYPE.TOURNAMENT && this._round === 1 && isWin(this._gameApp.getPlayer(), data.score)) {
+                    if (gameType === GAME_TYPE.TOURNAMENT && this._round === 1 && isWin(this._gameApp.getPlayer(), data.score))
                         this._waitNextMatch = true;
-                    } else if (gameType === GAME_TYPE.LOCAL_TWO) {
-                        this._waitNextMatch = false;
-                    }
+                    else if (gameType === GAME_TYPE.LOCAL_TWO && localStorage.getItem("local_tournament")) // local_tournament final round
+                        setLocalFinalBoard(this._boardContainer, data.score, this);
                     toggleFocusOut(this._gameCanvas, false);
                     renderEndStatus(this._gameCanvas, this._gameApp.getPlayer(), data.score, gameType);
                     changeGiveUpToEnd(this._gameContainer);
@@ -288,19 +288,16 @@ class SocketApp {
                         this._gameContainer.querySelector('.exitgame__btn').onclick = () => {
                             this.gameClose();
                             this.cancelRenderGameApp();
-                            this.closeAllModal();
+                            this.closeAllModal(); // waitNextMatch === true => userList 초기화 안됨
 
                             setLocalNextMatchBoard(this._boardContainer);
-                            this._boardContainer.style.opacity = '1';
                             this.appearBoardModal();
+                            this._waitNextMatch = false; // exit버튼 시 나가게 하려고 false로 변경
 
-                            if (JSON.parse(localStorage.getItem("local_tournament")).length === 2) {
+                            if (JSON.parse(localStorage.getItem("local_tournament")).length === 2)
                                 this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.LOCAL_TWO, [JSON.parse(localStorage.getItem("local_tournament"))[0], JSON.parse(localStorage.getItem("local_tournament"))[1]]);
-                                // TODO: 이거 끝나면 You win 대신 finalWinnerBoard 띄워야 하눈디.. ㅎㅎ
-                                // isWaitNextMatch === true면 띄우기 ! !
-                            } else {
+                            else
                                 this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.LOCAL_TOURNAMENT, userList.slice(-2));
-                            }
                         };
                     }
                 }

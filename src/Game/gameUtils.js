@@ -143,7 +143,7 @@ export function setFinalWinnerBoardModal(socketApp, container) {
     const winnerAvatars = container.querySelectorAll('.insert-winnerAvatar');
     const title = container.querySelector('.tournament__header');
 
-    title.innerText = "Congratulations! You are the winner 🏆"
+    title.innerText = "Congratulations! You are the winner 🏆";
     winnerAvatars[1].classList.add('loser-avatar');
 
     avatar.classList.remove('anonymous-avatar');
@@ -293,6 +293,40 @@ export function setLocalNextMatchBoard(boardContainer) {
         if (avatarNodes[i].getAttribute('data-image') !== winners[i < 2 ? 0 : 1].profile)
             avatarNodes[i].classList.add('loser-avatar');
     }
+    boardContainer.style.opacity = '1';
+}
+
+export function setLocalFinalBoard(boardContainer, score, socketApp) {
+    const winners = JSON.parse(localStorage.getItem("local_tournament"));
+    const finalAvatar = boardContainer.querySelector('.insert-finalAvatar');
+    const winnerAvatars = boardContainer.querySelectorAll('.insert-winnerAvatar');
+
+    const title = boardContainer.querySelector('.tournament__header');
+    title.innerText = "Result of the tournament";
+
+    let winnerIdx;
+    score[0] > score[1] ? winnerIdx = 0 : winnerIdx = 1;
+    
+    winnerAvatars[1 - winnerIdx].classList.add('loser-avatar');
+
+    finalAvatar.classList.remove('anonymous-avatar');
+    finalAvatar.setAttribute('data-image', winners[winnerIdx].profile);
+
+    // boardContainer.querySelector('.board-modal__info').style.opacity = '0';
+
+    const btn = boardContainer.querySelector('.modal__ready-btn');
+    btn.innerHTML = '<i class="bi bi-door-closed"></i> Exit';
+    btn.onclick = () => {
+        socketApp.closeAllModal();
+    }
+    btn.disabled = false;
+    btn.style.opacity = '1';
+
+    socketApp.closeGameModal();
+    boardContainer.style.opacity = '1';
+    socketApp.appearBoardModal();
+
+    localStorage.removeItem("local_tournament");
 }
 
 export function handleGameModal() {
@@ -365,7 +399,7 @@ export function renderEndStatus(gameContainer, gamePlayer, score, gameType) {
         } else {
             status = `GUEST <span class="game-modal__win">WIN!</span>`;
         }
-    } else if (gameType === GAME_TYPE.LOCAL_TWO || gameType === GAME_TYPE.LOCAL_TOURNAMENT) {
+    } else if (gameType === GAME_TYPE.LOCAL_TOURNAMENT) {
         const players = gameContainer.parentNode.parentNode.querySelectorAll('.playgame__header--profile');
         let winnerIdx = 0;
 
@@ -375,18 +409,13 @@ export function renderEndStatus(gameContainer, gamePlayer, score, gameType) {
             winnerIdx = 1;
             status = `${players[1].children[1].innerText} <span class="game-modal__win">WIN!</span>`;
         }
-
         let winnerProfile = players[winnerIdx].children[0].getAttribute('data-image');
         let winnerName = players[winnerIdx].children[1].innerText;
 
-        if (gameType === GAME_TYPE.LOCAL_TWO)
-            localStorage.removeItem("local_tournament");
-        else {
-            let winners;
-            localStorage.getItem("local_tournament") ? winners = JSON.parse(localStorage.getItem("local_tournament")) : winners = [];
-            winners.push({profile: winnerProfile, nickname: winnerName});
-            localStorage.setItem("local_tournament", JSON.stringify(winners));
-        }
+        let winners;
+        localStorage.getItem("local_tournament") ? winners = JSON.parse(localStorage.getItem("local_tournament")) : winners = [];
+        winners.push({profile: winnerProfile, nickname: winnerName});
+        localStorage.setItem("local_tournament", JSON.stringify(winners));
     } else {
         if (!isWin(gamePlayer, score)) {
             status = 'YOU <span class="game-modal__lose">LOSE..</span>';
