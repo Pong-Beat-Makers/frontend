@@ -280,20 +280,19 @@ function handleLocalGame(socketApp) {
     });
 }
 
-export function setupLocalTournaNextMatch(boardContainer) {
+export function setLocalNextMatchBoard(boardContainer) {
     const winnerAvatars = boardContainer.querySelectorAll('.insert-winnerAvatar');
     const avatarNodes = boardContainer.querySelectorAll('.insert-playerAvatar');
     
     const winners = JSON.parse(localStorage.getItem("local_tournament"));
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < winners.length; i++) {
         winnerAvatars[i].setAttribute('data-image', winners[i].profile);
         winnerAvatars[i].classList.remove('anonymous-avatar');
     }
-    
-    avatarNodes.forEach(node => {
-        if (node.getAttribute('data-image') !== winners[0].profile && node.getAttribute('data-image') !== winners[1].profile)
-            node.classList.add('loser-avatar');
-    });
+    for (let i = 0; i < winners.length * 2; i++) {
+        if (avatarNodes[i].getAttribute('data-image') !== winners[i < 2 ? 0 : 1].profile)
+            avatarNodes[i].classList.add('loser-avatar');
+    }
 }
 
 export function handleGameModal() {

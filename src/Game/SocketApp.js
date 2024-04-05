@@ -14,7 +14,7 @@ import {
     orderPlayers,
     exitInviteGame,
     toggleFocusOut,
-    setupLocalTournaNextMatch,
+    setLocalNextMatchBoard,
     setupNextMatchAtBoardModal,
     setFinalWinnerBoardModal,
     getPlayerIdxInPlayerList,
@@ -275,6 +275,8 @@ class SocketApp {
                 } else if (data.message === 'Game End') {
                     if (gameType === GAME_TYPE.TOURNAMENT && this._round === 1 && isWin(this._gameApp.getPlayer(), data.score)) {
                         this._waitNextMatch = true;
+                    } else if (gameType === GAME_TYPE.LOCAL_TWO) {
+                        this._waitNextMatch = false;
                     }
                     toggleFocusOut(this._gameCanvas, false);
                     renderEndStatus(this._gameCanvas, this._gameApp.getPlayer(), data.score, gameType);
@@ -282,17 +284,21 @@ class SocketApp {
                     this._gaming = false;
                     if (gameType === GAME_TYPE.LOCAL_TOURNAMENT) {
                         changeEndToNextMatch(this._gameContainer);
+                        this._waitNextMatch = true;
                         this._gameContainer.querySelector('.exitgame__btn').onclick = () => {
                             this.gameClose();
                             this.cancelRenderGameApp();
                             this.closeAllModal();
 
+                            setLocalNextMatchBoard(this._boardContainer);
+                            this._boardContainer.style.opacity = '1';
+                            this.appearBoardModal();
+
                             if (JSON.parse(localStorage.getItem("local_tournament")).length === 2) {
-                                openBoardModal(this, GAME_TYPE.LOCAL_TOURNAMENT, this._allPlayerList);
-                                setupLocalTournaNextMatch(this._boardContainer);
                                 this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.LOCAL_TWO, [JSON.parse(localStorage.getItem("local_tournament"))[0], JSON.parse(localStorage.getItem("local_tournament"))[1]]);
+                                // TODO: 이거 끝나면 You win 대신 finalWinnerBoard 띄워야 하눈디.. ㅎㅎ
+                                // isWaitNextMatch === true면 띄우기 ! !
                             } else {
-                                openBoardModal(this, GAME_TYPE.LOCAL_TWO, userList.slice(-2));
                                 this._enterGameRoom(`local/${crypto.randomUUID()}`, GAME_TYPE.LOCAL_TOURNAMENT, userList.slice(-2));
                             }
                         };
@@ -382,7 +388,7 @@ class SocketApp {
         this._matchingContainer = undefined;
 
         this._gameCanvas = undefined;
-        // this._allPlayerList = undefined;
+        this._allPlayerList = undefined;
         this._gaming = false;
         this._waitNextMatch = false;
         this._round = 0;
