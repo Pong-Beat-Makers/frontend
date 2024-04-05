@@ -138,10 +138,12 @@ export function closeMatchingModal(matchingContainer, socketApp) {
     matchingContainer.remove();
 }
 
-export function finalWinnerBoardModalSetting(socketApp, container) {
+export function setFinalWinnerBoardModal(socketApp, container) {
     const avatar = container.querySelector('.insert-finalAvatar');
     const winnerAvatars = container.querySelectorAll('.insert-winnerAvatar');
+    const title = container.querySelector('.tournament__header');
 
+    title.innerText = "Congratulations! You are the winner 🏆"
     winnerAvatars[1].classList.add('loser-avatar');
 
     avatar.classList.remove('anonymous-avatar');

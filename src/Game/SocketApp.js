@@ -16,7 +16,7 @@ import {
     toggleFocusOut,
     setupLocalTournaNextMatch,
     setupNextMatchAtBoardModal,
-    finalWinnerBoardModalSetting,
+    setFinalWinnerBoardModal,
     getPlayerIdxInPlayerList,
     isWin
 } from "./gameUtils.js";
@@ -121,7 +121,7 @@ class SocketApp {
     }
 
     finalWinner() {
-        finalWinnerBoardModalSetting(this, this._boardContainer);
+        setFinalWinnerBoardModal(this, this._boardContainer);
     }
 
     localTwo(playerInfo = player.getInfo(), guestInfo = generateGuest('GUEST', [player.getProfile()])) {
