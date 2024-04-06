@@ -125,6 +125,10 @@ canvas {
 * versus modal
 */
 
+.modal-name__versus {
+    z-index: 1;
+}
+
 .versus-modal__wrapper {
     width: 100%;
     height: 100%;
@@ -185,6 +189,10 @@ canvas {
 /*
 * tournament
 */
+
+.modal-name__tournament {
+    z-index: 1;
+}
 
 .tournament__wrapper {
     position: absolute;

@@ -179,7 +179,6 @@ class SocketApp {
                     this._gameContainer.addEventListener('keydown', e => {
                         if (e.key === 'ArrowLeft') this._gameSend({'move': 'up'});
                         else if (e.key === 'ArrowRight') this._gameSend({'move': 'down'});
-                        else if (e.keyCode === 67) this._gameApp.toggleCamera();
                     });
 
                     this._gameContainer.addEventListener('keyup', e => {
@@ -266,7 +265,6 @@ class SocketApp {
                         this._gameContainer.addEventListener('keydown', e => {
                             if (e.key === 'ArrowLeft') this._gameSend({'move': 'up'});
                             else if (e.key === 'ArrowRight') this._gameSend({'move': 'down'});
-                            else if (e.keyCode === 67) this._gameApp.toggleCamera();
                         });
 
                         this._gameContainer.addEventListener('keyup', e => {
