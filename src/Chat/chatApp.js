@@ -34,7 +34,7 @@ class ChatApp {
             const data = JSON.parse(e.data);
 
             if (data.type === 'system_message') {
-                if (data.message === 'You have successfully logged') {
+                if (data.message === 'You have successfully logged in') {
                     this._friendsOnline = data.online_friends;
                     delete data.online_friends;
 
