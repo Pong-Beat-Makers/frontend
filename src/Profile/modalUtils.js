@@ -267,6 +267,12 @@ export function handleEditUserModalUtils(app) {
                         e.target.classList.remove('warnColor');
                         warningContainer.innerHTML = '';
                         saveBtn.disabled = false;
+                        if ((player.getNickName() !== e.target.value && /^User(\d+)?$/i.test(e.target.value)) || e.target.value.includes('\n')) {
+                            warningContainer.innerHTML = `Invalid Nickname.`;
+                            e.target.classList.add('warnColor');
+                            saveBtn.disabled = true;
+                            return ;
+                        }
                         try {
                             const data = await player.searchUser(e.target.value);
                             data.forEach(user => {
@@ -341,16 +347,11 @@ export function handleEditUserModalUtils(app) {
                 'status_message_to': status_message.value,
                 'set_2fa_to': get2FAData(toggleItems)
             };
-
-            if ((player.getNickName() !== nickname.value && /User\d+$/.test(nickname.value)) || nickname.value.includes('\n')) {
-                openInfoModal(`${nickname.value} is not vaild.`);
-            } else {
-                try {
-                    await player.setProfile(data);
-                    await renderMainPage();
-                } catch (e) {
-                    openInfoModal(`Something was wrong ..<br />Error code: ${e.error}`);
-                }
+            try {
+                await player.setProfile(data);
+                await renderMainPage();
+            } catch (e) {
+                openInfoModal(`Something was wrong ..<br />Error code: ${e.error}`);
             }
         });
     });

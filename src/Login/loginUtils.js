@@ -203,7 +203,7 @@ export function setProfileSection(app, player) {
 
     setAvatar(player.getProfile(), avatar);
 
-    if (/User\d+$/.test(player.getNickName())) {
+    if (/^User(\d+)?$/i.test(player.getNickName())) {
         infoNode[0].innerHTML = "We advise you to change your nickname!";
     } else {
         infoNode[0].innerHTML = "";

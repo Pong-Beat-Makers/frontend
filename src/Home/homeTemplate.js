@@ -27,7 +27,7 @@ class Home {
                     <div class="home__body__rank-contents--detail">3rd or lower: -20 points</div>
                 </div>
                 <div class="home__footer">
-                    <div>Team 42tsc_Pong of 42 Seoul</div>
+                    <div>Team Pong-Beat-Makers of 42 Seoul</div>
                     <div>Contributers: hyeslim, isunwoo, jeelee, naki, youngmch</div>
                 </div>
             </div>
