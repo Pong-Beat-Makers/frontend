@@ -267,7 +267,7 @@ export function handleEditUserModalUtils(app) {
                         e.target.classList.remove('warnColor');
                         warningContainer.innerHTML = '';
                         saveBtn.disabled = false;
-                        if ((player.getNickName() !== e.target.value && /^User(\d+)?$/.test(e.target.value)) || e.target.value.includes('\n')) {
+                        if ((player.getNickName() !== e.target.value && /^User(\d+)?$/i.test(e.target.value)) || e.target.value.includes('\n')) {
                             warningContainer.innerHTML = `Invalid Nickname.`;
                             e.target.classList.add('warnColor');
                             saveBtn.disabled = true;
