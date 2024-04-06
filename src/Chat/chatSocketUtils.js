@@ -103,7 +103,7 @@ export function saveSystemMsg(newMsgObj) {
     let chatLog = localStorageLog ? JSON.parse(localStorageLog) : [];
 
     if (chatLog.length > 0) {
-        if (newMsgObj.message === 'You have successfully logged') {
+        if (newMsgObj.message === 'You have successfully logged in') {
             localStorage.setItem(SYSTEM_MESSAGE, JSON.stringify([newMsgObj]));
             return ;
         }
